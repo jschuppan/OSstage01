@@ -1,10 +1,22 @@
 //
+#include <iostream>
 #include <pthread.h>
+#include <assert.h>
 #include <list>
 #include "scheduler.h"
 
-void Scheduler::create_task(functionPtr, threadArg, threadName) {
+Scheduler::Scheduler() {
+  processCount = 0;
+  TCB threadTCB;
+}
 
+//void Scheduler::create_task(functionPtr, threadArg, threadName)
+void Scheduler::create_task() {
+  int tmpResult;
+  tmpResult = pthread_create(pthread_t[processCount], NULL, perform_simple_output, &thread_args_3);
+  assert(!result_code);
+
+  processCount++;
 }
 
 void Scheduler::yield() {
