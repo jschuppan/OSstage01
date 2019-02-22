@@ -7,5 +7,6 @@ const int MAX_WINDOWS_THREADS = 6;
 
 int main () {
 
+
   return 0;
 }
