@@ -25,7 +25,7 @@ class linkedList
     void deleteList();
     void removeFromFront();
     void removeFromEnd();
-    T getDatumById(int id);
+    T* getDatumById(int id);
 };
 
 template class linkedList<int>;

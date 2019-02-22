@@ -17,7 +17,7 @@ int main()
 
   Window d1;
   mylist.addToFront(d1, 1);
-  mylist.getDatumById(1).write_window(1,1,"HELLO");
+  mylist.getDatumById(1)->write_window(1,1,"HELLO");
 
 
 

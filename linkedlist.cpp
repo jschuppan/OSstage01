@@ -85,13 +85,16 @@ void linkedList<T> :: removeFromEnd()
 }
 
 template<class T>
-T linkedList<T> :: getDatumById(int id)
+T* linkedList<T> :: getDatumById(int id)
 {
   node* temp = head;
-    //return NULL;
+  if(!temp)
+    return NULL;
   while(temp->id != id)
   {
     temp = temp->next;
+    if(temp == NULL)
+      return NULL;
   }
-  return temp->datum;
+  return &temp->datum;
 }
