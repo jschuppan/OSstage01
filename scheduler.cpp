@@ -41,8 +41,12 @@ void Scheduler::yield()
 
 void* Scheduler :: perform_simple_output(void* arguments)
 {
+  Window* win = ( (thread_data *)arguments )->thread_win;
   for (int i=0; i < 10000; i++) {
     tempCounter += i;
-    thread_win->write_window(1,1,tempCounter);
+
+    //// Try commenting this out. UI will still crash so it has to do
+    /// with creating the windows and its not thread related
+    win->write_window(1,1,"test");
   }
 }

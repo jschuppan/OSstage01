@@ -12,7 +12,6 @@ class Scheduler {
       Window *thread_win;
       bool kill_signal;
       int sleep_time;
-      int tempCounter;
       int thread_results;
     };
 
@@ -24,6 +23,7 @@ class Scheduler {
 
     TCB* process_table;
     int processCount;
+    int tempCounter;
     pthread_t pthreads[5];
     thread_data threadInfo[5];
     void* perform_simple_output(void* arguments);
