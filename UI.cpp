@@ -1,7 +1,6 @@
 #include "UI.h"
 #include <iostream>
 
-//8==D~{(.)}
 
 //default constructor
 UI :: UI()

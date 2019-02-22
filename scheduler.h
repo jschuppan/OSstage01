@@ -1,7 +1,6 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include <string>
 #include <pthread.h>
 #include "window.h"
 #include "linkedlist.h"
@@ -24,17 +23,17 @@ public:
     private:
       int threadID, state;
     public:
-      TCB(int threadID, int state)
-      {
-        this->threadID = threadID;
-        this->state = state;
-      }
+      // TCB(int threadID, int state)
+      // {
+      //   this->threadID = threadID;
+      //   this->state = state;
+      // }
       int getThreadID() { return this->threadID; }
       int getState() { return this->state; }
     };
 
-
-    linkedList <Scheduler::TCB> TCBList;
+    linkedlist <TCB> qTest;
+    // linkedList <fuckYou::TCB> TCBList;
 
     //TCB* process_table;
     int processCount;
@@ -45,7 +44,7 @@ public:
     //typedef void * (*THREADFUNCPTR)(void *);
 
 
-  public:
+  //public:
     Scheduler();
     int create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
