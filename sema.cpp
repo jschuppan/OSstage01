@@ -38,6 +38,7 @@ void Semaphore::down(int threadID)
 
     // first push new process request on queue
     processQueue.push(threadID);
+        // SUSPENDINSCHEDULER()
     // we need to deal with requests until the queue
     // is empty
     while(lastPop != threadID);
