@@ -10,7 +10,7 @@ class UI
     private:
     linkedList <Window> windowList;
     //console max values
-    int maxX,maxY,windowCreated;
+    int maxX,maxY,windowCreatedCount;
 
     public:
     UI();
@@ -20,12 +20,14 @@ class UI
     void resize();
 
     //mutators
-    void setWindowCreated(int windowCreated);
+    void setWindowCreatedCount(int windowCreatedCount);
 
     //accessors
     int getMaxX();
     int getMaxY();
-    int getWindowCreated();
+    int getwindowCreatedCount();
+    Window* getWindowCreated();
+
 
 };
 

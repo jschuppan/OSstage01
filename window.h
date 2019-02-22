@@ -11,8 +11,8 @@ class Window
 private:
     WINDOW* window_ptr;
     int x,y;
-    int width, height;  
-    
+    int width, height;
+
 public:
 	Window();
 	Window(int height, int width, int starty, int startx);
@@ -23,19 +23,21 @@ public:
     void moveWindow(int y, int x);
     void windowRefresh();
     void resizeWindow(int height, int width);
-    
+
     //Accessors
     int getX();
     int getY();
     int getWidth();
     int getHeight();
-    
+    WINDOW* getWindowPtr();
+
      //Mutators
     void setX(int x);
     void setY(int y);
     void setHeight(int height);
-    void setWidth(int width); 
+    void setWidth(int width);
     void setWindowPtr(WINDOW* window_ptr);
+
 
 
 };

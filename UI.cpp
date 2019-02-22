@@ -7,7 +7,7 @@ UI :: UI()
   getmaxyx(stdscr, maxY, maxX); // get console screen size
   wprintw(stdscr, "Screen Height = %d, Screen width = %d", maxY, maxX);
   refresh();
-  windowCreated = 0;
+  windowCreatedCount = 0;
   addStarterWindows();
 }
 
@@ -15,20 +15,20 @@ UI :: UI()
 void UI :: addStarterWindows()
 {
     //Header Window
-      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2), windowCreated);
-      windowCreated++;
+      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2), windowCreatedCount);
+      windowCreatedCount++;
 
      //Control window
      int y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowCreated);
-     windowCreated++;
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowCreatedCount);
+     windowCreatedCount++;
 
      int tempx =  windowList.getDatumById(1)->getX() +  windowList.getDatumById(1)->getWidth();
      int tempy =  windowList.getDatumById(1)->getY();
 
      //Input window
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx), windowCreated);
-     windowCreated++;
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx), windowCreatedCount);
+     windowCreatedCount++;
 
 }
 
@@ -38,52 +38,52 @@ void UI :: addNewWindow()
      int width = (getMaxX()-3) /3;
      int y2;
 
-     if(windowCreated >= 9)
+     if(windowCreatedCount >= 9)
         return;
-     if(windowCreated == 3)
+     if(windowCreatedCount == 3)
      {
          //Middle left Window
          y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-         windowList.addToEnd(Window(height, width, y2, 2),windowCreated);
-         windowCreated++;
+         windowList.addToEnd(Window(height, width, y2, 2),windowCreatedCount);
+         windowCreatedCount++;
 
          windowList.getDatumById(1)->moveWindow(windowList.getDatumById(3)->getY()+windowList.getDatumById(3)->getHeight(), 2);
          windowList.getDatumById(2)->moveWindow(windowList.getDatumById(3)->getY()+windowList.getDatumById(3)->getHeight(), windowList.getDatumById(1)->getX() + windowList.getDatumById(1)->getWidth());
          update();
      }
-     else if(windowCreated % 3 == 0)
+     else if(windowCreatedCount % 3 == 0)
      {
          resize();
-         y2 = windowList.getDatumById(windowCreated - 1)->getY() + windowList.getDatumById(windowCreated - 1)->getHeight();
-         windowList.addToEnd(Window(height/2, width, y2, 2), windowCreated);
-         windowCreated++;
+         y2 = windowList.getDatumById(windowCreatedCount - 1)->getY() + windowList.getDatumById(windowCreatedCount - 1)->getHeight();
+         windowList.addToEnd(Window(height/2, width, y2, 2), windowCreatedCount);
+         windowCreatedCount++;
          update();
      }
 
      //SEGMENTATION FAULT HERE
-     else if( windowCreated <= 6)
+     else if( windowCreatedCount <= 6)
      {
         //Middle windows
-         int tempx = windowList.getDatumById(windowCreated - 1)->getX() + windowList.getDatumById(windowCreated - 1)->getWidth();
-         int tempy = windowList.getDatumById(windowCreated - 1)->getY();
-         windowList.addToEnd(Window(height, width, tempy, tempx), windowCreated);
-         windowCreated++;
+         int tempx = windowList.getDatumById(windowCreatedCount - 1)->getX() + windowList.getDatumById(windowCreatedCount - 1)->getWidth();
+         int tempy = windowList.getDatumById(windowCreatedCount - 1)->getY();
+         windowList.addToEnd(Window(height, width, tempy, tempx), windowCreatedCount);
+         windowCreatedCount++;
      }
 
      else
      {
          //Middle windows
-         int tempx = windowList.getDatumById(windowCreated - 1)->getX() + windowList.getDatumById(windowCreated - 1)->getWidth();
-         int tempy = windowList.getDatumById(windowCreated - 1)->getY();
-         windowList.addToEnd(Window(height/2, width, tempy, tempx), windowCreated);
-         windowCreated++;
+         int tempx = windowList.getDatumById(windowCreatedCount - 1)->getX() + windowList.getDatumById(windowCreatedCount - 1)->getWidth();
+         int tempy = windowList.getDatumById(windowCreatedCount - 1)->getY();
+         windowList.addToEnd(Window(height/2, width, tempy, tempx), windowCreatedCount);
+         windowCreatedCount++;
      }
 }
 
 
 void UI :: resize()
 {
-    if(windowCreated >= 9)
+    if(windowCreatedCount >= 9)
         return;
     else
     {
@@ -101,7 +101,7 @@ void UI :: update()
     wprintw(stdscr, "Screen Height = %d, Screen width = %d", maxY, maxX);
     wrefresh(stdscr);
 
-    for(int i = 0; i<windowCreated; i++)
+    for(int i = 0; i<windowCreatedCount; i++)
     {
         windowList.getDatumById(i)->windowRefresh();
     }
@@ -110,7 +110,8 @@ void UI :: update()
 //accessors
 int UI :: getMaxY(){return maxY;}
 int UI :: getMaxX(){return maxX;}
-int UI :: getWindowCreated(){return windowCreated;}
+int UI :: getwindowCreatedCount(){return windowCreatedCount;}
+Window* getWindowCreated() {return windowList.getDatumById(windowCreatedCount-1);}
 
 //Mutators
-void UI :: setWindowCreated(int windowCount){windowCreated = windowCreated;}
+void UI :: setWindowCreatedCount(int windowCreatedCount){this->windowCreatedCount = windowCreatedCount;}

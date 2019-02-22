@@ -17,8 +17,9 @@ int main()
   initscr(); //strart curses
   refresh(); //refreshes virtual window
   UI userInf;
+  Scheduler s;
 
-
+  s.create_task(userInf.getWindowCreated());
    char ch;
    for (int i=0;i<1000;i++) {
         if((ch = getch()) == 'a')
