@@ -1,5 +1,5 @@
-OBJS	= Ultima.o scheduler.o sema.o UI.o window.o
-SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp
+OBJS	= Ultima.o scheduler.o sema.o UI.o window.o linkedlist.o
+SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp linkedlist.cpp
 HEADER	=
 OUT	= phase01
 CC	 = g++
