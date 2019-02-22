@@ -25,6 +25,8 @@ class Scheduler {
     static void* perform_simple_output(void* arguments);
     Scheduler();
 
+    typedef void * (*THREADFUNCPTR)(void *);
+
 
   public:
     void create_task();   // create appropriate data structures and calls coroutine()
