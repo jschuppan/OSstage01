@@ -1,13 +1,15 @@
 #include "linkedlist.h"
+#include "window.h"
+#include<iostream>
 
 template<class T>
-linkedlist :: linkedlist()
+linkedList<T> :: linkedList()
 {
   head = NULL;
 }
 
 template<class T>
-void linkedlist :: addToEnd(T datum)
+void linkedList<T> :: addToEnd(T datum, int id)
 {
     node* temp = head;
     if(!temp)
@@ -15,8 +17,9 @@ void linkedlist :: addToEnd(T datum)
       temp = new node;
       temp->next = NULL;
       temp->datum = datum;
+      temp->id = id;
     }
-    else if
+    else
     {
       while (temp->next)
       {
@@ -25,21 +28,23 @@ void linkedlist :: addToEnd(T datum)
       temp = temp->next;
       temp = new node;
       temp->datum = datum;
+      temp->id = id;
       temp->next = NULL;
     }
 }
 
 template<class T>
-void linkedlist :: addToFront(T datum)
+void linkedList<T> :: addToFront(T datum, int id)
 {
     node* temp = new node;
     temp->next = head;
     head = temp;
     head->datum = datum;
+    head->id = id;
 }
 
 template<class T>
-bool linkedlist :: isEmpty()
+bool linkedList<T> :: isEmpty()
 {
   if(head)
     return false;
@@ -48,7 +53,7 @@ bool linkedlist :: isEmpty()
 }
 
 template<class T>
-void linkedlist :: deleteList()
+void linkedList<T> :: deleteList()
 {
   while(! isEmpty())
   {
@@ -58,7 +63,7 @@ void linkedlist :: deleteList()
 }
 
 template<class T>
-void linkedlist :: removeFromFront()
+void linkedList<T> :: removeFromFront()
 {
   node* temp = head;
   head = head->next;
@@ -67,7 +72,7 @@ void linkedlist :: removeFromFront()
 }
 
 template<class T>
-void linkedlist :: removeFromEnd()
+void linkedList<T> :: removeFromEnd()
 {
   node* temp = head;
   while(temp->next)
@@ -77,4 +82,16 @@ void linkedlist :: removeFromEnd()
   temp->next = new node;
   temp = temp->next;
   temp->next = NULL;
+}
+
+template<class T>
+T linkedList<T> :: getDatumById(int id)
+{
+  node* temp = head;
+    //return NULL;
+  while(temp->id != id)
+  {
+    temp = temp->next;
+  }
+  return temp->datum;
 }

@@ -5,35 +5,33 @@
 #include <stdarg.h>
 #include<unistd.h>
 #include<string>
+#include "linkedlist.h"
 using namespace std;
 
-void* myFunct(void* args);
 int main()
 {
 
-    void* ptr;
-    ptr = myFunct;
-    
-/*
   initscr(); //strart curses
-  refresh(); //refreshes virtual window	
-  
+  refresh(); //refreshes virtual window
+  linkedList <Window> mylist;
 
-   UI userInf;
+  Window d1;
+  mylist.addToFront(d1, 1);
+  mylist.getDatumById(1).write_window(1,1,"HELLO");
+
+
+
+  // UI userInf;
    char ch;
    for (int i=0;i<1000;i++) {
           if ((ch = getch()) == ERR) {
              continue;
           }
           else {
-            userInf.addNewWindow();
+            //userInf.addNewWindow();
           }
           sleep(3);
    }
-  endwin();
-  */
-}
 
-void* myFunct(void* args)
-{
+  endwin();
 }
