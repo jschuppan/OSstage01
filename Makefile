@@ -9,8 +9,8 @@ LFLAGS	 = -lncurses -lnpthread
 all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 
-ultima.o: ultima.cpp
-	$(CC) $(FLAGS) ultima.cpp
+ultima.o: Ultima.cpp
+	$(CC) $(FLAGS) Ultima.cpp
 
 scheduler.o: scheduler.cpp
 	$(CC) $(FLAGS) scheduler.cpp
