@@ -19,11 +19,13 @@ int main()
   UI userInf;
   Scheduler s;
 
-  s.create_task(userInf.getWindowCreated());
    char ch;
    for (int i=0;i<1000;i++) {
         if((ch = getch()) == 'a')
+        {
             userInf.addNewWindow();
+            s.create_task(userInf.getWindowCreated());
+        }
         else if((ch = getch()) == 'q')
         {
             break;
