@@ -11,12 +11,18 @@ Scheduler::Scheduler()
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
+<<<<<<< HEAD
 void Scheduler::create_task()
 {
+=======
+void Scheduler::create_task(Window* Win) {
+>>>>>>> d97a318d241618ce982b4554052b3d62df7c3040
   int createResult;
+  threadInfo[processCount].thread_win = Win;
   // create a thread
   createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
   // check if we ran into issues
+  threadInfo[processCount].thread_win->write_window(1,1,"Hello");
   assert(!createResult);
 
   processCount++;
