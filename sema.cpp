@@ -1,21 +1,19 @@
+// Authors: Jakob Schuppan, Robert Davis
 #include <stdio.h>
 #include <iostream>
 #include <queue>
 #include "sema.h"
+
+const bool DEBUG = false;
 
 
 Semaphore::Semaphore(std::string resName)
 {
   this->resName = resName;
   this->sema_value = 1;
+  this->lastPop = 0;
 }
 
-// void Semaphore::down(int threadID) {
-//   std::cout << "before lock" << std::endl;
-//   resMutex.lock();
-//   std::cout << "after lock" << std::endl;
-//   resMutex.unlock();
-// }
 
 void Semaphore::down(int threadID)
 {
@@ -24,25 +22,28 @@ void Semaphore::down(int threadID)
   {
     // make resource unavailable
     sema_value = 0;
+
+    if (DEBUG)
+      std::cout << "Setting lock" << std::endl;
+
     // set out mutex lock to prevent resource from
     // being used by multiple threads
-    std::cout << "Setting lock" << std::endl;
     resMutex.lock();
   }
   // case 2: resource is unavailable
   else if (sema_value == 0)
   {
+    if(DEBUG)
+      std::cout << "Pushing thread " << threadID << " on queue!" << std::endl;
+
     // first push new process request on queue
-    std::cout << "Pushing thread " << threadID
-              << " on queue!" << std::endl;
     processQueue.push(threadID);
     // we need to deal with requests until the queue
     // is empty
-    while(!processQueue.empty() || (lastPop != pthread_self()))
-      {
-        // std::cout << "stuck" << std::endl;
-      }
-    std::cout << "cleared while!" << std::endl;
+    while(lastPop != threadID);
+
+    if(DEBUG)
+      std::cout << "cleared while!" << std::endl;
     //callToScheduler();
   }
 
@@ -61,20 +62,27 @@ void Semaphore::up()
   // our status to available
   if(processQueue.empty())
   {
-    std::cout << "Queue empty. Unlocking sema!" << std::endl;
+    if(DEBUG)
+      std::cout << "Queue empty. Unlocking sema!" << std::endl;
     resMutex.unlock();
     sema_value = 1;
   }
   else {
     // next in queue gets released
-
     // get threadID from pop
     lastPop = processQueue.front();
     processQueue.pop();
-    std::cout << "last pop ID: " << lastPop << std::endl;
+
+    if (DEBUG)
+      std::cout << "last pop ID: " << lastPop << std::endl;
+
+    // check if queue is now empty. If so release and unlock
+    if (processQueue.empty()) {
+      if(DEBUG)
+        std::cout << "Queue NOW empty. Unlocking sema!" << std::endl;
+      resMutex.unlock();
+      sema_value = 1;
+    }
   }
 
-  // if (queue.isEmpty()) {
-  // sema_value = 1;
-//}
 }
