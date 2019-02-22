@@ -1,5 +1,8 @@
 #include "window.h"
 #include "UI.h"
+#include "linkedlist.h"
+#include "scheduler.h"
+#include "sema.h"
 #include <iostream>
 #include <curses.h>     // neede dfor Curses windowing
 #include <stdarg.h>
