@@ -4,8 +4,12 @@
 #include <list>
 #include <assert.h>
 #include "scheduler.h"
+#include "sema.h"
 #include <fstream>
 #include<unistd.h> //sleep
+
+Semaphore ns("write_window");
+
 void* perform_simple_output(void* arguments);
 Scheduler::Scheduler()
 {
@@ -53,7 +57,10 @@ void* perform_simple_output(void* arguments)
     char buff[256];
     Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
     sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+
+    //ns.down(td->thread_no);
     td->thread_win->write_window(buff);
+    //ns.up();
 
     //debugFile2.open("debug_thread.txt");
     //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
