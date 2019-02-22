@@ -12,10 +12,9 @@ Scheduler::Scheduler() {
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
 void Scheduler::create_task(void* threadFunction) {
   int createResult;
-  int tempOutput[5]; // just for testing
 
   // create a thread
-  createResult = pthread_create(pthread_t[processCount], NULL, &threadFunction, tempOutput[processCount]);
+  createResult = pthread_create(&thread_2, NULL, perform_simple_output, &thread_args_2);
   // check if we ran into issues
   assert(!createResult);
 
@@ -30,5 +29,23 @@ void Scheduler::yield() {
   if (result != 0) {
     perror("Fatal error: pThread failed to yield!");
     exit(0);
+  }
+}
+
+void *perform_simple_output(void *arguments) {
+  // extract the thread arguments: (method 1)
+  // cast arguments in to thread_data
+  thread_data *td = (thread_data *) arguments;
+  int thread_no = td->thread_no;
+  int sleep_time = td->sleep_time;
+  WINDOW * Win = td->thread_win;
+  // bool kill_signal = td->kill_signal;
+  int CPU_Quantum =0;
+  char buff[256];
+
+  while(!td->kill_signal) {
+    sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
+    write_window(Win, buff);
+    sleep(thread_no*2);
   }
 }
