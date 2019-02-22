@@ -7,18 +7,20 @@
 #include<string>
 using namespace std;
 
+const int MAX_WINDOWS_THREADS = 6;
+
 int main()
 {
   initscr(); //strart curses
-  refresh(); //refreshes virtual window	
+  refresh(); //refreshes virtual window
   UI userInf;
-  
-  
+
+
    char ch;
    for (int i=0;i<1000;i++) {
-        if(ch = getch() == 'a')
+        if((ch = getch()) == 'a')
             userInf.addNewWindow();
-        else if(ch = getch() == 'q')
+        else if((ch = getch()) == 'q')
         {
             break;
         }

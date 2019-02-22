@@ -10,11 +10,10 @@ Scheduler::Scheduler() {
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-void Scheduler::create_task(void* threadFunction) {
+void Scheduler::create_task() {
   int createResult;
-
   // create a thread
-  createResult = pthread_create(&thread_2, NULL, perform_simple_output, &thread_args_2);
+  createResult = pthread_create(pthreads[processCount], NULL, perform_simple_output, threadInfo[processCount]);
   // check if we ran into issues
   assert(!createResult);
 
@@ -32,20 +31,20 @@ void Scheduler::yield() {
   }
 }
 
-void *perform_simple_output(void *arguments) {
+void Scheduler :: *perform_simple_output(void *arguments) {
   // extract the thread arguments: (method 1)
   // cast arguments in to thread_data
   thread_data *td = (thread_data *) arguments;
   int thread_no = td->thread_no;
   int sleep_time = td->sleep_time;
-  WINDOW * Win = td->thread_win;
+  //WINDOW * Win = td->thread_win;
   // bool kill_signal = td->kill_signal;
   int CPU_Quantum =0;
   char buff[256];
 
   while(!td->kill_signal) {
-    sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
-    write_window(Win, buff);
-    sleep(thread_no*2);
+    //sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
+    //write_window(Win, buff);
+    //sleep(thread_no*2);
   }
 }
