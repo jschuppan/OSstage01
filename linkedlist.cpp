@@ -1,4 +1,10 @@
-#include "linkedlist"
+#include "linkedlist.h"
+
+template<class T>
+linkedlist :: linkedlist()
+{
+  head = NULL;
+}
 
 template<class T>
 void linkedlist :: addToEnd()
