@@ -25,7 +25,6 @@ void linkedList<T> :: addToEnd(T datum, int id)
       {
         temp = temp->next;
       }
-      temp = temp->next;
       temp = new node;
       temp->datum = datum;
       temp->id = id;

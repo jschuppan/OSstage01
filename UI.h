@@ -3,13 +3,21 @@
 
 #include<iostream>
 #include "window.h"
+#include "linkedlist.h"
 
 class UI
 {
     private:
-    linkedList windowList;
+    linkedList <Window> windowList;
+    struct windowNode
+    {
+        Window* Win;
+        windowNode* next;
+    };
+    windowNode* head;
     //console max values
-    int maxX,maxY;
+    int maxX,maxY,windowsCreated;
+    int windowCount;
 
     public:
     UI();

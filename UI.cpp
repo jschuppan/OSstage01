@@ -15,23 +15,21 @@ UI :: UI()
 void UI :: addStarterWindows()
 {
     //Header Window
-      windowList.addToFront(new Window(getMaxY() /5, getMaxX()-4, 2, 2),windowsCreated);
+      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2), windowsCreated);
       windowsCreated++;
 
      //Control window
-     int y2 = temp->Win->getY() + temp->Win->getHeight();
-     windowList.addToEnd(new Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowsCreated)
+     int y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowsCreated);
      windowsCreated++;
 
-     int tempx = temp->Win->getX() + temp->Win->getWidth();
-     int tempy = temp->Win->getY();
+     int tempx =  windowList.getDatumById(1)->getX() +  windowList.getDatumById(1)->getWidth();
+     int tempy =  windowList.getDatumById(1)->getY();
 
      //Input window
-     windowList.addToEnd(new Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx))
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx), windowsCreated);
      windowsCreated++;
-     //temp->Win->write_window(windowCount);
-     //wrefresh(temp->Win);
-    }
+
 }
 
 void UI :: addNewWindow()

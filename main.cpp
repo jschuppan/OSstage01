@@ -13,15 +13,15 @@ int main()
 
   initscr(); //strart curses
   refresh(); //refreshes virtual window
-  linkedList <Window> mylist;
 
-  Window d1;
-  mylist.addToFront(d1, 1);
-  mylist.getDatumById(1)->write_window(1,1,"HELLO");
-
+//  Window d1;
+  //mylist.addToFront(d1, 1);
+  //mylist.getDatumById(1)->write_window(1,1,"HELLO");
 
 
-  // UI userInf;
+
+   UI userInf;
+   
    char ch;
    for (int i=0;i<1000;i++) {
           if ((ch = getch()) == ERR) {
