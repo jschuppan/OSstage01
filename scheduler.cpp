@@ -8,7 +8,7 @@
 void Scheduler::create_task(functionPtr, threadArg, threadName) {
   int createResult;
 
-  createResult =
+  createResult = pthread_create(&thread_3, NULL, perform_simple_output, &thread_args_3);
   assert(!createResult);
 
 }
