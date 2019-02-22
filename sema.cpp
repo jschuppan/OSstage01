@@ -11,7 +11,7 @@ Semaphore::Semaphore(std::string resName)
 {
   this->resName = resName;
   this->sema_value = 1;
-  this->lastPop = 0;
+  this->lastPop = -1;
 }
 
 
