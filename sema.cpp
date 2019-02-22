@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <stdio.h>
 #include <iostream>
 #include <queue>
 #include "sema.h"
