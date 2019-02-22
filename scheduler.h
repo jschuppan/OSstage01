@@ -19,8 +19,8 @@ class Scheduler {
     };
     TCB* process_table;
     int processCount;
-    pthread_t pthreads[MAX_WINDOWS_THREADS];
-    thread_data threadInfo[MAX_WINDOWS_THREADS];
+    pthread_t pthreads[5];
+    thread_data threadInfo[5];
     void* perform_simple_output(void* arguments);
     Scheduler();
 

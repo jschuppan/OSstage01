@@ -2,6 +2,8 @@
 #define SEMA_H
 
 #include <mutex>
+#include <queue>
+
 
 class Semaphore {
   public:
