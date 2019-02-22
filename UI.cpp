@@ -1,5 +1,5 @@
 #include "UI.h"
-#include<iostream>
+#include <iostream>
 
 //default constructor
 UI :: UI()
