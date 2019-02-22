@@ -5,12 +5,14 @@
 #include <assert.h>
 #include "scheduler.h"
 
-Scheduler::Scheduler() {
+Scheduler::Scheduler()
+{
   processCount = 0;
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-void Scheduler::create_task() {
+void Scheduler::create_task()
+{
   int createResult;
   // create a thread
   createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
@@ -21,7 +23,8 @@ void Scheduler::create_task() {
 
 }
 
-void Scheduler::yield() {
+void Scheduler::yield()
+{
   int result;
   //result = callingThread.pthread_yield();
 
@@ -31,7 +34,8 @@ void Scheduler::yield() {
   }
 }
 
-void* Scheduler :: perform_simple_output(void* arguments) {
+void* Scheduler :: perform_simple_output(void* arguments)
+{
   // extract the thread arguments: (method 1)
   // cast arguments in to thread_data
   thread_data *td = (thread_data *) arguments;
