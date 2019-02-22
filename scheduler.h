@@ -4,8 +4,9 @@
 #include <string>
 #include <pthread.h>
 #include "window.h"
-
+#include "linkedlist.h"
 class Scheduler {
+  //Change to private
 public:
     struct thread_data {
       int thread_no;
@@ -17,13 +18,25 @@ public:
       int thread_results;
     };
 
-    struct TCB {
+    struct TCB
+    {
       // state: 0 (running), 1 (ready), 2 (blocked)
+    private:
       int threadID, state;
-      std::string name;
+    public:
+      TCB(int threadID, int state)
+      {
+        this->threadID = threadID;
+        this->state = state;
+      }
+      int getThreadID() { return this->threadID; }
+      int getState() { return this->state; }
     };
 
-    TCB* process_table;
+
+    linkedList <Scheduler::TCB> TCBList;
+
+    //TCB* process_table;
     int processCount;
     int tempCounter;
     pthread_t pthreads[5];

@@ -2,6 +2,7 @@
 #define LINKEDLIST_H
 
 #include "window.h"
+#include "scheduler.h"
 
 template <class T>
 class linkedList
@@ -30,4 +31,5 @@ class linkedList
 
 template class linkedList<int>;
 template class linkedList<Window>;
+template class linkedList<Scheduler::TCB>;
 #endif

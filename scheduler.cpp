@@ -16,7 +16,7 @@ Scheduler::Scheduler()
   processCount = 0;
   tempCounter = 0;
 }
-
+//TCB State: 0 running, 1 ready, 2 blocked, 3 dead
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
 int Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
@@ -24,7 +24,8 @@ int Scheduler::create_task(Window* threadWin, Window* headerWin, Window* console
   threadInfo[processCount].thread_win = threadWin;
   threadInfo[processCount].head_win = headerWin;
   threadInfo[processCount].console_win = consoleWin;
-  threadInfo[processCount].thread_no = processCount;
+
+  TCBList.addToEnd(TCB(processCount,1));
   //std::ofstream debugFile2;
   //debugFile2.open("debug.txt");
 //  debugFile2 << "thread# = " << &temp.sleep_time <<"\n";
@@ -72,14 +73,25 @@ void* perform_simple_output(void* arguments)
 
     sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
     td->console_win->write_window(buff);
+
+
     //debugFile2.open("debug_thread.txt");
     //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
     //debugFile2.close();
 
-
+    dump(5);
+    sleep(3);
     //// the issue with the core dump is related to how the window
     //// ptr is passed
     //twindow->display_help();
-    sleep(1);
   }
+}
+
+void Scheduler :: dump(int level)
+{
+  std::ofstream debugFile2;
+  debugFile2.open("debug_thread.txt", std:: ofstream::app);
+  debugFile2 << "thread# = " << TCBList.getDatumById(0)->getThreadID()<<"\n";
+  debugFile2 << "State:  = " << TCBList.getDatumById(0)->getState()<<"\n";
+  debugFile2.close();
 }
