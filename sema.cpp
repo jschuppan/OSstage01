@@ -26,19 +26,23 @@ void Semaphore::down(int threadID)
     sema_value = 0;
     // set out mutex lock to prevent resource from
     // being used by multiple threads
+    std::cout << "Setting lock" << std::endl;
     resMutex.lock();
   }
   // case 2: resource is unavailable
   else if (sema_value == 0)
   {
-    // first push new process request on queu
-    processQueue.push();
+    // first push new process request on queue
+    std::cout << "Pushing thread " << threadID
+              << " on queue!" << std::endl;
+    processQueue.push(threadID);
     // we need to deal with requests until the queue
     // is empty
-    while(!processQueue.empty())
-    {
-
-    }
+    while(!processQueue.empty() || (lastPop != pthread_self()))
+      {
+        // std::cout << "stuck" << std::endl;
+      }
+    std::cout << "cleared while!" << std::endl;
     //callToScheduler();
   }
 
@@ -57,12 +61,17 @@ void Semaphore::up()
   // our status to available
   if(processQueue.empty())
   {
+    std::cout << "Queue empty. Unlocking sema!" << std::endl;
     resMutex.unlock();
     sema_value = 1;
   }
   else {
     // next in queue gets released
+
+    // get threadID from pop
+    lastPop = processQueue.front();
     processQueue.pop();
+    std::cout << "last pop ID: " << lastPop << std::endl;
   }
 
   // if (queue.isEmpty()) {

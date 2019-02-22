@@ -14,8 +14,9 @@ class Semaphore {
   private:
     std::string resName;
     int sema_value;
-    std::queue<int> processQueue;
+    std::queue<pthread_t> processQueue;
     std::mutex resMutex;
+    pthread_t lastPop;
 };
 
 #endif
