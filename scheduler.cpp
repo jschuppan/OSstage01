@@ -19,7 +19,7 @@ void Scheduler::create_task(Window* Win) {
   // create a thread
   createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
   // check if we ran into issues
-  threadInfo[processCount].thread_win->write_window(1,1,"Hello");
+  //threadInfo[processCount].thread_win->write_window(1,1,"Hello");
   createResult = pthread_join(pthreads[processCount], NULL);
 
   //assert(!createResult);
@@ -43,5 +43,6 @@ void* Scheduler :: perform_simple_output(void* arguments)
 {
   for (int i=0; i < 10000; i++) {
     tempCounter += i;
+    thread_win->write_window(1,1,tempCounter);
   }
 }
