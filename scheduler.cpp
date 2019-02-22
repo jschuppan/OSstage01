@@ -42,9 +42,9 @@ void Scheduler :: *perform_simple_output(void *arguments) {
   int CPU_Quantum =0;
   char buff[256];
 
-  while(!td->kill_signal) {
+  //while(!td->kill_signal) {
     //sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
     //write_window(Win, buff);
     //sleep(thread_no*2);
-  }
+  //}
 }
