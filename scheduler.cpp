@@ -46,8 +46,8 @@ void* Scheduler :: perform_simple_output(void* arguments)
     Window* twindow = ( (thread_data *)arguments )->thread_win;
 
 
-    //// Try commenting this out. UI will still crash so it has to do
-    /// with creating the windows and its not thread related
+    //// the issue with the core dump is related to how the window
+    //// ptr is passed
     twindow->write_window(1,1, "test");
   }
 }
