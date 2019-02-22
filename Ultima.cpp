@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <string>
+#include <fstream>
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
@@ -18,12 +19,15 @@ int main()
   refresh(); //refreshes virtual window
   UI userInf;
   Scheduler s;
+  ofstream debugFile;
+  debugFile.open("debug.txt");
 
    char ch;
    for (int i=0;i<1000;i++) {
         if((ch = getch()) == 'a')
         {
             userInf.addNewWindow();
+            debugFile << userInf.getwindowCreatedCount() << endl;
             s.create_task(userInf.getWindowCreated());
         }
         else if((ch = getch()) == 'q')
@@ -32,5 +36,6 @@ int main()
         }
           sleep(1);
    }
-  endwin();
+endwin();
+debugFile.close();
 }

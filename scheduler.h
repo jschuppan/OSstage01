@@ -9,7 +9,7 @@ class Scheduler {
   private:
     struct thread_data {
       int thread_no;
-      Window *thread_win;
+      Window* thread_win;
       bool kill_signal;
       int sleep_time;
       int thread_results;

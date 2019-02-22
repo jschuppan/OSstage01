@@ -113,7 +113,7 @@ void UI :: update()
 int UI :: getMaxY(){return maxY;}
 int UI :: getMaxX(){return maxX;}
 int UI :: getwindowCreatedCount(){return windowCreatedCount;}
-Window* UI :: getWindowCreated() {return windowList.getDatumById(windowCreatedCount - 1);}
+Window* UI :: getWindowCreated() {return windowList.getDatumById((windowCreatedCount - 1));}
 
 //Mutators
 void UI :: setWindowCreatedCount(int windowCreatedCount){this->windowCreatedCount = windowCreatedCount;}
