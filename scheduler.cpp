@@ -31,7 +31,7 @@ void Scheduler::yield() {
   }
 }
 
-void* Scheduler :: perform_simple_output(void* arguments) {
+static void* Scheduler :: perform_simple_output(void* arguments) {
   // extract the thread arguments: (method 1)
   // cast arguments in to thread_data
   thread_data *td = (thread_data *) arguments;
