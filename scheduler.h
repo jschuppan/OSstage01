@@ -13,10 +13,13 @@ class Scheduler {
       int sleep_time;
       int thread_results;
     };
+
     struct TCB {
+      // state: 0 (running), 1 (ready), 2 (blocked)
       int threadID, state;
       std::string name;
     };
+
     TCB* process_table;
     int processCount;
     pthread_t pthreads[5];
