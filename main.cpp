@@ -21,14 +21,14 @@ int main()
 
 
    UI userInf;
-   
+
    char ch;
    for (int i=0;i<1000;i++) {
           if ((ch = getch()) == ERR) {
              continue;
           }
           else {
-            //userInf.addNewWindow();
+            userInf.addNewWindow();
           }
           sleep(3);
    }

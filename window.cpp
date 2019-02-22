@@ -11,8 +11,6 @@ Window:: Window()
   setY(15);
   setHeight(10);
   setWidth(80);
-
-  create_window(getHeight(),getWidth(),getY(),getX());
 }
 
 //constructor
