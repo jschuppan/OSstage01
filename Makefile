@@ -1,4 +1,4 @@
-OBJS	= ultima.o scheduler.o sema.p
+OBJS	= Ultima.o scheduler.o sema.o
 SOURCE	= scheduler.cpp sema.cpp ultima.cpp
 HEADER	=
 OUT	= phase01
@@ -9,7 +9,7 @@ LFLAGS	 = -lncurses -lnpthread
 all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 
-ultima.o: Ultima.cpp
+Ultima.o: Ultima.cpp
 	$(CC) $(FLAGS) Ultima.cpp
 
 scheduler.o: scheduler.cpp

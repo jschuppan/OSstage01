@@ -22,7 +22,7 @@ class Scheduler {
     int processCount;
     pthread_t pthreads[MAX_WINDOWS_THREADS];
     thread_data threadInfo[MAX_WINDOWS_THREADS];
-    static void* perform_simple_output(void* arguments);
+    void* perform_simple_output(void* arguments);
     Scheduler();
 
     typedef void * (*THREADFUNCPTR)(void *);

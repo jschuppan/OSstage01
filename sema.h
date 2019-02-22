@@ -1,6 +1,8 @@
 #ifndef SEMA_H
 #define SEMA_H
 
+#include <mutex>
+
 class Semaphore {
   public:
     Semaphore(std::string resName);
