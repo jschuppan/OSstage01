@@ -5,11 +5,17 @@
 #include <assert.h>
 #include "scheduler.h"
 
+Scheduler::Scheduler() {
+  processCount = 0;
+}
+
 void Scheduler::create_task(functionPtr, threadArg, threadName) {
   int createResult;
 
-  createResult = pthread_create(&thread_3, NULL, perform_simple_output, &thread_args_3);
+  createResult = pthread_create(pthread_t[processCount], NULL, perform_simple_output, &thread_args_3);
   assert(!createResult);
+  
+  processCount++;
 
 }
 
