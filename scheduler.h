@@ -12,6 +12,7 @@ class Scheduler {
       Window *thread_win;
       bool kill_signal;
       int sleep_time;
+      int tempCounter;
       int thread_results;
     };
 

@@ -5,9 +5,11 @@
 #include <assert.h>
 #include "scheduler.h"
 
+
 Scheduler::Scheduler()
 {
   processCount = 0;
+  tempCounter = 0;
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
@@ -39,20 +41,7 @@ void Scheduler::yield()
 
 void* Scheduler :: perform_simple_output(void* arguments)
 {
-  // extract the thread arguments: (method 1)
-  // cast arguments in to thread_data
-  thread_data *td = (thread_data *) arguments;
-  int thread_no = td->thread_no;
-  int sleep_time = td->sleep_time;
-  //WINDOW * Win = td->thread_win;
-  // bool kill_signal = td->kill_signal;
-  int CPU_Quantum =0;
-  char buff[256];
-  while (1);
-
-  //while(!td->kill_signal) {
-    //sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
-    //write_window(Win, buff);
-    //sleep(thread_no*2);
-  //}
+  for (int i=0; i < 10000; i++) {
+    tempCounter += i;
+  }
 }
