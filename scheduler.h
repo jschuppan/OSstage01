@@ -3,7 +3,6 @@
 
 #include <string>
 #include <pthread.h>
-#include "Ultima.cpp"
 
 class Scheduler {
   private:
