@@ -50,7 +50,6 @@ void UI :: addNewWindow()
          windowList.getDatumById(1)->moveWindow(windowList.getDatumById(3)->getY()+windowList.getDatumById(3)->getHeight(), 2);
          windowList.getDatumById(2)->moveWindow(windowList.getDatumById(3)->getY()+windowList.getDatumById(3)->getHeight(), windowList.getDatumById(1)->getX() + windowList.getDatumById(1)->getWidth());
          update();
-         windowCreated++;
      }
      else if(windowCreated % 3 == 0)
      {
@@ -70,7 +69,7 @@ void UI :: addNewWindow()
          windowList.addToEnd(Window(height, width, tempy, tempx), windowCreated);
          windowCreated++;
      }
-     /*
+
      else
      {
          //Middle windows
@@ -78,7 +77,7 @@ void UI :: addNewWindow()
          int tempy = windowList.getDatumById(windowCreated - 1)->getY();
          windowList.addToEnd(Window(height/2, width, tempy, tempx), windowCreated);
          windowCreated++;
-     }*/
+     }
 }
 
 
