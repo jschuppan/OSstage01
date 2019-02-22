@@ -1,5 +1,6 @@
 #include "linkedlist.h"
 #include "window.h"
+#include "scheduler.h"
 #include<iostream>
 
 template<class T>
@@ -98,3 +99,8 @@ T* linkedList<T> :: getDatumById(int id)
   }
   return &temp->datum;
 }
+
+
+template class linkedList<int>;
+template class linkedList<Window>;
+template class linkedList<Scheduler::TCB>;

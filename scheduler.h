@@ -1,5 +1,4 @@
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#pragma once
 
 #include <string>
 #include <pthread.h>
@@ -34,7 +33,7 @@ public:
       int getState() { return this->state; }
     };
 
-    std :: queue <TCB> TCBList;
+    linkedList <TCB> TCBList;
 
     //TCB* process_table;
     int processCount;
@@ -54,5 +53,3 @@ public:
     void garbage_collect();
 
 };
-
-#endif

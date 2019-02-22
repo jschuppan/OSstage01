@@ -1,5 +1,4 @@
-#ifndef SEMA_H
-#define SEMA_H
+#pragma once
 
 #include <mutex>
 #include <queue>
@@ -18,5 +17,3 @@ class Semaphore {
     std::mutex resMutex;
     pthread_t lastPop;
 };
-
-#endif

@@ -1,8 +1,7 @@
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
+#pragma once
 
 #include "window.h"
-#include "scheduler.h"
+// #include "scheduler.h"
 
 template <class T>
 class linkedList
@@ -28,8 +27,3 @@ class linkedList
     void removeFromEnd();
     T* getDatumById(int id);
 };
-
-template class linkedList<int>;
-template class linkedList<Window>;
-//template class linkedList<Scheduler::TCB>;
-#endif

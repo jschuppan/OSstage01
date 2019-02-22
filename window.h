@@ -1,5 +1,4 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 #include<iostream>
 #include<curses.h>  //Used for curses windows
@@ -41,5 +40,3 @@ public:
 
 
 };
-
-#endif
