@@ -4,7 +4,7 @@ HEADER	=
 OUT	= phase01
 CC	 = g++
 FLAGS	 = -g -c -Wall
-LFLAGS	 = -lncurses -lnpthread
+LFLAGS	 = -lncurses -lpthread
 
 all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
