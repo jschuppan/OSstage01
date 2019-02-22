@@ -1,6 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
+// 8==D~{(.)}
+
 #include<iostream>
 #include "window.h"
 #include "linkedlist.h"
