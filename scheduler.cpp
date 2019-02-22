@@ -15,10 +15,10 @@ void Scheduler::create_task(Window* Win) {
   int createResult;
   threadInfo[processCount].thread_win = Win;
   // create a thread
-  //createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
+  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
   // check if we ran into issues
   threadInfo[processCount].thread_win->write_window(1,1,"Hello");
-  //createResult = pthread_join(pthreads[processCount], NULL);
+  createResult = pthread_join(pthreads[processCount], NULL);
 
   //assert(!createResult);
 
@@ -48,6 +48,7 @@ void* Scheduler :: perform_simple_output(void* arguments)
   // bool kill_signal = td->kill_signal;
   int CPU_Quantum =0;
   char buff[256];
+  while (1);
 
   //while(!td->kill_signal) {
     //sprintf(buff, " Task-%d running #%d\n", thread_no, CPU_Quantum++);
