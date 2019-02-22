@@ -23,7 +23,7 @@ int main()
   Scheduler s;
   debugFile.open("debug.txt");
   UI userInf;
-
+ int treadNum;
 
    char ch;
    for (int i=0;i<100;i++) {
@@ -31,7 +31,7 @@ int main()
         {
             userInf.addNewWindow();
             //debugFile << userInf.getwindowCreatedCount() << endl;
-            s.create_task(userInf.getWindowCreated());
+            threadNum = s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
         }
         else if((ch = getch()) == 'q')
         {

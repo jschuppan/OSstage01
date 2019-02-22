@@ -29,6 +29,7 @@ class UI
     int getMaxY();
     int getwindowCreatedCount();
     Window* getWindowCreated();
+    Window* getWindowByID(int id);
 
 
 };
