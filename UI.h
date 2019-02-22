@@ -7,15 +7,9 @@
 class UI
 {
     private:
-    struct windowNode
-    {
-        Window* Win;
-        windowNode* next;
-    };
-    windowNode* head;
+    linkedList windowList;
     //console max values
     int maxX,maxY;
-    int windowCount;
 
     public:
     UI();
@@ -23,10 +17,10 @@ class UI
     void addStarterWindows();
     void addNewWindow();
     void resize();
-    
+
     //mutators
     void setWindowCount(int windowCount);
-    
+
     //accessors
     int getMaxX();
     int getMaxY();
