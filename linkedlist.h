@@ -9,17 +9,17 @@ class linkedList
         node* next;
         T datum;
     }
-    
+
     node* head;
-    
+
     public:
     linkedList();
-    
+
     void addToEnd();
-    void addToFrnt();
+    void addToFront();
     bool isEmpty();
     void deleteList();
     void removeFromFront();
-    void removeFromBack();
-    
+    void removeFromEnd();
+
 };
