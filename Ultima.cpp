@@ -19,7 +19,7 @@ int main()
 {
   initscr(); //strart curses
   refresh(); //refreshes virtual window
-
+  linkedList <int> myList;
   Scheduler s;
   debugFile.open("debug.txt");
   UI userInf;

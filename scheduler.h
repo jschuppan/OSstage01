@@ -1,14 +1,14 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include <string>
 #include <pthread.h>
 #include <queue>
-#include <list>
 #include "window.h"
 #include "linkedlist.h"
 class Scheduler {
   //Change to private
-private:
+public:
     struct thread_data {
       int thread_no;
       Window* thread_win;
@@ -25,19 +25,16 @@ private:
     private:
       int threadID, state;
     public:
-      // TCB(int threadID, int state)
-      // {
-      //   this->threadID = threadID;
-      //   this->state = state;
-      // }
-      // int getThreadID() { return this->threadID; }
-      // int getState() { return this->state; }
+      TCB(int threadID, int state)
+      {
+        this->threadID = threadID;
+        this->state = state;
+      }
+      int getThreadID() { return this->threadID; }
+      int getState() { return this->state; }
     };
 
-    std::queue <TCB> qTest;
-
-
-    // linkedList <fuckYou::TCB> TCBList;
+    std :: queue <TCB> TCBList;
 
     //TCB* process_table;
     int processCount;
