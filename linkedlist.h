@@ -1,4 +1,5 @@
-
+#ifndef LINKEDLIST_H
+#ifndef LINKEDLIST_H
 
 template <class T>
 class linkedList
@@ -23,3 +24,5 @@ class linkedList
     void removeFromEnd();
 
 };
+
+#endif
