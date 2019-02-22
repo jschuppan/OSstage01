@@ -2,11 +2,13 @@
 #define SCHEDULER_H
 
 #include <pthread.h>
+#include <queue>
+#include <list>
 #include "window.h"
 #include "linkedlist.h"
 class Scheduler {
   //Change to private
-public:
+private:
     struct thread_data {
       int thread_no;
       Window* thread_win;
@@ -28,11 +30,13 @@ public:
       //   this->threadID = threadID;
       //   this->state = state;
       // }
-      int getThreadID() { return this->threadID; }
-      int getState() { return this->state; }
+      // int getThreadID() { return this->threadID; }
+      // int getState() { return this->state; }
     };
 
-    linkedlist <TCB> qTest;
+    std::queue <TCB> qTest;
+
+
     // linkedList <fuckYou::TCB> TCBList;
 
     //TCB* process_table;
@@ -44,7 +48,7 @@ public:
     //typedef void * (*THREADFUNCPTR)(void *);
 
 
-  //public:
+  public:
     Scheduler();
     int create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
