@@ -5,7 +5,8 @@
 #include <assert.h>
 #include "scheduler.h"
 #include <fstream>
-
+#include<unistd.h> //sleep
+void* perform_simple_output(void* arguments);
 Scheduler::Scheduler()
 {
   processCount = 0;
@@ -13,18 +14,22 @@ Scheduler::Scheduler()
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-void Scheduler::create_task(Window* Win) {
+int Scheduler::create_task(Window* Win) {
   int createResult;
   threadInfo[processCount].thread_win = Win;
-
+  std::ofstream debugFile2;
+  //debugFile2.open("debug.txt");
+//  debugFile2 << "thread# = " << &temp.sleep_time <<"\n";
+  //debugFile2.close();
   // create a thread
-  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
-
+  createResult = pthread_create(&pthreads[processCount], NULL, perform_simple_output, &threadInfo[processCount]);
+  //threadInfo[0].thread_win->display_help();
   // wait for termination and check if we ran into issues
-  createResult = pthread_join(pthreads[processCount], NULL);
+  //createResult = pthread_join(pthreads[processCount], NULL);
   //assert(!createResult);
 
   processCount++;
+  return threadInfo[processCount].thread_no;
 
 }
 
@@ -39,20 +44,25 @@ void Scheduler::yield()
   }
 }
 
-void* Scheduler :: perform_simple_output(void* arguments)
+void* perform_simple_output(void* arguments)
 {
+  int tempCounter =0;
   for (int i=0; i < 10000; i++) {
-    tempCounter += i;
-    Window* twindow = threadInfo[0].thread_win;
-    // std::ofstream debugFile2;
-    // debugFile2.open("debug_thread.txt");
-    // debugFile2 << "twindow" << twindow <<"\n";
-    // debugFile2.close();
+    tempCounter++;
+    //std::ofstream debugFile2;
+    char buff[256];
+    Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
+    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+    td->thread_win->write_window(buff);
 
+    //debugFile2.open("debug_thread.txt");
+    //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
+    //debugFile2.close();
 
 
     //// the issue with the core dump is related to how the window
     //// ptr is passed
-    twindow->write_window(1,1, "test");
+    //twindow->display_help();
+    sleep(1);
   }
 }

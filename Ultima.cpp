@@ -19,16 +19,18 @@ int main()
 {
   initscr(); //strart curses
   refresh(); //refreshes virtual window
-  UI userInf;
+
   Scheduler s;
   debugFile.open("debug.txt");
+  UI userInf;
+
 
    char ch;
-   for (int i=0;i<1000;i++) {
+   for (int i=0;i<100;i++) {
         if((ch = getch()) == 'a')
         {
             userInf.addNewWindow();
-            // debugFile << userInf.getwindowCreatedCount() << endl;
+            //debugFile << userInf.getwindowCreatedCount() << endl;
             s.create_task(userInf.getWindowCreated());
         }
         else if((ch = getch()) == 'q')
