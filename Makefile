@@ -1,19 +1,22 @@
 OBJS	= ultima.o scheduler.o sema.p
 SOURCE	= scheduler.cpp sema.cpp ultima.cpp
-HEADER	= 
-OUT	= hw2
+HEADER	=
+OUT	= phase01
 CC	 = g++
 FLAGS	 = -g -c -Wall
-LFLAGS	 = lncurses lnpthread
+LFLAGS	 = -lncurses -lnpthread
 
 all: $(OBJS)
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 
-tokenizer.o: hw2.cpp
-	$(CC) $(FLAGS) hw2.cpp
+ultima.o: Ultima.cpp
+	$(CC) $(FLAGS) Ultima.cpp
 
-ezQueue.o: ezStack.cpp
-	$(CC) $(FLAGS) ezStack.cpp
+scheduler.o: scheduler.cpp
+	$(CC) $(FLAGS) scheduler.cpp
+
+sema.o: sema.cpp
+	$(CC) $(FLAGS) sema.cpp
 
 clean:
 	rm -f $(OBJS) $(OUT)
