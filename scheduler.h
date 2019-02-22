@@ -3,7 +3,6 @@
 
 #include <string>
 #include <pthread.h>
-#include "Ultima.cpp"
 
 class Scheduler {
   private:
@@ -24,6 +23,9 @@ class Scheduler {
     thread_data threadInfo[MAX_WINDOWS_THREADS];
     void* perform_simple_output(void* arguments);
     Scheduler();
+
+    typedef void * (*THREADFUNCPTR)(void *);
+
 
   public:
     void create_task();   // create appropriate data structures and calls coroutine()

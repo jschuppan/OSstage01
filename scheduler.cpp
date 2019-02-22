@@ -13,7 +13,7 @@ Scheduler::Scheduler() {
 void Scheduler::create_task() {
   int createResult;
   // create a thread
-  createResult = pthread_create(pthreads[processCount], NULL, perform_simple_output, threadInfo[processCount]);
+  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
   // check if we ran into issues
   assert(!createResult);
 

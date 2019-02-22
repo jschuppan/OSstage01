@@ -1,10 +1,13 @@
 #include "window.h"
 #include "UI.h"
-#include<iostream>
+#include "linkedlist.h"
+#include "scheduler.h"
+#include "sema.h"
+#include <iostream>
 #include <curses.h>     // neede dfor Curses windowing
 #include <stdarg.h>
-#include<unistd.h>
-#include<string>
+#include <unistd.h>
+#include <string>
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
