@@ -11,12 +11,7 @@ Scheduler::Scheduler()
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-<<<<<<< HEAD
-void Scheduler::create_task(Window* Win) {
-=======
-void Scheduler::create_task()
-{
->>>>>>> 7eb7c37ec4c7f9058c302423224dabad4e991226
+  void Scheduler::create_task(Window* Win) {
   int createResult;
   threadInfo[processCount].thread_win = Win;
   // create a thread
