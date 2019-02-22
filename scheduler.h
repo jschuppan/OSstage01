@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 #include <string>
 #include <pthread.h>
@@ -24,11 +25,8 @@ public:
     private:
       int threadID, state;
     public:
-      TCB(int threadID, int state)
-      {
-        this->threadID = threadID;
-        this->state = state;
-      }
+      void setThreadID(int ID){this->threadID = ID;}
+      void setState(int state){this->state = state;}
       int getThreadID() { return this->threadID; }
       int getState() { return this->state; }
     };
@@ -53,3 +51,5 @@ public:
     void garbage_collect();
 
 };
+
+#endif
