@@ -15,12 +15,12 @@ void Scheduler::create_task(Window* Win) {
   int createResult;
   threadInfo[processCount].thread_win = Win;
   // create a thread
-  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
+  //createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
   // check if we ran into issues
   threadInfo[processCount].thread_win->write_window(1,1,"Hello");
-  createResult = pthread_join(pthreads[processCount], NULL);
+  //createResult = pthread_join(pthreads[processCount], NULL);
 
-  assert(!createResult);
+  //assert(!createResult);
 
   processCount++;
 
