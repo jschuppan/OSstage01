@@ -9,12 +9,16 @@ Scheduler::Scheduler() {
   processCount = 0;
 }
 
-void Scheduler::create_task(functionPtr, threadArg, threadName) {
+//void Scheduler::create_task(functionPtr, threadArg, threadName)
+void Scheduler::create_task(void* threadFunction) {
   int createResult;
+  int tempOutput[5]; // just for testing
 
-  createResult = pthread_create(pthread_t[processCount], NULL, perform_simple_output, &thread_args_3);
+  // create a thread
+  createResult = pthread_create(pthread_t[processCount], NULL, &threadFunction, tempOutput[processCount]);
+  // check if we ran into issues
   assert(!createResult);
-  
+
   processCount++;
 
 }
