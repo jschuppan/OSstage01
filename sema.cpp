@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "sema.h"
 
 
@@ -12,7 +13,13 @@ void Semaphore::down(int threadID) {
 
   }
   // case 2: resource is unavailable
-  
+  else if (sema_value == 0) {
+
+  }
+
+  else {
+    p
+  }
 }
 void Semaphore::up() {
 
