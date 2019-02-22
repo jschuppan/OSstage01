@@ -7,13 +7,14 @@ linkedlist :: linkedlist()
 }
 
 template<class T>
-void linkedlist :: addToEnd()
+void linkedlist :: addToEnd(T datum)
 {
     node* temp = head;
     if(!temp)
     {
       temp = new node;
       temp->next = NULL;
+      temp->datum = datum;
     }
     else if
     {
@@ -23,16 +24,18 @@ void linkedlist :: addToEnd()
       }
       temp = temp->next;
       temp = new node;
+      temp->datum = datum;
       temp->next = NULL;
     }
 }
 
 template<class T>
-void linkedlist :: addToFront()
+void linkedlist :: addToFront(T datum)
 {
     node* temp = new node;
     temp->next = head;
     head = temp;
+    head->datum = datum;
 }
 
 template<class T>

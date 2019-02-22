@@ -16,8 +16,8 @@ class linkedList
     public:
     linkedList();
 
-    void addToEnd();
-    void addToFront();
+    void addToEnd(T datum);
+    void addToFront(T datum);
     bool isEmpty();
     void deleteList();
     void removeFromFront();
