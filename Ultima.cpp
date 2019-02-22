@@ -31,7 +31,7 @@ int main()
         {
             userInf.addNewWindow();
             //debugFile << userInf.getwindowCreatedCount() << endl;
-            threadNum = s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+            s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
         }
         else if((ch = getch()) == 'q')
         {

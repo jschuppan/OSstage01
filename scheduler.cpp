@@ -18,16 +18,17 @@ Scheduler::Scheduler()
 }
 //TCB State: 0 running, 1 ready, 2 blocked, 3 dead
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-int Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
+void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
   int createResult;
   threadInfo[processCount].thread_win = threadWin;
   threadInfo[processCount].head_win = headerWin;
   threadInfo[processCount].console_win = consoleWin;
+  threadInfo[processCount].thread_no = processCount;
   TCB tcbTemp;
   tcbTemp.setThreadID(processCount);
   tcbTemp.setState(1);
-  TCBList.addToEnd(tcbTemp, processCount);
+  TCBList.addToFront(tcbTemp, processCount);
   std::ofstream debugFile2;
   debugFile2.open("debug.txt");
   debugFile2 << "thread# = " << processCount<<"\n";
@@ -41,10 +42,8 @@ int Scheduler::create_task(Window* threadWin, Window* headerWin, Window* console
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
   threadInfo[processCount].head_win->write_window(buff);
-
+  dump(5);
   processCount++;
-  //dump(5);
-  return threadInfo[processCount].thread_no;
 
 }
 
@@ -92,7 +91,7 @@ void* perform_simple_output(void* arguments)
     //debugFile2.close();
 
     // dump(5);
-    sleep(3);
+    sleep(1);
     //// the issue with the core dump is related to how the window
     //// ptr is passed
     //twindow->display_help();
