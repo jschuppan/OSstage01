@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include "sema.h"
 
 
@@ -10,17 +11,24 @@ Semaphore::Semaphore(std::string resName) {
 void Semaphore::down(int threadID) {
   // case 1: resource is available
   if (sema_value == 1) {
-
+    sema_value = 0;
+    //mutexCall();
   }
   // case 2: resource is unavailable
   else if (sema_value == 0) {
-
+    //callToScheduler()
   }
 
+  // otherwise there is an issue
   else {
-    p
+    perror("Invalid Semaphore state. Quitting!");
+    exit(0);
   }
-}
-void Semaphore::up() {
 
+}
+
+void Semaphore::up() {
+  // if (queue.isEmpty()) {
+  // sema_value = 1;
+//}
 }
