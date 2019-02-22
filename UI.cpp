@@ -7,43 +7,28 @@ UI :: UI()
   getmaxyx(stdscr, maxY, maxX); // get console screen size
   wprintw(stdscr, "Screen Height = %d, Screen width = %d", maxY, maxX);
   refresh();
+  windowsCreated = 0;
   addStarterWindows();
 }
 
 //adds UI windows
 void UI :: addStarterWindows()
 {
-  //can only create windows if no windows exist
-  if(head == NULL)
-    {
-
     //Header Window
-      head = new windowNode;
-      head->next = NULL;
-      head-> Win = new Window(getMaxY() /5, getMaxX()-4, 2, 2);
-      windowNode* temp = head;
-      windowCount++;
-      head->Win->write_window("Header");
+      windowList.addToFront(new Window(getMaxY() /5, getMaxX()-4, 2, 2),windowsCreated);
+      windowsCreated++;
 
      //Control window
-     temp->next = new windowNode;
      int y2 = temp->Win->getY() + temp->Win->getHeight();
-     temp->next->Win = new Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2);
-     temp = temp->next;
-     temp->next = NULL;
-     windowCount++;
+     windowList.addToEnd(new Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowsCreated)
+     windowsCreated++;
 
      int tempx = temp->Win->getX() + temp->Win->getWidth();
      int tempy = temp->Win->getY();
 
      //Input window
-     temp->next = new windowNode;
-     tempx = temp->Win->getX() + temp->Win->getWidth();
-     tempy = temp->Win->getY();
-     temp->next->Win = new Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx);
-     temp = temp->next;
-     temp->next = NULL;
-     windowCount++;
+     windowList.addToEnd(new Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx))
+     windowsCreated++;
      //temp->Win->write_window(windowCount);
      //wrefresh(temp->Win);
     }
