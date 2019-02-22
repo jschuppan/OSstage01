@@ -13,13 +13,14 @@ using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
 
+ofstream debugFile;
+
 int main()
 {
   initscr(); //strart curses
   refresh(); //refreshes virtual window
   UI userInf;
   Scheduler s;
-  ofstream debugFile;
   debugFile.open("debug.txt");
 
    char ch;
@@ -27,7 +28,7 @@ int main()
         if((ch = getch()) == 'a')
         {
             userInf.addNewWindow();
-            debugFile << userInf.getwindowCreatedCount() << endl;
+            // debugFile << userInf.getwindowCreatedCount() << endl;
             s.create_task(userInf.getWindowCreated());
         }
         else if((ch = getch()) == 'q')

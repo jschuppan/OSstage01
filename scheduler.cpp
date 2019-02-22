@@ -4,7 +4,7 @@
 #include <list>
 #include <assert.h>
 #include "scheduler.h"
-
+#include <fstream>
 
 Scheduler::Scheduler()
 {
@@ -15,10 +15,10 @@ Scheduler::Scheduler()
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
 void Scheduler::create_task(Window* Win) {
   int createResult;
-  thread_data threadIO;
-  threadIO.thread_win = Win;
+  threadInfo[processCount].thread_win = Win;
+
   // create a thread
-  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadIO);
+  createResult = pthread_create(&pthreads[processCount], NULL, (THREADFUNCPTR) &Scheduler::perform_simple_output, &threadInfo[processCount]);
 
   // wait for termination and check if we ran into issues
   createResult = pthread_join(pthreads[processCount], NULL);
@@ -43,7 +43,12 @@ void* Scheduler :: perform_simple_output(void* arguments)
 {
   for (int i=0; i < 10000; i++) {
     tempCounter += i;
-    Window* twindow = ( (thread_data *)arguments )->thread_win;
+    Window* twindow = threadInfo[0].thread_win;
+    // std::ofstream debugFile2;
+    // debugFile2.open("debug_thread.txt");
+    // debugFile2 << "twindow" << twindow <<"\n";
+    // debugFile2.close();
+
 
 
     //// the issue with the core dump is related to how the window
