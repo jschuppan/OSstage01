@@ -18,10 +18,14 @@ Scheduler::Scheduler()
 }
 
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
-int Scheduler::create_task(Window* Win) {
+int Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
+
   int createResult;
-  threadInfo[processCount].thread_win = Win;
-  std::ofstream debugFile2;
+  threadInfo[processCount].thread_win = threadWin;
+  threadInfo[processCount].head_win = headerWin;
+  threadInfo[processCount].console_win = consoleWin;
+  threadInfo[processCount].thread_no = processCount;
+  //std::ofstream debugFile2;
   //debugFile2.open("debug.txt");
 //  debugFile2 << "thread# = " << &temp.sleep_time <<"\n";
   //debugFile2.close();
@@ -31,6 +35,9 @@ int Scheduler::create_task(Window* Win) {
   // wait for termination and check if we ran into issues
   //createResult = pthread_join(pthreads[processCount], NULL);
   //assert(!createResult);
+  char buff[256];
+  sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
+  threadInfo[processCount].head_win->write_window(buff);
 
   processCount++;
   return threadInfo[processCount].thread_no;
@@ -56,12 +63,15 @@ void* perform_simple_output(void* arguments)
     //std::ofstream debugFile2;
     char buff[256];
     Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
-    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
 
+    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
     //ns.down(td->thread_no);
     td->thread_win->write_window(buff);
+
     //ns.up();
 
+    sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
+    td->console_win->write_window(buff);
     //debugFile2.open("debug_thread.txt");
     //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
     //debugFile2.close();

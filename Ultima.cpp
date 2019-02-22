@@ -23,7 +23,7 @@ int main()
   Scheduler s;
   debugFile.open("debug.txt");
   UI userInf;
- int treadNum;
+ int threadNum;
 
    char ch;
    for (int i=0;i<100;i++) {
