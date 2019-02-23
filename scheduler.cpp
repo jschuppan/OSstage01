@@ -30,8 +30,8 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   tcbTemp.setState(1);
   TCBList.addToFront(tcbTemp, processCount);
   std::ofstream debugFile2;
-  debugFile2.open("debug.txt");
-  debugFile2 << "thread# = " << processCount<<"\n";
+  debugFile2.open("debug.txt", std::ofstream::app);
+  debugFile2 << "thread# = " <<threadInfo[processCount].head_win <<"\n";
   debugFile2.close();
   // create a thread
   createResult = pthread_create(&pthreads[processCount], NULL, perform_simple_output, &threadInfo[processCount]);
@@ -41,7 +41,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   //assert(!createResult);
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
-  threadInfo[processCount].head_win->write_window(buff);
+  threadInfo[processCount].head_win->write_window(processCount + 1, 1,buff);
   dump(5);
   processCount++;
 
@@ -63,26 +63,29 @@ void Scheduler::dump(int level)
   std::ofstream debugFile2;
   int bs = level;
   debugFile2.open("debug_thread.txt", std:: ofstream::app);
-  debugFile2 << "thread# = " << TCBList.getDatumById(processCount)->getThreadID()<<"\n";
-  debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
+  debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
+  //debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
   debugFile2.close();
 }
 
 void* perform_simple_output(void* arguments)
 {
   int tempCounter =0;
+  char buff[256];
+  Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
+  int threadID = td->thread_no;
+
   for (int i=0; i < 10000; i++) {
     tempCounter++;
     //std::ofstream debugFile2;
-    char buff[256];
-    Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
 
-    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+    sprintf(buff, "Task-%d running #%d\n",threadID,tempCounter);
     //ns.down(td->thread_no);
+    //ns.down(td->thread_win);
     td->thread_win->write_window(buff);
 
-    //ns.up();
-    sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
+    ns.down();
+    sprintf(buff, " Thread-%d currently running.\n",threadID);
     td->console_win->write_window(buff);
 
 
