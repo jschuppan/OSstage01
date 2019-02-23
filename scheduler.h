@@ -40,7 +40,6 @@ public:
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
 
-
   public:
     Scheduler();
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
