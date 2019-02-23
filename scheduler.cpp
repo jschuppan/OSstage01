@@ -88,7 +88,7 @@ void* perform_simple_output(void* arguments)
     //ns.up();
     //mute.unlock();
 
-    sprintf(buff, " Thread-%d currently running.\n",threadID);
+    sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
     // mute.lock();
     //ns.down(threadID);
     td->console_win->write_window(buff);

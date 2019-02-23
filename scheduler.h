@@ -39,7 +39,6 @@ public:
     thread_data threadInfo[6];
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
-    // void* perform_simple_output(void* arguments)
 
 
   public:
