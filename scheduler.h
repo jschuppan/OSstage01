@@ -3,7 +3,6 @@
 
 #include <string>
 #include <pthread.h>
-#include <queue>
 #include "window.h"
 #include "linkedlist.h"
 class Scheduler {

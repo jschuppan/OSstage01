@@ -6,7 +6,12 @@
 #include "scheduler.h"
 #include "sema.h"
 #include <fstream>
-#include<unistd.h> //sleep
+#include <mutex>
+#include <cmath>
+#include <unistd.h> //sleep
+
+std::mutex mute;
+
 
 Semaphore ns("write_window");
 
@@ -75,20 +80,22 @@ void* perform_simple_output(void* arguments)
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
   int threadID = td->thread_no;
 
-  for (int i=0; i < 10000; i++) {
-    tempCounter++;
-
+  for (int i=0; i < 100000; i++) {
+    tempCounter += pow((i / 2), 2);
     sprintf(buff, "Task-%d running #%d\n",threadID,tempCounter);
-    // ns.down(threadID);
+    // mute.lock();
+    //ns.down(threadID);
     td->thread_win->write_window(buff);
-    // ns.up();
+    //ns.up();
+    //mute.unlock();
 
     sprintf(buff, " Thread-%d currently running.\n",threadID);
-    // ns.down(threadID);
+    // mute.lock();
+    //ns.down(threadID);
     td->console_win->write_window(buff);
-    // ns.up();
+    //ns.up();
+    // mute.unlock();
 
 
-    sleep(1);
   }
 }
