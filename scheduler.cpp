@@ -9,11 +9,18 @@
 #include <mutex>
 #include <cmath>
 #include <unistd.h> //sleep
+#include <random>
 
-std::mutex mute;
+std::mutex testMtx;
 
+int randomGenerator(int min, int max) {
+    std::mt19937 rng;
+    rng.seed(std::random_device()());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
 
-Semaphore ns("write_window");
+    return dist(rng);
+}
+
 
 void* perform_simple_output(void* arguments);
 
@@ -39,10 +46,6 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   TCBList.addToFront(tcbTemp, processCount);
 
 
-  std::ofstream debugFile2;
-  debugFile2.open("debug.txt", std::ofstream::app);
-  debugFile2 << "thread# = " <<threadInfo[processCount].head_win <<"\n";
-  debugFile2.close();
   // create a thread
   createResult = pthread_create(&pthreads[processCount], NULL, perform_simple_output, &threadInfo[processCount]);
   //threadInfo[0].thread_win->display_help();
@@ -52,7 +55,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
   threadInfo[processCount].head_win->write_window(processCount + 1, 1,buff);
-  dump(5);
+  //dump(5);
   processCount++;
 
 }
@@ -70,12 +73,21 @@ void Scheduler::yield()
 
 void Scheduler::dump(int level)
 {
-  std::ofstream debugFile2;
-  int bs = level;
-  debugFile2.open("debug_thread.txt", std:: ofstream::app);
-  debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
+  int bs = 0;
+  debugDump.open("sched_dump.txt", std:: ofstream::app);
+  debugDump << "\n DUMP START \n";
+
+  while((TCBList.getDatumById(bs)) != NULL) {
+    debugDump << "---- \n ThreadID: " << bs << std::endl
+               << "   " << "Status: "
+               << TCBList.getDatumById(bs)->getThreadData()->getState()
+               << std::endl << "---- \n";
+    bs++;
+  }
+  debugDump  << "\n DUMP END";
+  // debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
   //debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
-  debugFile2.close();
+  debugDump.close();
 }
 
 void* perform_simple_output(void* arguments)
@@ -83,10 +95,25 @@ void* perform_simple_output(void* arguments)
   int tempCounter =0;
   char buff[256];
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
+  std::ofstream threadDebug;
+  threadDebug.open("threadStatus.txt");
 
-  while(true) {
+
+
+  while(true)
+  {
+    sleep(1);
+    // testMtx.lock();
+      int runID = randomGenerator(10,100);
+      // threadDebug << "Thread: " << td->thread_no << "[" << runID << "]"<< std::endl;
+      threadDebug << "(" << td->thread_no << ":" << runID << ")"
+                  << "current status: " << td->state << std::endl;
+    // testMtx.unlock();
     if(td->state == 0)
     {
+        // testMtx.lock();
+        threadDebug << "   (" << td->thread_no << ":" << runID  << ")"<< "RUNNING" << std::endl;
+        // testMtx.unlock();
         tempCounter = td->state;
         sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
         // mute.lock();
@@ -102,15 +129,22 @@ void* perform_simple_output(void* arguments)
         //ns.up();
         // mute.unlock();
 
-        // setState()
+        // setState() --> replace with YIELD()
         td->state = 1;
-        sleep(1);
     }
-    else
-      pthread_yield();
-
+    else {
+      // testMtx.lock();
+      threadDebug << "   (" << td->thread_no << ":" << runID  << ")"<< "YIELDING" << std::endl;
+      // testMtx.unlock();
+      // pthread_yield();
+    }
   }
+  threadDebug.close();
 }
+
+// int Scheduler :: running(int ID) {
+//
+// }
 
 int Scheduler:: running(int ID)
 {
@@ -119,19 +153,19 @@ int Scheduler:: running(int ID)
   debugFile2.open("debug_thread.txt", std:: ofstream::app);
   debugFile2 << "running# = " << ID <<"\n";
 
-
+    // if thread not running
     if(TCBList.getDatumById(ID)->getThreadData()->getState() != 0)
     {
-      if(TCBList.getDatumById(ID+1))
+      // if the next element is not null
+      // set it to running and return following element
+      if((TCBList.getDatumById(ID+1)) != NULL)
       {
-        debugFile2 << "State# = " << TCBList.getDatumById(ID)->getThreadData()->getState()<<std::endl;
         TCBList.getDatumById(ID+1)->getThreadData()->setState(0);
         return ID+1;
       }
+      // otherwise set first thread to running
       else
       {
-        debugFile2 << "State1# = " << TCBList.getDatumById(ID)->getThreadData()->getState()<<std::endl;
-
         TCBList.getDatumById(0)->getThreadData()->setState(0);
         return 0;
       }

@@ -2,6 +2,7 @@
 #define SCHEDULER_H
 
 #include <string>
+#include <fstream>
 #include <pthread.h>
 #include <queue>
 #include "window.h"
@@ -46,11 +47,13 @@ public:
     int tempCounter;
     pthread_t pthreads[6];
     thread_data threadInfo[6];
+    std::ofstream debugDump;
+
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
 
 
-  public:
+   // public:
     Scheduler();
     int running(int ID);
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()

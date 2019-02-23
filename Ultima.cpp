@@ -12,8 +12,6 @@
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
-void checkInput();
-ofstream debugFile;
 
 int main()
 {
@@ -21,7 +19,8 @@ int main()
   refresh(); //refreshes virtual window
   linkedList <int> myList;
   Scheduler s;
-  debugFile.open("debug.txt");
+  ofstream debugUltima;
+  debugUltima.open("debugUltima.txt");
   UI userInf;
   int threadNum;
   void checkInput();
@@ -31,29 +30,74 @@ int main()
   s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
   userInf.addNewWindow();
   s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  userInf.addNewWindow();
+  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  // userInf.addNewWindow();
+  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  // userInf.addNewWindow();
+  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  // userInf.addNewWindow();
+  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+
+  for (int i=0;i<1000;i++)
+  {
+    // std::cout << "START LOOP" << "\n";
+
+       ID = s.running(ID);
+       sleep(1);
+       s.dump(0);
+      //  if((ch = getch()) == 'a')
+      //  {
+      //      userInf.addNewWindow();
+      //      s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+      //  }
+      //  else if((ch = getch()) == 'q')
+      //  {
+      //      break;
+      //  }
+      //  else if((ch = getch()) == 'd')
+      //  {
+      //    s.dump(0);
+      // }
+          // debugUltima << "END LOOP" << "\n";
+          //sleep(1);
+
+  }
 
 
 
-   while(1) {
-        //add window
-        // if((ch = getch()) == ERR){
-        //
-        // }
-        // else if((ch = getch()) == 'a')
-        // {
-        //     userInf.addNewWindow();
-        //     //debugFile << userInf.getwindowCreatedCount() << endl;
-        //     s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-        // }
-        // //quit
-        // else if((ch = getch()) == 'q')
-        // {
-        //     break;
-        // }
-        ID = s.running(ID);
-   }
+   // while(1) {
+   //      //add window
+   //      // if((ch = getch()) == ERR){
+   //      //
+   //      // }
+   //      debugUltima << "START WHILE" << "\n";
+   //
+   //      if((ch = getch()) == 'a')
+   //      {
+   //          userInf.addNewWindow();
+   //          //debugFile << userInf.getwindowCreatedCount() << endl;
+   //          s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+   //      }
+   //      //quit
+   //      else if((ch = getch()) == 'q')
+   //      {
+   //          break;
+   //      }
+   //      //dump
+   //      else if((ch = getch()) == 'd')
+   //      {
+   //          s.dump(0);
+   //      }
+   //      debugUltima << "id for this run: " << ID << "\n";
+   //      ID = s.running(ID);
+   //      debugUltima << "scheduler returned: " << ID << "\n";
+   //      debugUltima << "END WHILE" << "\n";
+   //      sleep(1);
+   //
+   // }
 endwin();
-debugFile.close();
+debugUltima.close();
 }
 
 // void checkInput()

@@ -19,4 +19,4 @@ sema.o: sema.cpp
 	$(CC) $(FLAGS) sema.cpp
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm -f $(OBJS) $(OUT) *.txt
