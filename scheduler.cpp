@@ -77,26 +77,18 @@ void* perform_simple_output(void* arguments)
 
   for (int i=0; i < 10000; i++) {
     tempCounter++;
-    //std::ofstream debugFile2;
 
     sprintf(buff, "Task-%d running #%d\n",threadID,tempCounter);
-    //ns.down(td->thread_no);
-    //ns.down(td->thread_win);
+    // ns.down(threadID);
     td->thread_win->write_window(buff);
+    // ns.up();
 
-    ns.down();
     sprintf(buff, " Thread-%d currently running.\n",threadID);
+    // ns.down(threadID);
     td->console_win->write_window(buff);
+    // ns.up();
 
 
-    //debugFile2.open("debug_thread.txt");
-    //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
-    //debugFile2.close();
-
-    // dump(5);
     sleep(1);
-    //// the issue with the core dump is related to how the window
-    //// ptr is passed
-    //twindow->display_help();
   }
 }
