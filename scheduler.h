@@ -38,7 +38,7 @@ public:
     pthread_t pthreads[6];
     thread_data threadInfo[6];
     //void* peintrform_simple_output(void* arguments);
-    //typedef void * (*THREADFUNCPTR)(void *);
+    typedef void * (*TP)(void *);
 
   public:
     Scheduler();
