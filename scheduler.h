@@ -39,6 +39,7 @@ public:
     thread_data threadInfo[6];
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
+    void* perform_simple_output(void* arguments)
 
 
   public:
@@ -48,7 +49,7 @@ public:
     void yield();  // strict round robin process switch.
     void dump(int level);
     void garbage_collect();
-    void getProcessCount() { return this->processCount; }
+    int getProcessCount() { return this->processCount; }
 
 };
 
