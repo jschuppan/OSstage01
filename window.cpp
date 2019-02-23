@@ -57,12 +57,17 @@ void Window :: display_help()
 {
   wclear(window_ptr);
   write_window(1, 1, "...Help...");
-  write_window(2, 1, "1= Kill 1");
-  write_window(3, 1, "2= Kill 2");
-  write_window(4, 1, "3= Kill 3");
-  write_window(5, 1, "c= clear screen");
-  write_window(6, 1, "h= help screen");
-  write_window(7, 1, "q= Quit");
+  write_window(2, 1, "0= Kill 0");
+  write_window(3, 1, "1= Kill 1");
+  write_window(4, 1, "2= Kill 2");
+  write_window(5, 1, "3= Kill 3");
+  write_window(6, 1, "4= Kill 4");
+  write_window(7, 1, "5= Kill 5");
+  write_window(8, 1, "c= clear screen");
+  write_window(9, 1, "h= help screen");
+  write_window(10, 1, "q= Quit");
+  write_window(11, 1, "d...Dump...");
+  write_window(12, 1, "r...Restart...");
 }
 
 //meant to be used to change window size
