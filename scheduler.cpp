@@ -76,7 +76,7 @@ void Scheduler::dump(int level)
   int bs = 0;
   debugDump.open("sched_dump.txt", std:: ofstream::app);
   debugDump << "\n DUMP START \n";
-
+  // threadStop
   while((TCBList.getDatumById(bs)) != NULL) {
     debugDump << "---- \n ThreadID: " << bs << std::endl
                << "   " << "Status: "
@@ -102,12 +102,12 @@ void* perform_simple_output(void* arguments)
 
   while(true)
   {
-    sleep(1);
+    //sleep(1);
     // testMtx.lock();
       int runID = randomGenerator(10,100);
       // threadDebug << "Thread: " << td->thread_no << "[" << runID << "]"<< std::endl;
-      threadDebug << "(" << td->thread_no << ":" << runID << ")"
-                  << "current status: " << td->state << std::endl;
+      // threadDebug << "(" << td->thread_no << ":" << runID << ")"
+      //             << "current status: " << td->state << std::endl;
     // testMtx.unlock();
     if(td->state == 0)
     {
@@ -149,7 +149,7 @@ void* perform_simple_output(void* arguments)
 int Scheduler:: running(int ID)
 {
 
-  std::ofstream debugFile2;
+  std::ofstream runDebug;
   debugFile2.open("debug_thread.txt", std:: ofstream::app);
   debugFile2 << "running# = " << ID <<"\n";
 
