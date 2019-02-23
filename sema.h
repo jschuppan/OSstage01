@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SEMA_H
+#define SEMA_H
 
 #include <mutex>
 #include <queue>
@@ -7,7 +8,7 @@
 class Semaphore {
   public:
     Semaphore(std::string resName);
-    void down(int threadID);
+    void down(pthread_t threadID);
     void up();
 
   private:
@@ -15,5 +16,7 @@ class Semaphore {
     int sema_value;
     std::queue<pthread_t> processQueue;
     std::mutex resMutex;
-    pthread_t lastPop;
+    int lastPop;
 };
+
+#endif

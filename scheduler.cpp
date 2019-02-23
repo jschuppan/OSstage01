@@ -6,7 +6,12 @@
 #include "scheduler.h"
 #include "sema.h"
 #include <fstream>
-#include<unistd.h> //sleep
+#include <mutex>
+#include <cmath>
+#include <unistd.h> //sleep
+
+std::mutex mute;
+
 
 Semaphore ns("write_window");
 
@@ -73,30 +78,28 @@ void* perform_simple_output(void* arguments)
   int tempCounter =0;
   char buff[256];
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
-  int threadID = td->thread_no;
 
-  for (int i=0; i < 10000; i++) {
-    tempCounter++;
-    //std::ofstream debugFile2;
-
-    sprintf(buff, "Task-%d running #%d\n",threadID,tempCounter);
-    //ns.down(td->thread_no);
-    //ns.down(td->thread_win);
+  for (int i=0; i < 100000; i++) {
+    tempCounter += pow((i / 2), 2);
+    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+    // mute.lock();
+    //ns.down(threadID);
     td->thread_win->write_window(buff);
+    //ns.up();
+    //mute.unlock();
 
-    ns.down();
-    sprintf(buff, " Thread-%d currently running.\n",threadID);
+    sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
+    // mute.lock();
+    //ns.down(threadID);
     td->console_win->write_window(buff);
+    //ns.up();
+    // mute.unlock();
 
-
-    //debugFile2.open("debug_thread.txt");
-    //debugFile2 << "thread# = " << &td->sleep_time<<"\n";
-    //debugFile2.close();
-
-    // dump(5);
+    // setState()
     sleep(1);
-    //// the issue with the core dump is related to how the window
-    //// ptr is passed
-    //twindow->display_help();
+
+    pthread_yield();
+
+
   }
 }
