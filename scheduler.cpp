@@ -16,6 +16,7 @@ std::mutex mute;
 Semaphore ns("write_window");
 
 void* perform_simple_output(void* arguments);
+
 Scheduler::Scheduler()
 {
   processCount = 0;
@@ -26,6 +27,7 @@ Scheduler::Scheduler()
 void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
   int createResult;
+
   threadInfo[processCount].thread_win = threadWin;
   threadInfo[processCount].head_win = headerWin;
   threadInfo[processCount].console_win = consoleWin;
@@ -33,7 +35,10 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   TCB tcbTemp;
   tcbTemp.setThreadID(processCount);
   tcbTemp.setState(1);
+  tcbTemp.setThreadData(&threadInfo[processCount]);
   TCBList.addToFront(tcbTemp, processCount);
+
+
   std::ofstream debugFile2;
   debugFile2.open("debug.txt", std::ofstream::app);
   debugFile2 << "thread# = " <<threadInfo[processCount].head_win <<"\n";
@@ -79,27 +84,58 @@ void* perform_simple_output(void* arguments)
   char buff[256];
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
 
-  for (int i=0; i < 100000; i++) {
-    tempCounter += pow((i / 2), 2);
-    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
-    // mute.lock();
-    //ns.down(threadID);
-    td->thread_win->write_window(buff);
-    //ns.up();
-    //mute.unlock();
+  while(true) {
+    if(td->state == 0)
+    {
+        tempCounter = td->state;
+        sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+        // mute.lock();
+        //ns.down(threadID);
+        td->thread_win->write_window(buff);
+        //ns.up();
+        //mute.unlock();
 
-    sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
-    // mute.lock();
-    //ns.down(threadID);
-    td->console_win->write_window(buff);
-    //ns.up();
-    // mute.unlock();
+        sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
+        // mute.lock();
+        //ns.down(threadID);
+        td->console_win->write_window(buff);
+        //ns.up();
+        // mute.unlock();
 
-    // setState()
-    sleep(1);
-
-    pthread_yield();
-
+        // setState()
+        td->state = 1;
+        sleep(1);
+    }
+    else
+      pthread_yield();
 
   }
+}
+
+int Scheduler:: running(int ID)
+{
+
+  std::ofstream debugFile2;
+  debugFile2.open("debug_thread.txt", std:: ofstream::app);
+  debugFile2 << "running# = " << ID <<"\n";
+
+
+    if(TCBList.getDatumById(ID)->getThreadData()->getState() != 0)
+    {
+      if(TCBList.getDatumById(ID+1))
+      {
+        debugFile2 << "State# = " << TCBList.getDatumById(ID)->getThreadData()->getState()<<std::endl;
+        TCBList.getDatumById(ID+1)->getThreadData()->setState(0);
+        return ID+1;
+      }
+      else
+      {
+        debugFile2 << "State1# = " << TCBList.getDatumById(ID)->getThreadData()->getState()<<std::endl;
+
+        TCBList.getDatumById(0)->getThreadData()->setState(0);
+        return 0;
+      }
+    }
+    debugFile2.close();
+    return ID;
 }

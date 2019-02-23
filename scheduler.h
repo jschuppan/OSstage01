@@ -3,6 +3,7 @@
 
 #include <string>
 #include <pthread.h>
+#include <queue>
 #include "window.h"
 #include "linkedlist.h"
 class Scheduler {
@@ -16,16 +17,24 @@ public:
       bool kill_signal;
       int sleep_time;
       int thread_results;
+      int state = 1;
+
+    public:
+      void setState(int state){this->state = state;}
+      int getState() { return this->state; }
     };
 
     struct TCB
     {
       // state: 0 (running), 1 (ready), 2 (blocked)
     private:
+      thread_data* threadData;
       int threadID, state;
     public:
+      void setThreadData(thread_data* d){this->threadData = d;}
       void setThreadID(int ID){this->threadID = ID;}
       void setState(int state){this->state = state;}
+      thread_data* getThreadData(){return threadData;}
       int getThreadID() { return this->threadID; }
       int getState() { return this->state; }
     };
@@ -38,16 +47,17 @@ public:
     pthread_t pthreads[6];
     thread_data threadInfo[6];
     //void* peintrform_simple_output(void* arguments);
-    typedef void * (*TP)(void *);
+    //typedef void * (*THREADFUNCPTR)(void *);
+
 
   public:
     Scheduler();
+    int running(int ID);
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
     void yield();  // strict round robin process switch.
     void dump(int level);
     void garbage_collect();
-    int getProcessCount() { return this->processCount; }
 
 };
 
