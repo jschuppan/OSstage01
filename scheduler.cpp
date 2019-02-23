@@ -78,11 +78,10 @@ void* perform_simple_output(void* arguments)
   int tempCounter =0;
   char buff[256];
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
-  int threadID = td->thread_no;
 
   for (int i=0; i < 100000; i++) {
     tempCounter += pow((i / 2), 2);
-    sprintf(buff, "Task-%d running #%d\n",threadID,tempCounter);
+    sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
     // mute.lock();
     //ns.down(threadID);
     td->thread_win->write_window(buff);
@@ -95,6 +94,11 @@ void* perform_simple_output(void* arguments)
     td->console_win->write_window(buff);
     //ns.up();
     // mute.unlock();
+
+    // setState()
+    sleep(1);
+
+    pthread_yield();
 
 
   }
