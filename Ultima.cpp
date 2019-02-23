@@ -15,8 +15,16 @@ const int MAX_WINDOWS_THREADS = 6;
 
 int main()
 {
+
+
+                               // If no input is ready, getch returns ERR
   initscr(); //strart curses
   refresh(); //refreshes virtual window
+
+  cbreak();                     // disable line buffering
+  noecho();                    // disable automatic echo of characters read by getch(), wgetch()
+  nodelay(stdscr, true);  // nodelay causes getch to be a non-blocking call.
+
   linkedList <int> myList;
   Scheduler s;
   ofstream debugUltima;
@@ -25,7 +33,7 @@ int main()
   int threadNum;
   void checkInput();
   char ch;
-  int ID = 0;
+  int ID = 2;
   userInf.addNewWindow();
   s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
   userInf.addNewWindow();
@@ -39,28 +47,28 @@ int main()
   // userInf.addNewWindow();
   // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
 
-  for (int i=0;i<1000;i++)
+  while(1)
   {
     // std::cout << "START LOOP" << "\n";
 
        ID = s.running(ID);
        sleep(1);
        s.dump(0);
-      //  if((ch = getch()) == 'a')
-      //  {
-      //      userInf.addNewWindow();
-      //      s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-      //  }
-      //  else if((ch = getch()) == 'q')
-      //  {
-      //      break;
-      //  }
-      //  else if((ch = getch()) == 'd')
-      //  {
-      //    s.dump(0);
-      // }
-          // debugUltima << "END LOOP" << "\n";
-          //sleep(1);
+       if((ch = getch()) == 'a')
+       {
+           userInf.addNewWindow();
+           s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+       }
+       else if(ch == 'q')
+       {
+           break;
+       }
+       else if(ch == 'd')
+       {
+         s.dump(0);
+      }
+          debugUltima << "END LOOP" << "\n";
+        //  sleep(1);
 
   }
 

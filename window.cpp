@@ -1,5 +1,5 @@
 #include "window.h"
-#include <curses.h>     // neede dfor Curses windowing
+#include <curses.h>     // needed for Curses windowing
 #include <stdarg.h>
 #include <iostream>
 

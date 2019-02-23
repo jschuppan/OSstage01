@@ -13,6 +13,8 @@
 
 std::mutex testMtx;
 
+void* perform_simple_output(void* arguments);
+
 int randomGenerator(int min, int max) {
     std::mt19937 rng;
     rng.seed(std::random_device()());
@@ -20,9 +22,6 @@ int randomGenerator(int min, int max) {
 
     return dist(rng);
 }
-
-
-void* perform_simple_output(void* arguments);
 
 Scheduler::Scheduler()
 {
@@ -33,6 +32,9 @@ Scheduler::Scheduler()
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
 void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
+
+  if(processCount > 5 )
+    return;
   int createResult;
 
   threadInfo[processCount].thread_win = threadWin;
@@ -54,12 +56,12 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   //assert(!createResult);
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
+  threadInfo[processCount].thread_win->write_window("\n");
   threadInfo[processCount].head_win->write_window(processCount + 1, 1,buff);
   //dump(5);
   processCount++;
 
 }
-
 void Scheduler::yield()
 {
   int result;
@@ -114,15 +116,15 @@ void* perform_simple_output(void* arguments)
         // testMtx.lock();
         threadDebug << "   (" << td->thread_no << ":" << runID  << ")"<< "RUNNING" << std::endl;
         // testMtx.unlock();
-        tempCounter = td->state;
-        sprintf(buff, "Task-%d running #%d\n",td->thread_no,tempCounter);
+        tempCounter++;
+        sprintf(buff, "  Task-%d running #%d\n",td->thread_no,tempCounter);
         // mute.lock();
         //ns.down(threadID);
         td->thread_win->write_window(buff);
         //ns.up();
         //mute.unlock();
 
-        sprintf(buff, " Thread-%d currently running.\n",td->thread_no);
+        sprintf(buff, "  Thread-%d currently running.\n",td->thread_no);
         // mute.lock();
         //ns.down(threadID);
         td->console_win->write_window(buff);
