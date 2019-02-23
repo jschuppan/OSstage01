@@ -150,9 +150,9 @@ int Scheduler:: running(int ID)
 {
 
   std::ofstream runDebug;
-  debugFile2.open("debug_thread.txt", std:: ofstream::app);
+  runDebug.open("debug_thread.txt", std:: ofstream::app);
   // debugFile2 << "running# = " << ID <<"\n";
-  debugFile << ID << ": " << TCBList.getDatumById(ID)->getThreadData()->getState() << std::endl;
+  runDebug << ID << ": " << TCBList.getDatumById(ID)->getThreadData()->getState() << std::endl;
 
     // if thread not running
     if(TCBList.getDatumById(ID)->getThreadData()->getState() != 0)
@@ -171,6 +171,6 @@ int Scheduler:: running(int ID)
         return 0;
       }
     }
-    debugFile2.close();
+    runDebug.close();
     return ID;
 }
