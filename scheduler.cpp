@@ -67,15 +67,17 @@ void Scheduler::dump(Window* targetWin, int level)
   // suspend threads and wait to make sure
   // everything is synced
   char dBuff[255];
-  std::ofstream debugDump;
-  // debugDump.open("debugDump.txt", std::ofstream::out | std::ofstream::app);
   SCHEDULER_SUSPENDED = true;
   TCB* myT = NULL;
   int ts;
-  debugDump <<"Before Loop" << std::endl;
+
+  if(level == 3 || level == 4) {
+    writeSema.dump(targetWin, level);
+  }
 
 
   sprintf(dBuff, "\n \n");
+  usleep(1000);
   while ((myT = TCBList.getNextElementUntilEnd(myT))) {
     int tn = myT->getThreadData()->getThreadNo();
     int ts = myT->getThreadData()->getState();
@@ -93,45 +95,7 @@ void Scheduler::dump(Window* targetWin, int level)
 
   targetWin->write_window(dBuff);
 
-  // debugDump << dBuff;
-  //
-  // debugDump <<"After loop" << std::endl;
-
-
-
-  // sprintf(dBuff, "------Scheduler Dump------\n");
-  // debugDump << dBuff;
-  // while(TCBList.getNextElementUntilEnd(NULL)) {
-  //   debugDump << TCBList.getNextElementUntilEnd(NULL)->getThreadData()->getThreadNo() << std::endl;
-  // }
-
-
-
-  // // compile current threat data
-  // while((TCBList.getDatumById(bs)) != NULL) {
-  //   int state = TCBList.getDatumById(bs)->getThreadData()->getState();
-  //   sprintf(dBuff, "Thread ID: ");
-  //   // sprintf(dBuff, (const char*)TCBList.getDatumById(bs)->getThreadData()->getThreadNo());
-  //   sprintf(dBuff, "\n    Status: ");
-  //   if(state == 0)
-  //     sprintf(dBuff, "Running");
-  //   else if (state == 1)
-  //     sprintf(dBuff, "Ready");
-  //   else if (state == 2)
-  //     sprintf(dBuff, "Blocked");
-  //   else if (state == 3)
-  //     sprintf(dBuff, "Dead");
-  //   else
-  //     sprintf(dBuff, "INVALID STATE");
-  //   sprintf(dBuff, "\n");
-  //   bs++;
-  // }
-  // targetWin->write_window(1, 1 , dBuff);
-
-  // debugDump.close();
-
   SCHEDULER_SUSPENDED = false;
-  // resume();
 }
 
 // stop():   This function stops all operations of the program
@@ -152,16 +116,12 @@ void* perform_simple_output(void* arguments)
   char buff[256];
   int wasLocked = false;
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
-  std::ofstream threadDebug;
-  threadDebug.open("threadStatus.txt");
 
   do {
   while((1) && (td->state != 4))
   {
     // check for suspend called by dump
     while (THREAD_SUSPENDED);
-
-    threadDebug << td->thread_no << " : " <<  td->state << std::endl;
 
     if(td->state == 0)
     {
@@ -188,8 +148,6 @@ void* perform_simple_output(void* arguments)
     }
   }
 } while(!THREAD_SUSPENDED);
-  threadDebug.close();
-
 }
 
 // running():
