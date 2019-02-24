@@ -3,6 +3,7 @@
 #include <iostream>
 #include <queue>
 #include "sema.h"
+#include <fstream>
 
 const bool DEBUG = false;
 
@@ -84,12 +85,14 @@ void Semaphore::up()
 
 }
 
-void dump(Window* targetWin, int level)
+void Semaphore :: dump(Window* targetWin, int level)
 {
-  TCB* myT = NULL;
+  std :: ofstream debugDump;
+  debugDump.open("semaDump.txt", std::ofstream::app);
+  //TCB* myT = NULL;
   debugDump <<"Before Loop" << std::endl;
 
-  while (!processQueue.isEmpty())
+  while (!processQueue.empty())
   {
     debugDump << processQueue.front();
   }
