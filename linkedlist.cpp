@@ -172,7 +172,9 @@ T* linkedList<T> ::  getNextElement(T* ndv)
 template<class T>
 T* linkedList<T> ::  getNextElementUntilEnd(T* ndv)
 {
+
   if(!head) {
+  //std::cout << "its me the devil" << std::endl;
     return NULL;
   }
   if(ndv == NULL)
@@ -186,6 +188,9 @@ T* linkedList<T> ::  getNextElementUntilEnd(T* ndv)
   {
     if (temp->next->datum == *ndv)
     {
+      if(!temp->next->next)
+          return NULL;
+      else
           return &temp->next->next->datum;
     }
     temp = temp->next;

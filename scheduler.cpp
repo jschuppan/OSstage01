@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <list>
 #include <assert.h>
+#include <fstream>
 #include "scheduler.h"
 #include "sema.h"
 #include <fstream>
@@ -16,10 +17,11 @@ bool THREAD_SUSPENDED = false;
 
 void* perform_simple_output(void* arguments);
 
+
 Scheduler::Scheduler()
 {
-  processCount = 0;
-  tempCounter = 0;
+  this->processCount = 0;
+  this->tempCounter = 0;
 }
 //TCB State: 0 running, 1 ready, 2 blocked, 3 dead
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
@@ -64,12 +66,29 @@ void Scheduler::dump(Window* targetWin, int level)
   // suspend threads and wait to make sure
   // everything is synced
   char dBuff[255];
+  std::ofstream debugDump;
+  debugDump.open("debugDump.txt", std::ofstream::out | std::ofstream::app);
   // stop();
   SCHEDULER_SUSPENDED = true;
   int bs = 0;
+  TCB* myT = NULL;
+  debugDump <<"Before Loop" << std::endl;
 
-  // targetWin.write_window(buff);
-  sprintf(dBuff, "------Scheduler Dump------\n");
+  while ((myT = TCBList.getNextElementUntilEnd(myT))) {
+    debugDump <<"Looping " << std::endl;
+  }
+
+  debugDump <<"After loop" << std::endl;
+
+
+  // // targetWin.write_window(buff);
+  // sprintf(dBuff, "------Scheduler Dump------\n");
+  // debugDump << dBuff;
+  // while(TCBList.getNextElementUntilEnd(NULL)) {
+  //   debugDump << TCBList.getNextElementUntilEnd(NULL)->getThreadData()->getThreadNo() << std::endl;
+  // }
+
+
 
   // // compile current threat data
   // while((TCBList.getDatumById(bs)) != NULL) {
@@ -90,7 +109,9 @@ void Scheduler::dump(Window* targetWin, int level)
   //   sprintf(dBuff, "\n");
   //   bs++;
   // }
-  targetWin->write_window(1, 1 , dBuff);
+  // targetWin->write_window(1, 1 , dBuff);
+
+  debugDump.close();
 
   SCHEDULER_SUSPENDED = false;
   // resume();
