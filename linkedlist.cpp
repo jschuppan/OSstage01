@@ -2,11 +2,14 @@
 #include "window.h"
 #include "scheduler.h"
 #include<iostream>
+#include "linkedlist.h"
 
+using namespace std;
 template<class T>
 linkedList<T> :: linkedList()
 {
   head = NULL;
+  size = 0;
 }
 
 template<class T>
@@ -19,6 +22,7 @@ void linkedList<T> :: addToEnd(T datum, int id)
       temp->next = NULL;
       temp->datum = datum;
       temp->id = id;
+      size++;
     }
     else
     {
@@ -31,6 +35,7 @@ void linkedList<T> :: addToEnd(T datum, int id)
       temp->datum = datum;
       temp->id = id;
       temp->next = NULL;
+      size++;
     }
 }
 
@@ -42,6 +47,7 @@ void linkedList<T> :: addToFront(T datum, int id)
     head = temp;
     head->datum = datum;
     head->id = id;
+    size++;
 }
 
 template<class T>
@@ -61,6 +67,7 @@ void linkedList<T> :: deleteList()
     removeFromFront();
   }
   head = NULL;
+  size = 0;
 }
 
 template<class T>
@@ -70,6 +77,7 @@ void linkedList<T> :: removeFromFront()
   head = head->next;
   delete temp;
   temp = NULL;
+  size--;
 }
 
 template<class T>
@@ -83,6 +91,7 @@ void linkedList<T> :: removeFromEnd()
   temp->next = new node;
   temp = temp->next;
   temp->next = NULL;
+  size--;
 }
 
 template<class T>
@@ -100,6 +109,61 @@ T* linkedList<T> :: getDatumById(int id)
   return &temp->datum;
 }
 
+template<class T>
+void linkedList<T> :: removeNodeByElement(int element)
+{
+    //empty list
+    if(!head)
+      return;
+    node* temp = head;
+    if(temp->id == element)
+    {
+      cout<<"REASSIGN HEAD"<<endl;
+        head = head->next;
+	cout<<"ABOUT TO DELETE TEMP"<<endl;
+	delete temp;
+	cout<<"TEMP DELETED" <<endl;
+	temp = NULL;
+	size--;
+	return;
+    }
+
+    while(temp->next)
+    {
+      if(temp->next->id == element)
+      {
+        temp->next = temp->next->next;
+        delete temp->next;
+	size--;
+        return;
+      }
+      temp = temp->next;
+    }
+}
+
+template<class T>
+node* linkedList<T> ::  getNextElement(node* nd)
+{
+  if(!head)
+    return NULL;
+
+  if(!nd)
+    return head;
+
+  else
+    if(!nd->next)
+      return head;
+      
+    else
+      return nd->next;
+  }
+}
+
+template<class T>
+int linkedList<T> :: getSize(){return size;}
+
+template<class T>
+void linkedList<T> :: setSize(int size){size = size;}
 
 template class linkedList<int>;
 template class linkedList<Window>;

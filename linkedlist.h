@@ -15,6 +15,7 @@ class linkedList
     };
 
     node* head;
+    int size;
 
     public:
     linkedList();
@@ -26,4 +27,9 @@ class linkedList
     void removeFromFront();
     void removeFromEnd();
     T* getDatumById(int id);
+    void removeNodeByElement(int element);
+    node* getNextElement(node*);
+
+    int getSize();
+    void setSize(int size);
 };
