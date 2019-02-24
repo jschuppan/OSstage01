@@ -12,6 +12,8 @@
 #include <random>
 
 std::mutex testMtx;
+bool THREAD_SUSPENDED = false;
+std::mutex suspend_mtx;
 
 void* perform_simple_output(void* arguments);
 
@@ -31,7 +33,6 @@ Scheduler::Scheduler()
 //TCB State: 0 running, 1 ready, 2 blocked, 3 dead
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
 void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
-
 
   if(processCount > 5 )
     return;
@@ -75,6 +76,12 @@ void Scheduler::yield()
 
 void Scheduler::dump(int level)
 {
+  // suspend threads and wait to make sure
+  // everything is synced
+  THREAD_SUSPENDED = true;
+  sleep(1);
+
+
   int bs = 0;
   debugDump.open("sched_dump.txt", std:: ofstream::app);
   debugDump << "\n DUMP START \n";
@@ -87,6 +94,8 @@ void Scheduler::dump(int level)
     bs++;
   }
   debugDump  << "\n DUMP END";
+
+  THREAD_SUSPENDED = false;
   // debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
   //debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
   debugDump.close();
@@ -94,7 +103,7 @@ void Scheduler::dump(int level)
 
 void* perform_simple_output(void* arguments)
 {
-  int tempCounter =0;
+  int tempCounter = 0;
   char buff[256];
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
   std::ofstream threadDebug;
@@ -102,6 +111,18 @@ void* perform_simple_output(void* arguments)
 
   while((1) && (td->state != 4))
   {
+    // check for suspend called by dump
+    if (THREAD_SUSPENDED) {
+      // we use try_lock to prevent deadlock
+      if(!suspend_mtx.try_lock()) {
+        suspend_mtx.lock();
+      };
+    }
+    // if thread is no longer suspended keep going
+    else {
+      suspend_mtx.unlock();
+    }
+
     //sleep(1);
     // testMtx.lock();
       int runID = randomGenerator(10,100);

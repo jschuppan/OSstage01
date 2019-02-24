@@ -5,6 +5,7 @@
 #include <fstream>
 #include <pthread.h>
 #include <queue>
+#include <mutex>
 #include "window.h"
 #include "linkedlist.h"
 class Scheduler {
@@ -47,10 +48,11 @@ public:
     int tempCounter;
     pthread_t pthreads[6];
     thread_data threadInfo[6];
-    std::ofstream debugDump;
 
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
+
+    std::ofstream debugDump;
 
 
    // public:
