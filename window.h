@@ -22,6 +22,7 @@ public:
     void moveWindow(int y, int x);
     void windowRefresh();
     void resizeWindow(int height, int width);
+    void createMaxSizeWindow();
 
     //Accessors
     int getX();

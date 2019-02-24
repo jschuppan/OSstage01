@@ -7,9 +7,8 @@ using namespace std;
 //defualt constructer
 Window:: Window()
 {
-  int maxY, maxX;
-  getmaxyx(stdscr, maxY, maxX); // get console screen size
-  create_window(maxY-1,maxX-1,1,1);
+    height = width = x = y = 0;
+    window_ptr =NULL;
 }
 
 //constructor
@@ -88,6 +87,15 @@ void Window :: moveWindow(int y, int x)
 {
     mvwin(window_ptr, y, x);
 }
+
+void Window :: createMaxSizeWindow()
+{
+    int maxY, maxX;
+    getmaxyx(stdscr, maxY, maxX);
+    create_window(maxY-1, maxX-1, 1,1);
+}
+
+
 //Mutators
 void Window:: setWindowPtr(WINDOW* window_ptr){this->window_ptr = window_ptr;}
 void Window:: setX(int x){this->x = x;}
