@@ -73,7 +73,7 @@ void Scheduler::yield()
   }
 }
 
-void Scheduler::dump(Window* targetWin, int level)
+void Scheduler::dump(WINDOW* targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced

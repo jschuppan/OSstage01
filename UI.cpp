@@ -114,7 +114,7 @@ void clearConsoleScreen()
     wrefresh(stdscr);
 }
 
-Window* createMaxWindow()
+WINDOW* createMaxWindow()
 {
   Window win;
   win.createMaxSizeWindow();

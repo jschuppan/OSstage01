@@ -41,41 +41,58 @@ int main()
   s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
 
 //loop until q is pressed
-  while(1)
+  while(ch != 'q')
   {
     // std::cout << "START LOOP" << "\n";
 
        ID = s.running(ID);
        // sleep(1);
-       if((ch = getch()) == 'a')
+       ch= getch();
+       switch (ch)
        {
-           userInf.addNewWindow();
-           s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+         case 'a':
+         {
+             userInf.addNewWindow();
+             s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+             break;
+         }
+         case 'q':
+         {
+             break;
+         }
+         case 's':
+         {
+             wrapperDump(s,userInf,1);
+             break;
+         }
+        case 'd':
+        {
+             wrapperDump(s,userInf,2);
+             break;
+        }
+        case 'f':
+        {
+             wrapperDump(s,userInf,3);
+             break;
+        }
+        case 'g':
+        {
+            wrapperDump(s,userInf,4);
+            break;
+        }
+        case  'c':
+        {
+            userInf.getWindowByID(2)->clearScreen();
+            break;
+        }
+        case 'h':
+        {
+            userInf.getWindowByID(2)->display_help();
+            userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
+            break;
+        }
        }
-       else if(ch == 'q')
-       {
-           break;
-       }
-       else if(ch == 's')
-       {
-           wrapperDump(s,userInf,1);
-       }
-      else if(ch == 'd')
-      {
-           wrapperDump(s,userInf,2);
-      }
-      else if(ch == 'f')
-      {
-           wrapperDump(s,userInf,3);
-      }
-      else if(ch == 'g')
-      {
-          wrapperDump(s,userInf,4);
-      }
-      else if(ch == 'c')
-      {
-          userInf.getWindowByID(2)->clearScreen();
-      }
+
         //  sleep(1);
   }
  endwin();
@@ -92,16 +109,6 @@ void wrapperDump(Scheduler &s, UI userInf, int level)
 }
  // void checkInput()
  // {
-
-  //       case 'c':           // clear the console window
-  //           refresh(); // Clear the entire screen (in case it is corrupted)
-  //           wclear(userInf.getWindowByID(2)); // Clear the Console window
-  //           userInf.getWindowByID(2)->write_window( 1, 1, "Ultima # ");
-  //           break;
-  //       case 'h':
-  //           userInf.getWindowByID(2)->display_help();
-  //           userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
-  //           break;
   //       case 'q':           // end the loop, and end the program.
   //           userInf.getWindowByID(2)->write_window(" Quiting the main program....\n" );
   //           break;

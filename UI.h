@@ -20,7 +20,7 @@ class UI
     void addNewWindow();
     void resize();
     void clearConsoleScreen();
-    Window* createMaxWindow();
+    WINDOW* createMaxWindow();
 
     //mutators
     void setWindowCreatedCount(int windowCreatedCount);
