@@ -62,14 +62,23 @@ int main()
        {
            break;
        }
-       else if(ch == 'd')
+       else if(ch == 's')
        {
-         sleep(1);
-         s.dump(0);
+           s.dump(1);
        }
-          debugUltima << "END LOOP" << "\n";
+      else if(ch == 'd')
+      {
+           s.dump(2);
+      }
+      else if(ch == 'f')
+      {
+           s.dump(3);
+      }
+      else if(ch == 'g')
+      {
+           s.dump(4);
+      }
         //  sleep(1);
-
   }
 
 
