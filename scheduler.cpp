@@ -71,29 +71,26 @@ void Scheduler::dump(Window* targetWin, int level)
   // targetWin.write_window(buff);
   sprintf(dBuff, "------Scheduler Dump------\n");
 
-  // compile current threat data
+  // // compile current threat data
   // while((TCBList.getDatumById(bs)) != NULL) {
-  //   // int state = TCBList.getDatumById(bs)->getThreadData()->getState();
-  //   // sprintf(dBuff, "Thread ID: ");
+  //   int state = TCBList.getDatumById(bs)->getThreadData()->getState();
+  //   sprintf(dBuff, "Thread ID: ");
   //   // sprintf(dBuff, (const char*)TCBList.getDatumById(bs)->getThreadData()->getThreadNo());
-  //   // sprintf(dBuff, "\n    Status: ");
-  //   // if(state == 0)
-  //   //   sprintf(dBuff, "Running");
-  //   // else if (state == 1)
-  //   //   sprintf(dBuff, "Ready");
-  //   // else if (state == 2)
-  //   //   sprintf(dBuff, "Blocked");
-  //   // else if (state == 3)
-  //   //   sprintf(dBuff, "Dead");
-  //   // else
-  //   //   sprintf(dBuff, "INVALID STATE");
-  //
+  //   sprintf(dBuff, "\n    Status: ");
+  //   if(state == 0)
+  //     sprintf(dBuff, "Running");
+  //   else if (state == 1)
+  //     sprintf(dBuff, "Ready");
+  //   else if (state == 2)
+  //     sprintf(dBuff, "Blocked");
+  //   else if (state == 3)
+  //     sprintf(dBuff, "Dead");
+  //   else
+  //     sprintf(dBuff, "INVALID STATE");
   //   sprintf(dBuff, "\n");
-  //
-  //
   //   bs++;
   // }
-  targetWin->write_window(1, 1 , "test");
+  targetWin->write_window(1, 1 , dBuff);
 
   SCHEDULER_SUSPENDED = false;
   // resume();
