@@ -52,7 +52,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   createResult = pthread_create(&pthreads[processCount], NULL, perform_simple_output, &threadInfo[processCount]);
   //threadInfo[0].thread_win->display_help();
   // wait for termination and check if we ran into issues
-  //createResult = pthread_join(pthreads[processCount], NULL);
+  createResult = pthread_join(pthreads[processCount], NULL);
   //assert(!createResult);
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
@@ -100,9 +100,7 @@ void* perform_simple_output(void* arguments)
   std::ofstream threadDebug;
   threadDebug.open("threadStatus.txt");
 
-
-
-  while(true)
+  while((1) && (td->state != 4))
   {
     //sleep(1);
     // testMtx.lock();
