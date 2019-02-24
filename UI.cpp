@@ -108,6 +108,11 @@ void UI :: update()
     }
 }
 
+void clearConsoleScreen()
+{
+    wclear(stdscr);
+    wrefresh(stdscr);
+}
 //accessors
 int UI :: getMaxY(){return maxY;}
 int UI :: getMaxX(){return maxX;}

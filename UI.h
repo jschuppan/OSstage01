@@ -19,6 +19,7 @@ class UI
     void addStarterWindows();
     void addNewWindow();
     void resize();
+    void clearConsoleScreen();
 
     //mutators
     void setWindowCreatedCount(int windowCreatedCount);

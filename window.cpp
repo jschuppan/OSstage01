@@ -95,6 +95,11 @@ void Window :: createMaxSizeWindow()
     create_window(maxY-1, maxX-1, 1,1);
 }
 
+void clearScreen()
+{
+  wclear(window_ptr);
+  wrefresh(window_ptr);
+}
 
 //Mutators
 void Window:: setWindowPtr(WINDOW* window_ptr){this->window_ptr = window_ptr;}

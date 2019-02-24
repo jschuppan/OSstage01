@@ -12,6 +12,7 @@
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
+void wrapperDump(Scheduler s, UI userInf, int level)
 
 int main()
 {
@@ -27,26 +28,19 @@ int main()
 
   linkedList <int> myList;
   Scheduler s;
-  ofstream debugUltima;
-  debugUltima.open("debugUltima.txt");
   UI userInf;
-  int threadNum;
-  void checkInput();
   char ch;
   int ID = 2;
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  // userInf.addNewWindow();
-  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  // userInf.addNewWindow();
-  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  // userInf.addNewWindow();
-  // s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
 
+  //Create starter threads and windows
+  userInf.addNewWindow();
+  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  userInf.addNewWindow();
+  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+  userInf.addNewWindow();
+  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+
+//loop until q is pressed
   while(1)
   {
     // std::cout << "START LOOP" << "\n";
@@ -64,89 +58,41 @@ int main()
        }
        else if(ch == 's')
        {
-           s.dump(1);
+           wrapperDump(s,userInf,1);
        }
       else if(ch == 'd')
       {
-           s.dump(2);
+           wrapperDump(s,userInf,2);
       }
       else if(ch == 'f')
       {
-           s.dump(3);
+           wrapperDump(s,userInf,3);
       }
       else if(ch == 'g')
       {
-           s.dump(4);
+          wrapperDump(s,userInf,4);
+      }
+      else if(ch == 'c')
+      {
+          userInf.getDatumById(2)->clearScreen();
       }
         //  sleep(1);
   }
-
-
-
-   // while(1) {
-   //      //add window
-   //      // if((ch = getch()) == ERR){
-   //      //
-   //      // }
-   //      debugUltima << "START WHILE" << "\n";
-   //
-   //      if((ch = getch()) == 'a')
-   //      {
-   //          userInf.addNewWindow();
-   //          //debugFile << userInf.getwindowCreatedCount() << endl;
-   //          s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-   //      }
-   //      //quit
-   //      else if((ch = getch()) == 'q')
-   //      {
-   //          break;
-   //      }
-   //      //dump
-   //      else if((ch = getch()) == 'd')
-   //      {
-   //          s.dump(0);
-   //      }
-   //      debugUltima << "id for this run: " << ID << "\n";
-   //      ID = s.running(ID);
-   //      debugUltima << "scheduler returned: " << ID << "\n";
-   //      debugUltima << "END WHILE" << "\n";
-   //      sleep(1);
-   //
-   // }
-endwin();
-debugUltima.close();
+ endwin();
 }
 
-// void checkInput()
-// {
-  // int processCounter;
-  // while(input != 'q')
-  //  {
-  //    processCounter = s.getProcessCount();
-  //    input = wgetch(Console_Win);
-  //    switch(input)
-  //    {
-  //      case '0':
-  //      case '1':
-  //      case '2':
-  //      case '3':
-  //      case '4':
-  //      case '5':
-  //           if (input == '0' && processCounter >= -1) thread_args_0.kill_signal = true;
-  //           else if (input == '1' && processCounter >= 1) thread_args_1.kill_signal = true;
-  //           else if(input == '2' && processCounter >= 2)  thread_args_2.kill_signal = true;
-  //           else if (input == '3'&& processCounter >= 3) thread_args_3.kill_signal = true;
-  //           else if(input == '4'&& processCounter >= 4)  thread_args_4.kill_signal = true;
-  //           else if(input == '5'&& processCounter >= 5)  thread_args_5.kill_signal = true;
-  //           sprintf(buff, " %c\n", input);
-  //           userInf.getWindowByID(2)->write_window( buff);
-  //           sprintf(buff, " Kill = %c\n", input);
-  //           userInf.getWindowByID(2)->write_window(buff);
-  //           userInf.getWindowByID(2)->write_window(buff);
-  //           sleep(4);
-  //           wclear(userInf.getWindowByID(2));
-  //           userInf.getWindowByID(2)->write_window( 1, 1, "Ultima # ");
-  //           break;
+void wrapperDump(Scheduler s, UI userInf, int level)
+{
+    userInf.clearConsoleScreen();
+    s.dump(userInf.createMaxSizeWindow(), level);
+    sleep(5);
+    userInf.clearConsoleScreen();
+    userInf.update();
+
+}
+ void checkInput()
+ {
+
   //       case 'c':           // clear the console window
   //           refresh(); // Clear the entire screen (in case it is corrupted)
   //           wclear(userInf.getWindowByID(2)); // Clear the Console window
