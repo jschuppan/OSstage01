@@ -116,16 +116,12 @@ void* perform_simple_output(void* arguments)
   char buff[256];
   int wasLocked = false;
   Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
-  std::ofstream threadDebug;
-  threadDebug.open("threadStatus.txt");
 
   do {
   while((1) && (td->state != 4))
   {
     // check for suspend called by dump
     while (THREAD_SUSPENDED);
-
-    threadDebug << td->thread_no << " : " <<  td->state << std::endl;
 
     if(td->state == 0)
     {
@@ -152,8 +148,6 @@ void* perform_simple_output(void* arguments)
     }
   }
 } while(!THREAD_SUSPENDED);
-  threadDebug.close();
-
 }
 
 // running():
