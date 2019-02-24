@@ -83,7 +83,6 @@ void Window :: resizeWindow(int height,int width)
 void Window :: windowRefresh()
 {
     //write_window(1,1,"HELLO");
-    wclear(window_ptr);
     box(window_ptr,0,0);
     wrefresh(window_ptr);
 }
@@ -115,9 +114,9 @@ bool Window :: operator==(Window& rhs)
   return false;
 }
 
-void deleteWindow()
+void Window :: deleteWindow()
 {
-  delete_win(window_ptr);
+  delwin(window_ptr);
   window_ptr = NULL;
 }
 //Mutators
