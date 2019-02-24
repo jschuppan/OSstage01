@@ -51,7 +51,6 @@ public:
 
     //void* peintrform_simple_output(void* arguments);
     //typedef void * (*THREADFUNCPTR)(void *);
-
     std::ofstream debugDump;
     bool SCHEDULER_SUSPENDED = false;
     std::mutex schedMutex;
@@ -65,6 +64,8 @@ public:
     void yield();  // strict round robin process switch.
     void dump(WINDOW* targetWin, int level);
     void garbage_collect();
+    void stop();
+    void resume();
 
 };
 

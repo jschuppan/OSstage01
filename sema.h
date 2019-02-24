@@ -5,10 +5,11 @@
 #include <queue>
 
 
+
 class Semaphore {
   public:
     Semaphore(std::string resName);
-    void down(pthread_t threadID);
+    void down(int threadID);
     void up();
 
   private:

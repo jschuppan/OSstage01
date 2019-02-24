@@ -15,7 +15,7 @@ Semaphore::Semaphore(std::string resName)
 }
 
 
-void Semaphore::down(pthread_t threadID)
+void Semaphore::down(int threadID)
 {
   // case 1: resource is available
   if (sema_value == 1)
@@ -24,8 +24,6 @@ void Semaphore::down(pthread_t threadID)
     // make resource unavailable
     sema_value = 0;
 
-    if (DEBUG)
-      std::cout << "Setting lock" << std::endl;
 
     // set out mutex lock to prevent resource from
     // being used by multiple threads
@@ -33,8 +31,6 @@ void Semaphore::down(pthread_t threadID)
   // case 2: resource is unavailable
   else if (sema_value == 0)
   {
-    if(DEBUG)
-      std::cout << "Pushing thread " << threadID << " on queue!" << std::endl;
 
     // first push new process request on queue
     processQueue.push(threadID);
@@ -45,9 +41,6 @@ void Semaphore::down(pthread_t threadID)
     while(lastPop != threadID);
     // std::cout << "CLEAR" << std::endl;
 
-
-    if(DEBUG)
-      std::cout << "cleared while!" << std::endl;
     //callToScheduler();
   }
 
