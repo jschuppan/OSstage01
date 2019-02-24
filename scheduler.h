@@ -30,14 +30,14 @@ public:
       // state: 0 (running), 1 (ready), 2 (blocked)
     private:
       thread_data* threadData;
-      int threadID, state;
+      int TthreadID, Tstate;
     public:
       void setThreadData(thread_data* d){this->threadData = d;}
-      void setThreadID(int ID){this->threadID = ID;}
-      void setState(int state){this->state = state;}
+      void setThreadID(int ID){this->TthreadID = ID;}
+      void setState(int state){this->Tstate = state;}
       thread_data* getThreadData(){return threadData;}
-      int getThreadID() { return this->threadID; }
-      int getState() { return this->state; }
+      int getThreadID() { return this->TthreadID; }
+      int getState() { return this->Tstate; }
     };
 
     linkedList <TCB> TCBList;

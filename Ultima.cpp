@@ -52,7 +52,7 @@ int main()
     // std::cout << "START LOOP" << "\n";
 
        ID = s.running(ID);
-       sleep(1);
+       // sleep(1);
        s.dump(0);
        if((ch = getch()) == 'a')
        {
