@@ -91,6 +91,21 @@ int main()
             userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
             break;
         }
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        {
+          {
+            if(s.getList()->getDatumById(((int)ch-1)) == NULL)
+                userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
+            else
+                s.getList()->getDatumById(((int)ch-1))->getThreadData()->setState(4);
+          }
+          break;
+        }
        }
 
         //  sleep(1);
