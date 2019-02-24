@@ -99,6 +99,13 @@ void Window :: clearScreen()
 {
   wclear(window_ptr);
   wrefresh(window_ptr);
+
+}
+bool Window :: operator==(Window& rhs)
+{
+  if(this->getWindowPtr() == rhs.getWindowPtr())
+      return true;
+  return false;
 }
 
 //Mutators

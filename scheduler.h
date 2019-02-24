@@ -40,6 +40,10 @@ public:
       thread_data* getThreadData(){return threadData;}
       int getThreadID() { return this->TthreadID; }
       int getState() { return this->Tstate; }
+      bool operator==(const TCB& rhs)
+      {
+        return (TthreadID == rhs.TthreadID);
+      }
     };
 
     typedef struct TCB realTCB;

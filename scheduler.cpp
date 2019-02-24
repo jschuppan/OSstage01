@@ -196,9 +196,6 @@ void* Scheduler:: running(void* ID)
 
   runDebug.open("debug_thread.txt", std::ofstream::app);
   runDebug << "START" << std::endl;
-  runDebug << TCBList.getDatumById(0)->getThreadID()<< std::endl;
-  runDebug << TCBList.getDatumById(1)->getThreadID()<< std::endl;
-  runDebug << TCBList.getDatumById(2)->getThreadID()<< std::endl;
 
 
 
@@ -210,12 +207,14 @@ void* Scheduler:: running(void* ID)
   // TCBList.getDatumById()->getThreadData()->setState(0);
 
   // return ID0;
-  TCB* myT = (TCB*)TCBList.getNextElement(ID);
+  TCB* myT = TCBList.getNextElement((TCB*)ID);
   runDebug << myT->getThreadID() << std::endl;
   // myT->getThreadData()->setState(0);
+    myT->getThreadData()->setState(0);
   runDebug << myT->getThreadData()->getState() << std::endl;
 
   runDebug.close();
+  sleep(1);
   return (void*)myT;
 
 

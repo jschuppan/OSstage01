@@ -29,7 +29,7 @@ class linkedList
     void removeFromEnd();
     T* getDatumById(int id);
     void removeNodeByElement(int element);
-    void* getNextElement(void* ndv);
+    T* getNextElement(T* ndv);
 
     int getSize();
     void setSize(int size);

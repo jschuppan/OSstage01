@@ -38,6 +38,7 @@ public:
   void setHeight(int height);
   void setWidth(int width);
   void setWindowPtr(WINDOW* window_ptr);
+  bool operator== (Window& rhs);
 
 
 

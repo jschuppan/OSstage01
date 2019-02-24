@@ -134,7 +134,7 @@ void linkedList<T> :: removeNodeByElement(int element)
       {
         temp->next = temp->next->next;
         delete temp->next;
-	size--;
+	       size--;
         return;
       }
       temp = temp->next;
@@ -142,22 +142,35 @@ void linkedList<T> :: removeNodeByElement(int element)
 }
 
 template<class T>
-void* linkedList<T> ::  getNextElement(void* ndv)
+T* linkedList<T> ::  getNextElement(T* ndv)
 {
-  node* nd = (node*)ndv;
+
   if(!head) {
-  std::cout << "its me the devil" << std::endl;
-    return NULL; }
+  //std::cout << "its me the devil" << std::endl;
+    return NULL;
+  }
+  if(ndv == NULL)
+  {
+    return &head->datum;
+  }
+    node* temp = head;
 
-  if(!nd)
-    return (void*)head;
+  if(head->datum == *ndv)
+  {
+    return &head->next->datum;
+  }
 
-  else
-    if(!nd->next)
-      return (void*)head;
-
-    else
-      return (void*)nd->next;
+  while(temp->next)
+  {
+    if (temp->next->datum == *ndv)
+    {
+      if(!temp->next->next)
+          return &head->datum;
+      else
+          return &temp->next->next->datum;
+    }
+    temp = temp->next;
+  }
  }
 
 
