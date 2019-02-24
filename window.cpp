@@ -61,11 +61,15 @@ void Window :: display_help()
   write_window(5, 1, "3= Kill 3");
   write_window(6, 1, "4= Kill 4");
   write_window(7, 1, "5= Kill 5");
-  write_window(8, 1, "c= clear screen");
-  write_window(9, 1, "h= help screen");
-  write_window(10, 1, "q= Quit");
-  write_window(11, 1, "d...Dump...");
-  write_window(12, 1, "r...Restart...");
+  write_window(1, 15, "c= clear screen");
+  write_window(2, 15, "h= help screen");
+  write_window(3, 15, "q= Quit");
+  write_window(4, 15, "r=..Restart...");
+  write_window(5, 15, "a= Add Thread");
+  write_window(6, 15, "s=..Scheduler Dump1...");
+  write_window(7, 15, "d=..Scheduler Dump2...");
+  write_window(1, 35, "f=..Semaphore Dump1...");
+  write_window(2, 35, "g=..Scheduler Dump2...");
 }
 
 //meant to be used to change window size
@@ -79,6 +83,7 @@ void Window :: resizeWindow(int height,int width)
 void Window :: windowRefresh()
 {
     //write_window(1,1,"HELLO");
+    wclear(window_ptr);
     box(window_ptr,0,0);
     wrefresh(window_ptr);
 }
@@ -98,6 +103,8 @@ void Window :: createMaxSizeWindow()
 void Window :: clearScreen()
 {
   wclear(window_ptr);
+  write_window(1,1,"Press h for help.");
+  box(window_ptr,0,0);
   wrefresh(window_ptr);
 
 }

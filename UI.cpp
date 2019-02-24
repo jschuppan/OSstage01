@@ -21,14 +21,15 @@ void UI :: addStarterWindows()
 
      //Control window
      int y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, y2, 2),windowCreatedCount);
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*1/3-2, y2, 2),windowCreatedCount);
      windowCreatedCount++;
 
      int tempx =  windowList.getDatumById(1)->getX() +  windowList.getDatumById(1)->getWidth();
      int tempy =  windowList.getDatumById(1)->getY();
 
      //Input window
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()/3-2, tempy, tempx), windowCreatedCount);
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, tempy, tempx), windowCreatedCount);
+     windowList.getDatumById(2)->write_window(1,1,"Press h for help.");
      windowCreatedCount++;
 
 }

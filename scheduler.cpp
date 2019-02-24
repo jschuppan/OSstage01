@@ -35,9 +35,9 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   threadInfo[processCount].thread_no = processCount;
   TCB tcbTemp;
   tcbTemp.setThreadID(processCount);
-  tcbTemp.setState(1);
+  tcbTemp.setState(3);
   tcbTemp.setThreadData(&threadInfo[processCount]);
-  TCBList.addToFront(tcbTemp, processCount);
+  TCBList.addToEnd(tcbTemp, processCount);
 
 
   // create a thread
@@ -63,8 +63,8 @@ void Scheduler::dump(Window* targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced
-  char dBuff[256];
-  stop();
+  char dBuff[255];
+  // stop();
   SCHEDULER_SUSPENDED = true;
   int bs = 0;
 
@@ -72,31 +72,31 @@ void Scheduler::dump(Window* targetWin, int level)
   sprintf(dBuff, "------Scheduler Dump------\n");
 
   // compile current threat data
-  while((TCBList.getDatumById(bs)) != NULL) {
-    // int state = TCBList.getDatumById(bs)->getThreadData()->getState();
-    // sprintf(dBuff, "Thread ID: ");
-    // sprintf(dBuff, (const char*)TCBList.getDatumById(bs)->getThreadData()->getThreadNo());
-    // sprintf(dBuff, "\n    Status: ");
-    // if(state == 0)
-    //   sprintf(dBuff, "Running");
-    // else if (state == 1)
-    //   sprintf(dBuff, "Ready");
-    // else if (state == 2)
-    //   sprintf(dBuff, "Blocked");
-    // else if (state == 3)
-    //   sprintf(dBuff, "Dead");
-    // else
-    //   sprintf(dBuff, "INVALID STATE");
-
-    sprintf(dBuff, "\n");
-
-
-    bs++;
-  }
-  targetWin->write_window(dBuff);
+  // while((TCBList.getDatumById(bs)) != NULL) {
+  //   // int state = TCBList.getDatumById(bs)->getThreadData()->getState();
+  //   // sprintf(dBuff, "Thread ID: ");
+  //   // sprintf(dBuff, (const char*)TCBList.getDatumById(bs)->getThreadData()->getThreadNo());
+  //   // sprintf(dBuff, "\n    Status: ");
+  //   // if(state == 0)
+  //   //   sprintf(dBuff, "Running");
+  //   // else if (state == 1)
+  //   //   sprintf(dBuff, "Ready");
+  //   // else if (state == 2)
+  //   //   sprintf(dBuff, "Blocked");
+  //   // else if (state == 3)
+  //   //   sprintf(dBuff, "Dead");
+  //   // else
+  //   //   sprintf(dBuff, "INVALID STATE");
+  //
+  //   sprintf(dBuff, "\n");
+  //
+  //
+  //   bs++;
+  // }
+  targetWin->write_window(1, 1 , "test");
 
   SCHEDULER_SUSPENDED = false;
-  resume();
+  // resume();
 }
 
 // stop():   This function stops all operations of the program
@@ -110,6 +110,7 @@ void Scheduler::resume() {
   THREAD_SUSPENDED = false;
 }
 
+//thread worker function
 void* perform_simple_output(void* arguments)
 {
   int tempCounter = 0;
@@ -159,19 +160,35 @@ void* perform_simple_output(void* arguments)
 // running():
 void* Scheduler:: running(void* ID)
 {
+  //If last running is NULL
   if((TCB*) ID == NULL)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
-    myT->getThreadData()->setState(0);
+    //If next state is ready set to running
+    if(myT->getThreadData()->getState() == 1)
+    {
+      myT->getThreadData()->setState(0);
+      return (void*) myT;
+    }
+    //State is blocked or dead don't set running
     return (void*) myT;
   }
+  //If last state running is not running
   else if(((TCB*) ID)->getThreadData()->getState() != 0)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
-    myT->getThreadData()->setState(0);
+    //If next state is blocked or dead don't set to running
+    //If next state is ready set to running
+    if(myT->getThreadData()->getState() == 1)
+    {
+      myT->getThreadData()->setState(0);
+      return (void*) myT;
+    }
+    //State is blocked or dead don't set running
     return (void*) myT;
   }
 
+  //Keep running
   return (void*)ID;
 }
 

@@ -102,20 +102,22 @@ int main()
         case '5':
         {
           {
-            if(s.TCBList.getDatumById(((int)ch-1)) == NULL)
+            if(s.TCBList.getDatumById((int)ch-'0') == NULL)
             {
+                usleep(1000);
                 userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
-                //sleep(2);
-                wclear(userInf.getWindowByID(2)->getWindowPtr());
-                wrefresh(userInf.getWindowByID(2)->getWindowPtr());
             }
 
             else
-                s.TCBList.getDatumById(((int)ch-1))->getThreadData()->setState(4);
+                s.TCBList.getDatumById((int)ch-'0')->getThreadData()->setState(4);
           }
           break;
         }
-       }
+        case 'r':
+        {
+              s.resume();
+        }
+      }
 
         //  sleep(1);
   }
@@ -130,20 +132,15 @@ void wrapperDump(Scheduler &s, UI &userInf, int level)
     s.dump(userInf.createMaxWindow(), level);
     sleep(5);
     userInf.clearConsoleScreen();
-    userInf.update();
+    userInf.getWindowByID(0)->windowRefresh();
+    // userInf.update();
+    s.resume();
 
 }
  // void checkInput()
  // {
-  //       case 'q':           // end the loop, and end the program.
-  //           userInf.getWindowByID(2)->write_window(" Quiting the main program....\n" );
-  //           break;
-  //       case 'd':
-  //           s.stop();
+
   //
-  //          s.dump(userInf.create_window());
-  //       case 'r':
-  //           s.restart();
   //       case ERR:
   //       // if wgetch() return ERR, that means no keys were pressed
   //       // earlier we enabled non-blocking input using nodelay() see above

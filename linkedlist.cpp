@@ -16,12 +16,12 @@ template<class T>
 void linkedList<T> :: addToEnd(T datum, int id)
 {
     node* temp = head;
-    if(!temp)
+    if(!head)
     {
-      temp = new node;
-      temp->next = NULL;
-      temp->datum = datum;
-      temp->id = id;
+      head = new node;
+      head->next = NULL;
+      head->datum = datum;
+      head->id = id;
       size++;
     }
     else
@@ -150,15 +150,11 @@ T* linkedList<T> ::  getNextElement(T* ndv)
     return NULL;
   }
   if(ndv == NULL)
-  {
     return &head->datum;
-  }
-    node* temp = head;
 
+  node* temp = head;
   if(head->datum == *ndv)
-  {
     return &head->next->datum;
-  }
 
   while(temp->next)
   {
@@ -171,7 +167,7 @@ T* linkedList<T> ::  getNextElement(T* ndv)
     }
     temp = temp->next;
   }
- }
+}
 
 
 template<class T>
