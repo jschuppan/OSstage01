@@ -66,10 +66,10 @@ void Window :: display_help()
   write_window(2, 35, "q= Quit");
   write_window(3, 35, "r=..Restart...");
   write_window(4, 35, "a= Add Thread");
-  write_window(1, 50, "s=..Scheduler Dump1...");
-  write_window(2, 50, "d=..Scheduler Dump2...");
-  write_window(3, 50, "f=..Semaphore Dump1...");
-  write_window(4, 50, "g=..Semaphore Dump2...");
+  write_window(1, 50, "s=..Sched Dump1...");
+  write_window(2, 50, "d=..Sched Dump2...");
+  write_window(3, 50, "f=..Sema Dump1...");
+  write_window(4, 50, "g=..Semap Dump2...");
 }
 
 //meant to be used to change window size

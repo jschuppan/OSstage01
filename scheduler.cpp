@@ -75,23 +75,25 @@ void Scheduler::dump(Window* targetWin, int level)
     writeSema.dump(targetWin, level);
   }
 
-
-  sprintf(dBuff, "\n \n");
-  usleep(1000);
-  while ((myT = TCBList.getNextElementUntilEnd(myT))) {
-    int tn = myT->getThreadData()->getThreadNo();
-    int ts = myT->getThreadData()->getState();
-    sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
-    sprintf((dBuff  + strlen(dBuff)), "      Status: ", tn);
-    if (ts == 0)
-      sprintf((dBuff  + strlen(dBuff)), "   Running\n");
-    else if (ts == 1)
-      sprintf((dBuff  + strlen(dBuff)), "   Ready\n");
-    else if (ts == 2)
-      sprintf((dBuff  + strlen(dBuff)), "   Blocked\n");
-    else if (ts == 3)
-      sprintf((dBuff  + strlen(dBuff)), "   Dead\n");
+  else
+  {
+      sprintf(dBuff, "\n \n");
+      usleep(1000);
+      while ((myT = TCBList.getNextElementUntilEnd(myT))) {
+        int tn = myT->getThreadData()->getThreadNo();
+        int ts = myT->getThreadData()->getState();
+        sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
+        sprintf((dBuff  + strlen(dBuff)), "      Status: ", tn);
+        if (ts == 0)
+          sprintf((dBuff  + strlen(dBuff)), "   Running\n");
+        else if (ts == 1)
+          sprintf((dBuff  + strlen(dBuff)), "   Ready\n");
+        else if (ts == 2)
+          sprintf((dBuff  + strlen(dBuff)), "   Blocked\n");
+        else if (ts == 3)
+          sprintf((dBuff  + strlen(dBuff)), "   Dead\n");
   }
+}
 
   targetWin->write_window(dBuff);
 
