@@ -7,10 +7,9 @@ using namespace std;
 //defualt constructer
 Window:: Window()
 {
-  setX(2);
-  setY(15);
-  setHeight(10);
-  setWidth(80);
+  int maxY, maxX;
+  getmaxyx(stdscr, maxY, maxX); // get console screen size
+  create_window(maxY-1,maxX-1,1,1);
 }
 
 //constructor
