@@ -128,13 +128,15 @@ void wrapperDump(Scheduler &s, UI &userInf, int level)
 {
     s.stop();
     sleep(1);
-    userInf.clearConsoleScreen();
+    //userInf.clearConsoleScreen();
     s.dump(userInf.createMaxWindow(), level);
-    sleep(5);
-    userInf.clearConsoleScreen();
-    userInf.getWindowByID(0)->windowRefresh();
+    sleep(2);
+    userInf.update();
+    wprintw(userInf.getWindowByID(0)->getWindowPtr()," ");
+    //userInf.clearConsoleScreen();
+  //  userInf.getWindowByID(0)->windowRefresh();
     // userInf.update();
-    s.resume();
+    //s.resume();
 
 }
  // void checkInput()

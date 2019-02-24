@@ -115,6 +115,11 @@ bool Window :: operator==(Window& rhs)
   return false;
 }
 
+void deleteWindow()
+{
+  delete_win(window_ptr);
+  window_ptr = NULL;
+}
 //Mutators
 void Window:: setWindowPtr(WINDOW* window_ptr){this->window_ptr = window_ptr;}
 void Window:: setX(int x){this->x = x;}
