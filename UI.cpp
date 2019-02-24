@@ -108,13 +108,13 @@ void UI :: update()
     }
 }
 
-void clearConsoleScreen()
+void UI :: clearConsoleScreen()
 {
     wclear(stdscr);
     wrefresh(stdscr);
 }
 
-WINDOW* createMaxWindow()
+WINDOW* UI :: createMaxWindow()
 {
   Window win;
   win.createMaxSizeWindow();
