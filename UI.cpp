@@ -116,8 +116,8 @@ void UI :: clearConsoleScreen()
 
 Window* UI :: createMaxWindow()
 {
-  Window win;
-  win.createMaxSizeWindow();
+  Window *win;
+  win->createMaxSizeWindow();
   return win;
 }
 //accessors

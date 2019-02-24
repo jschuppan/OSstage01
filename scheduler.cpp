@@ -59,30 +59,44 @@ void Scheduler::yield()
 {
 }
 
-void Scheduler::dump(WINDOW* targetWin, int level)
+void Scheduler::dump(Window* targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced
+  char dBuff[256];
   stop();
   SCHEDULER_SUSPENDED = true;
-
-
   int bs = 0;
-  debugDump.open("sched_dump.txt", std:: ofstream::app);
-  debugDump << "\n DUMP START \n";
-  // threadStop
+
+  // targetWin.write_window(buff);
+  sprintf(dBuff, "------Scheduler Dump------\n");
+
+  // compile current threat data
   while((TCBList.getDatumById(bs)) != NULL) {
-    debugDump << "---- \n ThreadID: " << bs << std::endl
-               << "   " << "Status: "
-               << TCBList.getDatumById(bs)->getThreadData()->getState()
-               << std::endl << "---- \n";
+    // int state = TCBList.getDatumById(bs)->getThreadData()->getState();
+    // sprintf(dBuff, "Thread ID: ");
+    // sprintf(dBuff, (const char*)TCBList.getDatumById(bs)->getThreadData()->getThreadNo());
+    // sprintf(dBuff, "\n    Status: ");
+    // if(state == 0)
+    //   sprintf(dBuff, "Running");
+    // else if (state == 1)
+    //   sprintf(dBuff, "Ready");
+    // else if (state == 2)
+    //   sprintf(dBuff, "Blocked");
+    // else if (state == 3)
+    //   sprintf(dBuff, "Dead");
+    // else
+    //   sprintf(dBuff, "INVALID STATE");
+
+    sprintf(dBuff, "\n");
+
+
     bs++;
   }
-  debugDump  << "\n DUMP END";
+  targetWin->write_window(dBuff);
 
   SCHEDULER_SUSPENDED = false;
   resume();
-  debugDump.close();
 }
 
 // stop():   This function stops all operations of the program
