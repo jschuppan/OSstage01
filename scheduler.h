@@ -53,6 +53,8 @@ public:
     //typedef void * (*THREADFUNCPTR)(void *);
 
     std::ofstream debugDump;
+    bool SCHEDULER_SUSPENDED = false;
+    std::mutex schedMutex;
 
 
    // public:
@@ -61,7 +63,7 @@ public:
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
     void yield();  // strict round robin process switch.
-    void dump(int level);
+    void dump(Window targetWin, int level);
     void garbage_collect();
 
 };

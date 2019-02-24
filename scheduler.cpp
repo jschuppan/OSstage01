@@ -12,7 +12,6 @@
 #include <random>
 
 std::mutex testMtx;
-bool THREAD_SUSPENDED = false;
 std::mutex suspend_mtx;
 
 void* perform_simple_output(void* arguments);
@@ -74,7 +73,7 @@ void Scheduler::yield()
   }
 }
 
-void Scheduler::dump(int level)
+void Scheduler::dump(Window targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced
@@ -169,6 +168,18 @@ void* perform_simple_output(void* arguments)
 
 int Scheduler:: running(int ID)
 {
+  // suspend HERE
+  // check for suspend called by dump
+  if (SCHEDULER_SUSPENDED) {
+    // we use try_lock to prevent deadlock
+    if(!schedMutex.try_lock()) {
+      schedMutex.lock();
+    };
+  }
+  // if thread is no longer suspended keep going
+  else {
+    schedMutex.unlock();
+  }
 
   std::ofstream runDebug;
   runDebug.open("debug_thread.txt", std:: ofstream::app);
