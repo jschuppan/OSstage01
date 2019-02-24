@@ -77,7 +77,7 @@ void Scheduler::dump(Window* targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced
-  THREAD_SUSPENDED = true;
+  SCHEDULER_SUSPENDED = true;
   sleep(1);
 
 
@@ -95,7 +95,7 @@ void Scheduler::dump(Window* targetWin, int level)
   debugDump  << "\n DUMP END";
   sleep(1);
 
-  THREAD_SUSPENDED = false;
+  SCHEDULER_SUSPENDED = false;
   // debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
   //debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
   debugDump.close();
@@ -109,19 +109,19 @@ void* perform_simple_output(void* arguments)
   std::ofstream threadDebug;
   threadDebug.open("threadStatus.txt");
 
-  while((1) && (td->state != 4))
-  {
-    // check for suspend called by dump
-    if (THREAD_SUSPENDED) {
-      // we use try_lock to prevent deadlock
-      if(!suspend_mtx.try_lock()) {
-        suspend_mtx.lock();
-      };
-    }
-    // if thread is no longer suspended keep going
-    else {
-      suspend_mtx.unlock();
-    }
+  // while((1) && (td->state != 4))
+  // {
+  //   // check for suspend called by dump
+  //   if (THREAD_SUSPENDED) {
+  //     // we use try_lock to prevent deadlock
+  //     if(!suspend_mtx.try_lock()) {
+  //       suspend_mtx.lock();
+  //     };
+  //   }
+  //   // if thread is no longer suspended keep going
+  //   else {
+  //     suspend_mtx.unlock();
+  //   }
 
     //sleep(1);
     // testMtx.lock();
@@ -159,9 +159,8 @@ void* perform_simple_output(void* arguments)
       // testMtx.unlock();
       // pthread_yield();
     }
+    threadDebug.close();
   }
-  threadDebug.close();
-}
 
 // int Scheduler :: running(int ID) {
 //
