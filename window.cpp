@@ -95,7 +95,7 @@ void Window :: createMaxSizeWindow()
     create_window(maxY-1, maxX-1, 1,1);
 }
 
-void clearScreen()
+void Window :: clearScreen()
 {
   wclear(window_ptr);
   wrefresh(window_ptr);

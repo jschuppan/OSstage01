@@ -113,6 +113,13 @@ void clearConsoleScreen()
     wclear(stdscr);
     wrefresh(stdscr);
 }
+
+Window* createMaxWindow()
+{
+  Window win;
+  win.createMaxSizeWindow();
+  return win.getWindowPtr();
+}
 //accessors
 int UI :: getMaxY(){return maxY;}
 int UI :: getMaxX(){return maxX;}

@@ -84,7 +84,7 @@ int main()
 void wrapperDump(Scheduler s, UI userInf, int level)
 {
     userInf.clearConsoleScreen();
-    s.dump(userInf.createMaxSizeWindow(), level);
+    s.dump(userInf.createMaxWindow(), level);
     sleep(5);
     userInf.clearConsoleScreen();
     userInf.update();
