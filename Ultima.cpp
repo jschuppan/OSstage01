@@ -52,6 +52,7 @@ int main()
        {
          case 'a':
          {
+            usleep(1000);
              userInf.addNewWindow();
              s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
              break;
@@ -82,11 +83,13 @@ int main()
         }
         case  'c':
         {
+            usleep(1000);
             userInf.getWindowByID(2)->clearScreen();
             break;
         }
         case 'h':
         {
+            usleep(1000);
             userInf.getWindowByID(2)->display_help();
             userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
             break;
@@ -100,7 +103,13 @@ int main()
         {
           {
             if(s.TCBList.getDatumById(((int)ch-1)) == NULL)
+            {
                 userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
+                //sleep(2);
+                wclear(userInf.getWindowByID(2)->getWindowPtr());
+                wrefresh(userInf.getWindowByID(2)->getWindowPtr());
+            }
+
             else
                 s.TCBList.getDatumById(((int)ch-1))->getThreadData()->setState(4);
           }
@@ -115,6 +124,8 @@ int main()
 
 void wrapperDump(Scheduler &s, UI &userInf, int level)
 {
+    s.stop();
+    sleep(1);
     userInf.clearConsoleScreen();
     s.dump(userInf.createMaxWindow(), level);
     sleep(5);
