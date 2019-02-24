@@ -169,6 +169,29 @@ T* linkedList<T> ::  getNextElement(T* ndv)
   }
 }
 
+template<class T>
+T* linkedList<T> ::  getNextElementUntilEnd(T* ndv)
+{
+  if(!head) {
+    return NULL;
+  }
+  if(ndv == NULL)
+    return &head->datum;
+
+  node* temp = head;
+  if(head->datum == *ndv)
+    return &head->next->datum;
+
+  while(temp->next)
+  {
+    if (temp->next->datum == *ndv)
+    {
+          return &temp->next->next->datum;
+    }
+    temp = temp->next;
+  }
+}
+
 
 template<class T>
 int linkedList<T> :: getSize(){return size;}

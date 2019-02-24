@@ -30,6 +30,8 @@ class linkedList
     T* getDatumById(int id);
     void removeNodeByElement(int element);
     T* getNextElement(T* ndv);
+    T* getNextElementUntilEnd(T* ndv);
+
 
     int getSize();
     void setSize(int size);
