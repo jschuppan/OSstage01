@@ -83,3 +83,16 @@ void Semaphore::up()
   }
 
 }
+
+void dump(Window* targetWin, int level)
+{
+  TCB* myT = NULL;
+  debugDump <<"Before Loop" << std::endl;
+
+  while (!processQueue.isEmpty())
+  {
+    debugDump << processQueue.front();
+  }
+
+  debugDump <<"After loop" << std::endl;
+}

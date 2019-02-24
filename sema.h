@@ -3,7 +3,7 @@
 
 #include <mutex>
 #include <queue>
-
+#include <Window.h>
 
 
 class Semaphore {
@@ -11,6 +11,7 @@ class Semaphore {
     Semaphore(std::string resName);
     void down(int threadID);
     void up();
+    void dump(Window* targetWin,int level);
 
   private:
     std::string resName;
