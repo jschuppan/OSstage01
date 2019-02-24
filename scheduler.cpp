@@ -12,22 +12,9 @@
 #include <random>
 
 Semaphore writeSema("write_window");
-
-std::mutex testMtx;
 bool THREAD_SUSPENDED = false;
-std::mutex suspend_mtx;
-std::ofstream runDebug;
-
 
 void* perform_simple_output(void* arguments);
-
-int randomGenerator(int min, int max) {
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-
-    return dist(rng);
-}
 
 Scheduler::Scheduler()
 {
@@ -67,6 +54,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   processCount++;
 
 }
+
 void Scheduler::yield()
 {
 }
@@ -94,8 +82,6 @@ void Scheduler::dump(WINDOW* targetWin, int level)
 
   SCHEDULER_SUSPENDED = false;
   resume();
-  // debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
-  //debugFile2 << "State:  = " << TCBList.getDatumById(processCount)->getState()<<"\n";
   debugDump.close();
 }
 
@@ -124,62 +110,31 @@ void* perform_simple_output(void* arguments)
   {
     // check for suspend called by dump
     while (THREAD_SUSPENDED);
-    // {
-    //   // we use try_lock to prevent deadlock
-    //   if(!suspend_mtx.try_lock()) {
-    //     suspend_mtx.lock();
-    //     wasLocked = true;
-    //   };
-    // }
-    // if thread is no longer suspended keep going
-    // if(wasLocked) {
-    //   suspend_mtx.unlock();
-    //   threadDebug << "UNLOCKED" << std::endl;
-    // }
 
     threadDebug << td->thread_no << " : " <<  td->state << std::endl;
 
-    //sleep(1);
-    // testMtx.lock();
-      int runID = randomGenerator(10,100);
-      // threadDebug << "Thread: " << td->thread_no << "[" << runID << "]"<< std::endl;
-      // threadDebug << "(" << td->thread_no << ":" << runID << ")"
-      //             << "current status: " << td->state << std::endl;
-    // testMtx.unlock();
     if(td->state == 0)
     {
-      // testMtx.lock();
-      threadDebug << "   (" << td->thread_no << ":" << runID  << ")"<< "RUNNING" << std::endl;
-      // testMtx.unlock();
       tempCounter++;
       sprintf(buff, "  Task-%d running #%d\n",td->thread_no,tempCounter);
-      // mute.lock();
-      //ns.down(threadID);
       writeSema.down(td->thread_no);
       td->thread_win->write_window(buff);
       writeSema.up();
-      //ns.up();
-      //mute.unlock();
 
       sprintf(buff, "  Thread-%d currently running.\n",td->thread_no);
-      // mute.lock();
-      //ns.down(threadID);
+      writeSema.down(td->thread_no);
       td->console_win->write_window(buff);
-      //ns.up();
-      // mute.unlock();
+      writeSema.up();
+
 
       // catch a suspend here in case we
       // didnt get it up top due to timing
       while (THREAD_SUSPENDED);
-
       // setState() --> replace with YIELD()
       td->state = 1;
     }
     else {
-      // testMtx.lock();
-      threadDebug << "   (" << td->thread_no << ":" << runID  << ")"<< "YIELDING" << std::endl;
-      // testMtx.unlock();
-      // pthread_yield();
+      pthread_yield();
     }
   }
 } while(!THREAD_SUSPENDED);
@@ -187,70 +142,21 @@ void* perform_simple_output(void* arguments)
 
 }
 
-// int Scheduler :: running(int ID) {
-//
-// }
-
+// running():
 void* Scheduler:: running(void* ID)
 {
-
-  runDebug.open("debug_thread.txt", std::ofstream::app);
-  runDebug << "START" << std::endl;
-
-
-
-  // void* nextEl = (void* )TCBList.getDatumById(0);
-  // TCBList.getDatumById(0)->getThreadData()->setState(0);
-  // TCBList.getDatumById(1)->getThreadData()->setState(0);
-  // void* superNext = TCBList.getNextElement(nextEl);
-  // std::cout << (TCB)TCBList.getNextElement(nextEl)->getThreadData()->getThreadNo();
-  // TCBList.getDatumById()->getThreadData()->setState(0);
-
-  // return ID0;
-  TCB* myT = TCBList.getNextElement((TCB*)ID);
-  runDebug << myT->getThreadID() << std::endl;
-  // myT->getThreadData()->setState(0);
+  if((TCB*) ID == NULL)
+  {
+    TCB* myT = TCBList.getNextElement((TCB*)ID);
     myT->getThreadData()->setState(0);
-  runDebug << myT->getThreadData()->getState() << std::endl;
+    return (void*) myT;
+  }
+  else if(((TCB*) ID)->getThreadData()->getState() != 0)
+  {
+    TCB* myT = TCBList.getNextElement((TCB*)ID);
+    myT->getThreadData()->setState(0);
+    return (void*) myT;
+  }
 
-  runDebug.close();
-  sleep(1);
-  return (void*)myT;
-
-
-  // runDebug << myT->getThreadID() << std::endl;
-
-  // TCB* myTCB;
-  // // void* datumH =  TCBList.getDatum();
-  // myTCB = &*(TCB *)TCBList.getNextElement(ID);
-  // thread_data* tsd = myTCB->getThreadData();
-  // runDebug << tsd->getThreadNo() << std::endl;
-  // runDebug << tsd->getState() << std::endl;
-
-
-  // // debugFile2 << "running# = " << ID <<"\n";
-  // runDebug << ID << ": " << TCBList.getDatumById(ID)->getThreadData()->getState() << std::endl;
-  //
-  //   // while(SCHEDULER_SUSPENDED);
-  //   // if thread not running
-  //   if(TCBList.getDatumById(ID)->getThreadData()->getState() != 0)
-  //   {
-  //     // if the next element is not null
-  //     // set it to running and return following element
-  //     if((TCBList.getDatumById(ID+1)) != NULL)
-  //     {
-  //       // while(SCHEDULER_SUSPENDED);
-  //       TCBList.getDatumById(ID+1)->getThreadData()->setState(0);
-  //       return ID+1;
-  //     }
-  //     // otherwise set first thread to running
-  //     else
-  //     {
-  //       // while(SCHEDULER_SUSPENDED);
-  //       TCBList.getDatumById(0)->getThreadData()->setState(0);
-  //       return 0;
-  //     }
-  //   }
-  //   runDebug.close();
-  //   return ID;
+  return (void*)ID;
 }
