@@ -23,6 +23,7 @@ public:
 
     public:
       void setState(int state){this->state = state;}
+      int getThreadNo() { return thread_no; }
       int getState() { return this->state; }
     };
 
@@ -40,6 +41,9 @@ public:
       int getThreadID() { return this->TthreadID; }
       int getState() { return this->Tstate; }
     };
+
+    typedef struct TCB realTCB;
+
 
     linkedList <TCB> TCBList;
 

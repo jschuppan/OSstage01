@@ -16,6 +16,8 @@ Semaphore writeSema("write_window");
 std::mutex testMtx;
 bool THREAD_SUSPENDED = false;
 std::mutex suspend_mtx;
+std::ofstream runDebug;
+
 
 void* perform_simple_output(void* arguments);
 
@@ -192,9 +194,41 @@ void* perform_simple_output(void* arguments)
 void* Scheduler:: running(void* ID)
 {
 
-  (TCB)(TCBList.getNextElement(ID))->getThreadData->setState();
-  // std::ofstream runDebug;
-  // runDebug.open("debug_thread.txt", std:: ofstream::app);
+  runDebug.open("debug_thread.txt", std::ofstream::app);
+  runDebug << "START" << std::endl;
+  runDebug << TCBList.getDatumById(0)->getThreadID()<< std::endl;
+  runDebug << TCBList.getDatumById(1)->getThreadID()<< std::endl;
+  runDebug << TCBList.getDatumById(2)->getThreadID()<< std::endl;
+
+
+
+  // void* nextEl = (void* )TCBList.getDatumById(0);
+  // TCBList.getDatumById(0)->getThreadData()->setState(0);
+  // TCBList.getDatumById(1)->getThreadData()->setState(0);
+  // void* superNext = TCBList.getNextElement(nextEl);
+  // std::cout << (TCB)TCBList.getNextElement(nextEl)->getThreadData()->getThreadNo();
+  // TCBList.getDatumById()->getThreadData()->setState(0);
+
+  // return ID0;
+  TCB* myT = (TCB*)TCBList.getNextElement(ID);
+  runDebug << myT->getThreadID() << std::endl;
+  // myT->getThreadData()->setState(0);
+  runDebug << myT->getThreadData()->getState() << std::endl;
+
+  runDebug.close();
+  return (void*)myT;
+
+
+  // runDebug << myT->getThreadID() << std::endl;
+
+  // TCB* myTCB;
+  // // void* datumH =  TCBList.getDatum();
+  // myTCB = &*(TCB *)TCBList.getNextElement(ID);
+  // thread_data* tsd = myTCB->getThreadData();
+  // runDebug << tsd->getThreadNo() << std::endl;
+  // runDebug << tsd->getState() << std::endl;
+
+
   // // debugFile2 << "running# = " << ID <<"\n";
   // runDebug << ID << ": " << TCBList.getDatumById(ID)->getThreadData()->getState() << std::endl;
   //
