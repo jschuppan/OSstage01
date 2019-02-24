@@ -12,7 +12,7 @@
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
-void wrapperDump(Scheduler s, UI userInf, int level)
+void wrapperDump(Scheduler s, UI userInf, int level);
 
 int main()
 {
@@ -90,8 +90,8 @@ void wrapperDump(Scheduler s, UI userInf, int level)
     userInf.update();
 
 }
- void checkInput()
- {
+ // void checkInput()
+ // {
 
   //       case 'c':           // clear the console window
   //           refresh(); // Clear the entire screen (in case it is corrupted)

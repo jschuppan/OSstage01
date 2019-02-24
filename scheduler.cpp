@@ -73,7 +73,7 @@ void Scheduler::yield()
   }
 }
 
-void Scheduler::dump(Window targetWin, int level)
+void Scheduler::dump(Window* targetWin, int level)
 {
   // suspend threads and wait to make sure
   // everything is synced
@@ -93,6 +93,7 @@ void Scheduler::dump(Window targetWin, int level)
     bs++;
   }
   debugDump  << "\n DUMP END";
+  sleep(1);
 
   THREAD_SUSPENDED = false;
   // debugFile2 << "thread# = " << &threadInfo[0].thread_no<<"\n";
@@ -170,16 +171,14 @@ int Scheduler:: running(int ID)
 {
   // suspend HERE
   // check for suspend called by dump
-  if (SCHEDULER_SUSPENDED) {
+  while (SCHEDULER_SUSPENDED) {
     // we use try_lock to prevent deadlock
     if(!schedMutex.try_lock()) {
       schedMutex.lock();
     };
   }
-  // if thread is no longer suspended keep going
-  else {
+  // if scheduler is no longer suspended keep going
     schedMutex.unlock();
-  }
 
   std::ofstream runDebug;
   runDebug.open("debug_thread.txt", std:: ofstream::app);
