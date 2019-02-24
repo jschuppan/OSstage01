@@ -166,6 +166,10 @@ void* perform_simple_output(void* arguments)
       //ns.up();
       // mute.unlock();
 
+      // catch a suspend here in case we
+      // didnt get it up top due to timing
+      while (THREAD_SUSPENDED);
+
       // setState() --> replace with YIELD()
       td->state = 1;
     }
@@ -193,7 +197,7 @@ int Scheduler:: running(int ID)
   // debugFile2 << "running# = " << ID <<"\n";
   runDebug << ID << ": " << TCBList.getDatumById(ID)->getThreadData()->getState() << std::endl;
 
-    while(SCHEDULER_SUSPENDED);
+    // while(SCHEDULER_SUSPENDED);
     // if thread not running
     if(TCBList.getDatumById(ID)->getThreadData()->getState() != 0)
     {
@@ -201,14 +205,14 @@ int Scheduler:: running(int ID)
       // set it to running and return following element
       if((TCBList.getDatumById(ID+1)) != NULL)
       {
-        while(SCHEDULER_SUSPENDED);
+        // while(SCHEDULER_SUSPENDED);
         TCBList.getDatumById(ID+1)->getThreadData()->setState(0);
         return ID+1;
       }
       // otherwise set first thread to running
       else
       {
-        while(SCHEDULER_SUSPENDED);
+        // while(SCHEDULER_SUSPENDED);
         TCBList.getDatumById(0)->getThreadData()->setState(0);
         return 0;
       }
