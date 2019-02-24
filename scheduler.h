@@ -74,6 +74,7 @@ public:
     void garbage_collect();
     void stop();
     void resume();
+    //linkedList* getList();
 
 };
 

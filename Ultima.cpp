@@ -99,10 +99,10 @@ int main()
         case '5':
         {
           {
-            if(s.getList()->getDatumById(((int)ch-1)) == NULL)
+            if(s.TCBList.getDatumById(((int)ch-1)) == NULL)
                 userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
             else
-                s.getList()->getDatumById(((int)ch-1))->getThreadData()->setState(4);
+                s.TCBList.getDatumById(((int)ch-1))->getThreadData()->setState(4);
           }
           break;
         }

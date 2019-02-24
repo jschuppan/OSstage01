@@ -160,3 +160,6 @@ void* Scheduler:: running(void* ID)
 
   return (void*)ID;
 }
+
+
+//linkedList* Scheduler :: getList(){return TCBList;}
