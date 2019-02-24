@@ -53,7 +53,6 @@ int main()
 
        ID = s.running(ID);
        // sleep(1);
-       s.dump(0);
        if((ch = getch()) == 'a')
        {
            userInf.addNewWindow();
@@ -65,8 +64,9 @@ int main()
        }
        else if(ch == 'd')
        {
+         sleep(1);
          s.dump(0);
-      }
+       }
           debugUltima << "END LOOP" << "\n";
         //  sleep(1);
 
