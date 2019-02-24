@@ -12,7 +12,7 @@
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
-void wrapperDump(Scheduler s, UI userInf, int level);
+void wrapperDump(Scheduler &s, UI userInf, int level);
 
 int main()
 {
@@ -74,14 +74,14 @@ int main()
       }
       else if(ch == 'c')
       {
-          userInf.getDatumById(2)->clearScreen();
+          userInf.getWindowByID(2)->clearScreen();
       }
         //  sleep(1);
   }
  endwin();
 }
 
-void wrapperDump(Scheduler s, UI userInf, int level)
+void wrapperDump(Scheduler &s, UI userInf, int level)
 {
     userInf.clearConsoleScreen();
     s.dump(userInf.createMaxWindow(), level);

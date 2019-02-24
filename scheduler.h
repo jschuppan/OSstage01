@@ -63,7 +63,7 @@ public:
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
     void yield();  // strict round robin process switch.
-    void dump(Window targetWin, int level);
+    void dump(Window* targetWin, int level);
     void garbage_collect();
 
 };
