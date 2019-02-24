@@ -24,6 +24,7 @@ public:
   void resizeWindow(int height, int width);
   void createMaxSizeWindow();
   void clearScreen();
+  void deleteWindow();
 
   //Accessors
   int getX();
