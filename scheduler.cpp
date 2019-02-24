@@ -2,6 +2,7 @@
 // lastUpdated: 02-21-2019
 #include <pthread.h>
 #include <list>
+#include <string.h>
 #include <assert.h>
 #include <fstream>
 #include "scheduler.h"
@@ -67,21 +68,37 @@ void Scheduler::dump(Window* targetWin, int level)
   // everything is synced
   char dBuff[255];
   std::ofstream debugDump;
-  debugDump.open("debugDump.txt", std::ofstream::out | std::ofstream::app);
-  // stop();
+  // debugDump.open("debugDump.txt", std::ofstream::out | std::ofstream::app);
   SCHEDULER_SUSPENDED = true;
-  int bs = 0;
   TCB* myT = NULL;
+  int ts;
   debugDump <<"Before Loop" << std::endl;
 
+
+  sprintf(dBuff, "\n \n");
   while ((myT = TCBList.getNextElementUntilEnd(myT))) {
-    debugDump <<"Looping " << std::endl;
+    int tn = myT->getThreadData()->getThreadNo();
+    int ts = myT->getThreadData()->getState();
+    sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
+    sprintf((dBuff  + strlen(dBuff)), "      Status: ", tn);
+    if (ts == 0)
+      sprintf((dBuff  + strlen(dBuff)), "   Running\n");
+    else if (ts == 1)
+      sprintf((dBuff  + strlen(dBuff)), "   Ready\n");
+    else if (ts == 2)
+      sprintf((dBuff  + strlen(dBuff)), "   Blocked\n");
+    else if (ts == 3)
+      sprintf((dBuff  + strlen(dBuff)), "   Dead\n");
   }
 
-  debugDump <<"After loop" << std::endl;
+  targetWin->write_window(dBuff);
+
+  // debugDump << dBuff;
+  //
+  // debugDump <<"After loop" << std::endl;
 
 
-  // // targetWin.write_window(buff);
+
   // sprintf(dBuff, "------Scheduler Dump------\n");
   // debugDump << dBuff;
   // while(TCBList.getNextElementUntilEnd(NULL)) {
@@ -111,7 +128,7 @@ void Scheduler::dump(Window* targetWin, int level)
   // }
   // targetWin->write_window(1, 1 , dBuff);
 
-  debugDump.close();
+  // debugDump.close();
 
   SCHEDULER_SUSPENDED = false;
   // resume();

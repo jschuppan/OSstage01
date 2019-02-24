@@ -109,7 +109,7 @@ int main()
             }
 
             else
-                s.TCBList.getDatumById((int)ch-'0')->getThreadData()->setState(4);
+                s.TCBList.getDatumById((int)ch-'0')->getThreadData()->setState(3);
           }
           break;
         }
@@ -132,16 +132,8 @@ void wrapperDump(Scheduler &s, UI &userInf, int level)
     Window * Win = new Window();
     Win->createMaxSizeWindow();
     s.dump(Win, level);
-    sleep(2);
+    sleep(8);
     userInf.update();
-    //userInf.update();
-
-
-    sleep(5);
-    //userInf.clearConsoleScreen();
-    //userInf.getWindowByID(0)->windowRefresh();
-    // userInf.update();
-    //s.resume();
 
 }
  // void checkInput()
