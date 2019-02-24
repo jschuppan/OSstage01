@@ -58,7 +58,7 @@ public:
 
    // public:
     Scheduler();
-    int running(int ID);
+    void* running(void* ID);
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
     void yield();  // strict round robin process switch.

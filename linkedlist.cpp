@@ -142,22 +142,24 @@ void linkedList<T> :: removeNodeByElement(int element)
 }
 
 template<class T>
-node* linkedList<T> ::  getNextElement(node* nd)
+void* linkedList<T> ::  getNextElement(void* ndv)
 {
-  if(!head)
-    return NULL;
+  node* nd = (node*)ndv;
+  if(!head) {
+  std::cout << "its me the devil" << std::endl;
+    return NULL; }
 
   if(!nd)
-    return head;
+    return (void*)head;
 
   else
     if(!nd->next)
-      return head;
-      
+      return (void*)head;
+
     else
-      return nd->next;
-  }
-}
+      return (void*)nd->next;
+ }
+
 
 template<class T>
 int linkedList<T> :: getSize(){return size;}

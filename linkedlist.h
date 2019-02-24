@@ -1,7 +1,7 @@
 #pragma once
 
-#include "window.h"
-// #include "scheduler.h"
+//#include "window.h"
+
 
 template <class T>
 class linkedList
@@ -12,6 +12,7 @@ class linkedList
         node* next;
         T datum;
         int id;
+        friend linkedList;
     };
 
     node* head;
@@ -28,7 +29,7 @@ class linkedList
     void removeFromEnd();
     T* getDatumById(int id);
     void removeNodeByElement(int element);
-    node* getNextElement(node*);
+    void* getNextElement(void* ndv);
 
     int getSize();
     void setSize(int size);

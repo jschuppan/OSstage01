@@ -30,7 +30,7 @@ int main()
   Scheduler s;
   UI userInf;
   char ch;
-  int ID = 2;
+  void* ID = NULL;
 
   //Create starter threads and windows
   userInf.addNewWindow();
