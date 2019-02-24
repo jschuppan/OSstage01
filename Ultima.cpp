@@ -27,6 +27,7 @@ int main()
   nodelay(stdscr, true);  // nodelay causes getch to be a non-blocking call.
 
   linkedList <int> myList;
+  std::mutex testMtx;
   Scheduler s;
   UI userInf;
   char ch;
@@ -44,7 +45,6 @@ int main()
   while(ch != 'q')
   {
     // std::cout << "START LOOP" << "\n";
-
        ID = s.running(ID);
        // sleep(1);
        ch= getch();
