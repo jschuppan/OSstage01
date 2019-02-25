@@ -1,41 +1,48 @@
-// Authors: Jakob Schuppan, Robert Davis
-// lastUpdated: 02-21-2019
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : scheduler.cpp
+Date          : Febuary 25, 2019
+Purpose       : implementation of scheduler.h
+============================================================================*/
 #include <pthread.h>
-#include <list>
 #include <string.h>
 #include <assert.h>
-#include <fstream>
 #include "scheduler.h"
 #include "sema.h"
-#include <fstream>
 #include <mutex>
-#include <cmath>
 #include <unistd.h> //sleep
 #include <random>
 
+//Global Variables
 Semaphore writeSema("write_window");
-
 bool THREAD_SUSPENDED = false;
 
-
+//defualt constructor
 Scheduler::Scheduler()
 {
   this->processCount = 0;
   this->tempCounter = 0;
   writeSema.retrieveSchedulerObject(this);
 }
-//TCB State: 0 running, 1 ready, 2 blocked, 3 dead
-//void Scheduler::create_task(functionPtr, threadArg, threadName)
+/*-----------------------------------------------------------------
+Function      : create_task(Window* threadWin, Window* headerWin, Window* consoleWin);
+Parameters    : 3 Window ptrs
+Returns       : void
+Details       : TCB State: 0 running, 1 ready, 2 blocked, 3 dead
+                creates a thread and assigns the windows to the threads
+                arguments
+------------------------------------------------------------------*/
 void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
   if(processCount > 5 )
     return;
-
+  //Set thread data
   threadInfo[processCount].thread_win = threadWin;
   threadInfo[processCount].head_win = headerWin;
   threadInfo[processCount].console_win = consoleWin;
   threadInfo[processCount].thread_no = processCount;
   TCB tcbTemp;
+  //set TCB data
   tcbTemp.setThreadID(processCount);
   tcbTemp.setState(1);
   tcbTemp.setThreadData(&threadInfo[processCount]);
@@ -45,24 +52,34 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   // create a thread
   typedef void * (*TP)(void *);
   createResult = pthread_create(&pthreads[processCount], NULL, (TP)&Scheduler::perform_simple_output, this);
-  //threadInfo[0].thread_win->display_help();
   // wait for termination and check if we ran into issues
-  // createResult = pthread_join(pthreads[processCount], NULL);
   assert(!createResult);
   char buff[256];
   sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
   threadInfo[processCount].thread_win->write_window("\n");
   threadInfo[processCount].head_win->write_window(processCount + 1, 1,buff);
-  //dump(5);
+
   processCount++;
 
 }
 
+/*-----------------------------------------------------------------
+Function      : yield(int threadNum);
+Parameters    : int thread id
+Returns       : void
+Details       : changes state of thread to ready
+------------------------------------------------------------------*/
 void Scheduler::yield(int threadNum)
 {
   TCBList.getDatumById(threadNum)->setState(1);
 }
 
+/*-----------------------------------------------------------------
+Function      : dump(Window* targetWin, int level);
+Parameters    : ptr to Window object, int level to be dumped
+Returns       : void
+Details       : dumps thread infor out to a screen
+------------------------------------------------------------------*/
 void Scheduler::dump(Window* targetWin, int level)
 {
   // suspend threads and wait to make sure
@@ -71,19 +88,23 @@ void Scheduler::dump(Window* targetWin, int level)
   SCHEDULER_SUSPENDED = true;
   TCB* myT = NULL;
 
+  //use semaphore dump
   if(level == 3 || level == 4) {
     writeSema.dump(targetWin, level);
   }
 
+  //use Scheduler dump
   else
   {
       sprintf(dBuff, "\n \n");
       usleep(5000);
+      //loop until end of list
       while ((myT = TCBList.getNextElementUntilEnd(myT))) {
         int tn = myT->getThreadID();
         int ts = myT->getState();
         sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
         sprintf((dBuff  + strlen(dBuff)), "      Status: ");
+        //Check status of thread and output corresponing value
         if (ts == 0)
           sprintf((dBuff  + strlen(dBuff)), "   Running\n");
         else if (ts == 1)
@@ -102,19 +123,33 @@ void Scheduler::dump(Window* targetWin, int level)
   SCHEDULER_SUSPENDED = false;
 }
 
-// stop():   This function stops all operations of the program
-// input(s): None
-// returns:  void
+/*-----------------------------------------------------------------
+Function      : stop();
+Parameters    :
+Returns       : void
+Details       : stops all threads
+------------------------------------------------------------------*/
 void Scheduler::stop() {
   THREAD_SUSPENDED = true;
 }
 
+/*-----------------------------------------------------------------
+Function      : resume();
+Parameters    :
+Returns       : void
+Details       : restarts all threads
+------------------------------------------------------------------*/
 void Scheduler::resume() {
   THREAD_SUSPENDED = false;
 }
 
-//thread worker function
-
+/*-----------------------------------------------------------------
+Function      : perform_simple_output(void* arguments);
+Parameters    : void* arguments
+Returns       : void*
+Details       : Thread worker function,
+                Thread self yeilds after one cycle is complete
+------------------------------------------------------------------*/
 void* Scheduler::perform_simple_output(void* arguments)
 {
   int tempCounter = 0;
@@ -127,7 +162,6 @@ void* Scheduler::perform_simple_output(void* arguments)
   int threadNum = i;
 
   do {
-
     // run in endless loop until killed by garbage_collect()
     while((1) && (TCBList.getDatumById(threadNum)->getState() != 4))
     {
@@ -164,7 +198,14 @@ void* Scheduler::perform_simple_output(void* arguments)
   } while(!THREAD_SUSPENDED);
 }
 
-// running():
+/*-----------------------------------------------------------------
+Function      : running(void* ID);
+Parameters    : void* ID
+Returns       : void* (TCB)
+Details       : checks if the last thread that was running is
+                done running and sets the next thread to running.
+                If it is not done running let it run
+------------------------------------------------------------------*/
 void* Scheduler:: running(void* ID)
 {
   //If last running is NULL
@@ -199,8 +240,14 @@ void* Scheduler:: running(void* ID)
   return (void*)ID;
 }
 
-// garbage_collect(): Finds all terminated tasks and sets them to
-// state 4 which will end their while loops and the thread dies
+/*-----------------------------------------------------------------
+Function      : garbage_collect();
+Parameters    :
+Returns       : void
+Details       : Finds all terminated tasks and sets them to
+                state 4 which will end their while loops and
+                the thread dies
+------------------------------------------------------------------*/
 void Scheduler::garbage_collect() {
   TCB* myT = NULL;
   while ((myT = TCBList.getNextElementUntilEnd(myT))) {
@@ -209,6 +256,3 @@ void Scheduler::garbage_collect() {
     }
   }
 }
-
-
-//linkedList* Scheduler :: getList(){return TCBList;}

@@ -12,20 +12,24 @@ Purpose       : Simple implementation of a Queue
 template <typename T>
 class ezQueue {
 private:
-  // define node as simple struct
+  /******************************* START PRIVATE MEMBERS ********************/
   struct queueElement {
     queueElement* next;
     T content;
   };
 
   queueElement* head;
+  /******************************* END PRIVATE MEMBERS ********************/
 
 public:
+  /******************************* START PUBLIC MEMBERS *******************/
   ezQueue();
   void enQueue(T inContent);
   T deQueue();
   bool isEmpty();
   T* getNextElement(T* initElement);
+  /******************************** END PUBLIC MEMBERS **********************/
+
 };
 
 #endif

@@ -1,3 +1,9 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : scheduler.h
+Date          : Febuary 25, 2019
+Purpose       : implementation of a scheduler for threads
+============================================================================*/
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
