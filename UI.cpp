@@ -1,18 +1,29 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : UI.cpp
+Date          : Febuary 25, 2019
+Purpose       : implementation of UI.h
+============================================================================*/
 #include "UI.h"
 #include <iostream>
-
 
 //default constructor
 UI :: UI()
 {
-  getmaxyx(stdscr, maxY, maxX); // get console screen size
+  // get console screen size
+  getmaxyx(stdscr, maxY, maxX);
   wprintw(stdscr, "Screen Height = %d, Screen width = %d", maxY, maxX);
   refresh();
   windowCreatedCount = 0;
   addStarterWindows();
 }
 
-//adds UI windows
+/*-----------------------------------------------------------------
+Function      : addStarterWindows();
+Parameters    :
+Returns       : void
+Details       : creates three starter windows
+------------------------------------------------------------------*/
 void UI :: addStarterWindows()
 {
     //Header Window
@@ -34,14 +45,23 @@ void UI :: addStarterWindows()
 
 }
 
+/*-----------------------------------------------------------------
+Function      : addNewWindow();
+Parameters    :
+Returns       : void
+Details       : creates three starter windows
+------------------------------------------------------------------*/
 void UI :: addNewWindow()
 {
      int height = getMaxY() /2;
      int width = (getMaxX()-3) /3;
      int y2;
 
+     //Only create 9 windows
      if(windowCreatedCount >= 9)
         return;
+
+     //used for window alignment
      if(windowCreatedCount == 3)
      {
          //Middle left Window
@@ -61,8 +81,6 @@ void UI :: addNewWindow()
          windowCreatedCount++;
          update();
      }
-
-     //SEGMENTATION FAULT HERE
      else if( windowCreatedCount <= 6)
      {
         //Middle windows
@@ -82,7 +100,12 @@ void UI :: addNewWindow()
      }
 }
 
-
+/*-----------------------------------------------------------------
+Function      : resize();
+Parameters    :
+Returns       : void
+Details       : shrinks the middle 3 windows by half
+------------------------------------------------------------------*/
 void UI :: resize()
 {
     if(windowCreatedCount >= 9)
@@ -94,8 +117,14 @@ void UI :: resize()
         windowList.getDatumById(5)->resizeWindow(windowList.getDatumById(5)->getHeight()/2, windowList.getDatumById(5)->getWidth());
     }
 }
-//Used to update size of console window
-//refreshes all windows
+
+
+/*-----------------------------------------------------------------
+Function      : update();
+Parameters    :
+Returns       : void
+Details       : clears console screen and updates all windows
+------------------------------------------------------------------*/
 void UI :: update()
 {
     //clear and refresh standard screen
@@ -109,18 +138,31 @@ void UI :: update()
     }
 }
 
+/*-----------------------------------------------------------------
+Function      : clearConsoleScreen();
+Parameters    :
+Returns       : void
+Details       : clears console screen and refreshes
+------------------------------------------------------------------*/
 void UI :: clearConsoleScreen()
 {
     wclear(stdscr);
     wrefresh(stdscr);
 }
 
+/*-----------------------------------------------------------------
+Function      : createMaxWindow();
+Parameters    :
+Returns       : void
+Details       : calls function create createMaxSizeWindow in Window class
+------------------------------------------------------------------*/
 Window* UI :: createMaxWindow()
 {
   Window *win;
   win->createMaxSizeWindow();
   return win;
 }
+
 //accessors
 int UI :: getMaxY(){return maxY;}
 int UI :: getMaxX(){return maxX;}

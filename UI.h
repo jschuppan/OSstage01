@@ -1,6 +1,11 @@
-#pragma once
-
-// 8==D~{(.)}
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : UI.h
+Date          : Febuary 25, 2019
+Purpose       : uses window objects to create a user interface
+============================================================================*/
+#ifndef UI_H
+#definfe UI_H
 
 #include<iostream>
 #include "window.h"
@@ -9,11 +14,14 @@
 class UI
 {
     private:
+    /******************************* START PRIVATE MEMBERS ********************/
     linkedList <Window> windowList;
     //console max values
     int maxX,maxY,windowCreatedCount;
+    /******************************* END PRIVATE MEMBERS ********************/
 
     public:
+    /******************************* START PUBLIC MEMBERS *******************/
     UI();
     void update();
     void addStarterWindows();
@@ -31,6 +39,8 @@ class UI
     int getwindowCreatedCount();
     Window* getWindowCreated();
     Window* getWindowByID(int id);
-
+    /******************************** END PUBLIC MEMBERS **********************/
 
 };
+
+#endif
