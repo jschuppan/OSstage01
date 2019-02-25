@@ -2,11 +2,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <queue>
-#include "sema.h"
 #include <fstream>
-
-const bool DEBUG = false;
-
+#include "ezQueue.h"
+#include "sema.h"
 
 Semaphore::Semaphore(std::string resName)
 {
@@ -14,7 +12,6 @@ Semaphore::Semaphore(std::string resName)
   this->sema_value = 1;
   this->lastPop = -5;
 }
-
 
 void Semaphore::down(int threadID)
 {
@@ -25,7 +22,6 @@ void Semaphore::down(int threadID)
     // make resource unavailable
     sema_value = 0;
 
-
     // set out mutex lock to prevent resource from
     // being used by multiple threads
   }
@@ -34,7 +30,7 @@ void Semaphore::down(int threadID)
   {
 
     // first push new process request on queue
-    processQueue.push(threadID);
+    processQueue.enQueue(threadID);
 
     // SUSPENDINSCHEDULER()
     // we need to deal with requests until the queue
@@ -58,26 +54,18 @@ void Semaphore::up()
   // if nothing is queued we can
   // simply release the lock and reset
   // our status to available
-  if(processQueue.empty())
+  if(processQueue.isEmpty())
   {
-    if(DEBUG)
-      std::cout << "Queue empty. Unlocking sema!" << std::endl;
     resMutex.unlock();
     sema_value = 1;
   }
   else {
     // next in queue gets released
     // get threadID from pop
-    lastPop = processQueue.front();
-    processQueue.pop();
-
-    if (DEBUG)
-      std::cout << "last pop ID: " << lastPop << std::endl;
+    lastPop = processQueue.deQueue();
 
     // check if queue is now empty. If so release and unlock
-    if (processQueue.empty()) {
-      if(DEBUG)
-        std::cout << "Queue NOW empty. Unlocking sema!" << std::endl;
+    if (processQueue.isEmpty()) {
       resMutex.unlock();
       sema_value = 1;
     }
