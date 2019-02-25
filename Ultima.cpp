@@ -102,14 +102,14 @@ int main()
         case '5':
         {
           {
-            if(s.TCBList.getDatumById((int)ch-'0') == NULL)
+            if(s.getTCBList().getDatumById((int)ch-'0') == NULL)
             {
                 usleep(1000);
                 userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
             }
 
             else
-                s.TCBList.getDatumById((int)ch-'0')->getThreadData()->setState(3);
+                s.getTCBList().getDatumById((int)ch-'0')->getThreadData()->setState(3);
           }
           break;
         }
