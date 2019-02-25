@@ -1,3 +1,5 @@
+#ifndef SCHEDULER_CPP
+#define SCHEDULER_CPP
 // Authors: Jakob Schuppan, Robert Davis
 // lastUpdated: 02-21-2019
 #include <pthread.h>
@@ -189,3 +191,4 @@ void* Scheduler:: running(void* ID)
 
 
 //linkedList* Scheduler :: getList(){return TCBList;}
+#endif

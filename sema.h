@@ -5,6 +5,7 @@
 #include <queue>
 #include "ezQueue.h"
 #include "window.h"
+#include "scheduler.h"
 
 
 class Semaphore {

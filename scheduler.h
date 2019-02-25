@@ -5,6 +5,7 @@
 #include <fstream>
 #include <pthread.h>
 #include <queue>
+#include "sema.h"
 #include <mutex>
 #include "window.h"
 #include "linkedlist.h"
@@ -74,6 +75,8 @@ public:
     void garbage_collect();
     void stop();
     void resume();
+
+    friend class Semaphore;
     //linkedList* getList();
 
 };

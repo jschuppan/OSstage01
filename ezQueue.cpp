@@ -80,23 +80,24 @@ bool ezQueue<T>::isEmpty() {
   }
 }
 
-T* getNextElement(T* initElement)
+template <typename T>
+T* ezQueue<T>::getNextElement(T* initElement)
 {
   if(!head)
     return NULL;
   if(initElement == NULL)
     return &head->content;
-  if(head->datum == *initElement)
+  if(head->content == *initElement)
     return &head->next->content;
   queueElement* temp = head;
   while(temp->next)
   {
-    if (temp->next->datum == *initElement)
+    if (temp->next->content == *initElement)
     {
       if(!temp->next->next)
           return NULL;
       else
-          return &temp->next->next->datum;
+          return &temp->next->next->content;
     }
     temp = temp->next;
   }

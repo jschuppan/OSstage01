@@ -1,10 +1,14 @@
+#ifndef SEMA_CPP
+#define SEMA_CPP
 // Authors: Jakob Schuppan, Robert Davis
 #include <stdio.h>
 #include <iostream>
 #include <queue>
 #include <fstream>
 #include "ezQueue.h"
+#include <string.h>
 #include "sema.h"
+#include "scheduler.h"
 
 Semaphore::Semaphore(std::string resName)
 {
@@ -77,17 +81,19 @@ void Semaphore :: dump(Window* targetWin, int level)
 {
   char buff[256];
   sprintf(buff,"/n");
-  if(processQueue.empty())
+  int *nextElement = NULL;
+  if(processQueue.isEmpty())
   {
       targetWin->write_window(1,1, "Queue is empty");
   }
   else
   {
       sprintf(buff, "Queue : ");
-      while (!processQueue.empty())
+      while ((nextElement = processQueue.getNextElement(nextElement)))
       {
-          sprintf(buff + strlen(buff), "  %d, ", processQueue.);
+          sprintf(buff + strlen(buff), "  %d, ", *nextElement);
       }
-      targetWin->write_window();
+      targetWin->write_window(buff);
   }
 }
+#endif
