@@ -80,5 +80,27 @@ bool ezQueue<T>::isEmpty() {
   }
 }
 
+T* getNextElement(T* initElement)
+{
+  if(!head)
+    return NULL;
+  if(initElement == NULL)
+    return &head->content;
+  if(head->datum == *initElement)
+    return &head->next->content;
+  queueElement* temp = head;
+  while(temp->next)
+  {
+    if (temp->next->datum == *initElement)
+    {
+      if(!temp->next->next)
+          return NULL;
+      else
+          return &temp->next->next->datum;
+    }
+    temp = temp->next;
+  }
+}
+
 template class ezQueue<std::string>;
 template class ezQueue<int>;

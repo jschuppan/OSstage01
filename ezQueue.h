@@ -19,6 +19,7 @@ public:
   void enQueue(T inContent);
   T deQueue();
   bool isEmpty();
+  T* getNextElement(T* initElement);
 };
 
 #endif
