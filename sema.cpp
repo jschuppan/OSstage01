@@ -1,15 +1,20 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : sema.cpp
+Date          : Febuary 25, 2019
+Purpose       : implementation of sema.h
+============================================================================*/
 #ifndef SEMA_CPP
 #define SEMA_CPP
-// Authors: Jakob Schuppan, Robert Davis
 #include <stdio.h>
 #include <iostream>
 #include <queue>
-#include <fstream>
 #include "ezQueue.h"
 #include <string.h>
 #include "sema.h"
 #include "scheduler.h"
 
+//Constructor
 Semaphore::Semaphore(std::string resName)
 {
   this->resName = resName;
@@ -17,7 +22,15 @@ Semaphore::Semaphore(std::string resName)
   this->lastPop = -5;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : down(int id);
+Parameters    : int threadID
+Returns       : void
+Details       : checks if resource is available and allows the thread
+                to use it.
+                else the thread is put into a Queue until the resource
+                is available
+------------------------------------------------------------------*/
 void Semaphore::down(int threadID)
 {
   // case 1: resource is available
@@ -58,6 +71,13 @@ void Semaphore::down(int threadID)
   }
 }
 
+/*-----------------------------------------------------------------
+Function      : up();
+Parameters    :
+Returns       : void
+Details       : unlocks the mutex and allows the resource to be used
+                by another thread
+------------------------------------------------------------------*/
 void Semaphore::up()
 {
   // if nothing is queued we can
@@ -82,6 +102,12 @@ void Semaphore::up()
 
 }
 
+/*-----------------------------------------------------------------
+Function      : dump(Window* targetWin, int level);
+Parameters    : Window* targetWin , int level to dump
+Returns       : void
+Details       : outputs resource name and Queue contents into targetWin
+------------------------------------------------------------------*/
 void Semaphore :: dump(Window* targetWin, int level)
 {
   char buff[256];
@@ -100,6 +126,7 @@ void Semaphore :: dump(Window* targetWin, int level)
   else
   {
       sprintf(buff + strlen(buff), "Queue : ");
+      //loops until the end of the queue
       while ((nextElement = processQueue.getNextElement(nextElement)))
       {
           sprintf(buff + strlen(buff), "  %d, ", *nextElement);
@@ -109,8 +136,14 @@ void Semaphore :: dump(Window* targetWin, int level)
   targetWin->write_window(buff);
 }
 
-
-void Semaphore::retrieveSchedulerObject(void* schedObj) {
+/*-----------------------------------------------------------------
+Function      : retrieveSchedulerObject(void* schedObj);
+Parameters    : void* scheduler object
+Returns       : void
+Details       : sets schedRef to the paramenter object
+------------------------------------------------------------------*/
+void Semaphore::retrieveSchedulerObject(void* schedObj)
+{
   schedRef = schedObj;
 }
 #endif

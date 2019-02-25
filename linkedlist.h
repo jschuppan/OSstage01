@@ -12,6 +12,7 @@ template <class T>
 class linkedList
 {
     private:
+    /******************************* START PRIVATE MEMBERS ********************/
     struct node
     {
         node* next;
@@ -22,8 +23,10 @@ class linkedList
 
     node* head;
     int size;
+    /******************************* END PRIVATE MEMBERS ********************/
 
     public:
+    /******************************* START PUBLIC MEMBERS *******************/
     linkedList();
 
     void addToEnd(T datum, int id);
@@ -40,5 +43,6 @@ class linkedList
 
     int getSize();
     void setSize(int size);
+    /******************************** END PUBLIC MEMBERS **********************/
 };
 #endif
