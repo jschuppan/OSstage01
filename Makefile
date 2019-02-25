@@ -1,5 +1,5 @@
-OBJS	= Ultima.o scheduler.o sema.o UI.o window.o linkedlist.o
-SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp linkedlist.cpp
+OBJS	= Ultima.o scheduler.o sema.o UI.o window.o linkedlist.o ezQueue.o
+SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp linkedlist.cpp ezQueue.cpp
 HEADER	=
 OUT	= phase01
 CC	 = g++
@@ -17,6 +17,9 @@ scheduler.o: scheduler.cpp
 
 sema.o: sema.cpp
 	$(CC) $(FLAGS) sema.cpp
+
+ezQueue.o: ezQueue.cpp
+	$(CC) $(FLAGS) ezQueue.cpp
 
 clean:
 	rm -f $(OBJS) $(OUT) *.txt
