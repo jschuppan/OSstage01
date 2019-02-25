@@ -1,3 +1,9 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : Ultima.cpp
+Date          : Febuary 25, 2019
+Purpose       : Driver for project ULTIMA
+============================================================================*/
 #include "window.h"
 #include "UI.h"
 #include "linkedlist.h"
@@ -17,15 +23,15 @@ void wrapperDump(Scheduler &s, UI &userInf, int level);
 
 int main()
 {
-
-
-                               // If no input is ready, getch returns ERR
   initscr(); //strart curses
   refresh(); //refreshes virtual window
 
-  cbreak();                     // disable line buffering
-  noecho();                    // disable automatic echo of characters read by getch(), wgetch()
-  nodelay(stdscr, true);  // nodelay causes getch to be a non-blocking call.
+  // disable line buffering
+  cbreak();
+  // disable automatic echo of characters read by getch(), wgetch()
+  noecho();
+  // nodelay causes getch to be a non-blocking call.
+  nodelay(stdscr, true);
 
   linkedList <int> myList;
   Scheduler s;
@@ -43,7 +49,7 @@ int main()
   userInf.addNewWindow();
   s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
 
-//loop until q is pressed
+  //loop until q is pressed
   while(ch != 'q')
   {
        // start our scheduler which returns the ID
@@ -57,10 +63,11 @@ int main()
          garbageTimerStart = std::clock();
        }
 
-
+       //Get user input
        ch = getch();
        switch (ch)
        {
+         //Add new window
          case 'a':
          {
             usleep(1000);
@@ -68,36 +75,43 @@ int main()
              s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
              break;
          }
+         //Quit program
          case 'q':
          {
              break;
          }
+         //Dump(level1)
          case 's':
          {
              wrapperDump(s,userInf,1);
              break;
          }
+        //Dump(level2)
         case 'd':
         {
              wrapperDump(s,userInf,2);
              break;
         }
+        //Dump(level3)
         case 'f':
         {
              wrapperDump(s,userInf,3);
              break;
         }
+       //Dump(level4)
         case 'g':
         {
             wrapperDump(s,userInf,4);
             break;
         }
+        //clear console screen
         case  'c':
         {
             usleep(1000);
             userInf.getWindowByID(2)->clearScreen();
             break;
         }
+        //Display help
         case 'h':
         {
             usleep(1000);
@@ -105,6 +119,7 @@ int main()
             userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
             break;
         }
+        //Kill thread
         case '0':
         case '1':
         case '2':
@@ -124,48 +139,35 @@ int main()
           }
           break;
         }
+        //Resume running
         case 'r':
         {
               s.resume();
         }
       }
-
-        //  sleep(1);
-  }
- endwin();
+    }
+    //end curses
+    endwin();
 }
 
+/*-----------------------------------------------------------------
+Function      : wrapperDump(Scheduler &s, UI &userInf, int level);
+Parameters    : Scheduler,UI, integer level
+Returns       : void
+Details       : A wrapper function to encapsulate the call to dump
+------------------------------------------------------------------*/
 void wrapperDump(Scheduler &s, UI &userInf, int level)
 {
+    //pause program
     s.stop();
     sleep(1);
     userInf.clearConsoleScreen();
     Window * Win = new Window();
+    //create new window to dump to
     Win->createMaxSizeWindow();
     s.dump(Win, level);
+    //display dump window for 8 seconds
     sleep(8);
     userInf.update();
 
 }
- // void checkInput()
- // {
-
-  //
-  //       case ERR:
-  //       // if wgetch() return ERR, that means no keys were pressed
-  //       // earlier we enabled non-blocking input using nodelay() see above
-  //       // this allows the program to continue to inspect the keyboard without
-  //       // having to wait for the key to be pressed.
-  //           break;
-  //           default:
-  //           sprintf(buff, " %c\n", input);
-  //           userInf.getWindowByID(2)->write_window( buff);
-  //           userInf.getWindowByID(2)->write_window( " -Invalid Command\n");
-  //           userInf.getWindowByID(1)->write_window( buff);
-  //           userInf.getWindowByID(1)->write_window( " -Invalid Command\n");
-  //           userInf.getWindowByID(2)->write_window(" Ultima # ");
-  //           break;
-  //       }
-//         sleep(1);
-//     }
-// }
