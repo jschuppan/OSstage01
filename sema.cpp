@@ -99,7 +99,7 @@ void Semaphore :: dump(Window* targetWin, int level)
   }
   else
   {
-      sprintf(buff, "Queue : ");
+      sprintf(buff + strlen(buff), "Queue : ");
       while ((nextElement = processQueue.getNextElement(nextElement)))
       {
           sprintf(buff + strlen(buff), "  %d, ", *nextElement);
