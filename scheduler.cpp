@@ -85,6 +85,7 @@ void Scheduler::dump(Window* targetWin, int level)
   // suspend threads and wait to make sure
   // everything is synced
   char dBuff[255];
+  while(!SCHEDULER_COMPLETED_RUN);
   SCHEDULER_SUSPENDED = true;
   TCB* myT = NULL;
 
@@ -208,6 +209,8 @@ Details       : checks if the last thread that was running is
 ------------------------------------------------------------------*/
 void* Scheduler:: running(void* ID)
 {
+  SCHEDULER_COMPLETED_RUN = false;
+
   //If last running is NULL
   if((TCB*) ID == NULL)
   {
@@ -236,6 +239,7 @@ void* Scheduler:: running(void* ID)
     return (void*) myT;
   }
 
+  SCHEDULER_COMPLETED_RUN = true;
   //Keep running
   return (void*)ID;
 }
