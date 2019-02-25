@@ -39,7 +39,7 @@ void Semaphore::down(int threadID)
     Scheduler* sr = (Scheduler*)schedRef;
 
     // we'll suspend the process in the scheduler
-    sr->TCBList.getDatumById(threadID)->getThreadData()->setState(2);
+    sr->TCBList.getDatumById(threadID)->setState(2);
 
     // we need to deal with requests until the queue
     // is empty
@@ -47,7 +47,7 @@ void Semaphore::down(int threadID)
     // std::cout << "CLEAR" << std::endl;
 
     //callToScheduler();
-    sr->TCBList.getDatumById(threadID)->getThreadData()->setState(1);
+    sr->TCBList.getDatumById(threadID)->setState(1);
   }
 
   // otherwise there is an issue

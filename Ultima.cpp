@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string>
 #include <fstream>
+#include <ctime>
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
@@ -27,10 +28,11 @@ int main()
   nodelay(stdscr, true);  // nodelay causes getch to be a non-blocking call.
 
   linkedList <int> myList;
-  std::mutex testMtx;
   Scheduler s;
   UI userInf;
   char ch;
+  std::clock_t garbageTimerStart = std::clock();
+  double timeElapsed;
   void* ID = NULL;
 
   //Create starter threads and windows
@@ -44,10 +46,19 @@ int main()
 //loop until q is pressed
   while(ch != 'q')
   {
-    // std::cout << "START LOOP" << "\n";
+       // start our scheduler which returns the ID
+       // to the next node and continous round-robin style
        ID = s.running(ID);
-       // sleep(1);
-       ch= getch();
+
+       // run garbage_collect() every 30 seconds
+       timeElapsed = ((std::clock() - garbageTimerStart) / (double)CLOCKS_PER_SEC);
+       if (timeElapsed > 30) {
+         s.garbage_collect();
+         garbageTimerStart = std::clock();
+       }
+
+
+       ch = getch();
        switch (ch)
        {
          case 'a':
@@ -109,7 +120,7 @@ int main()
             }
 
             else
-                s.getTCBList().getDatumById((int)ch-'0')->getThreadData()->setState(3);
+                s.getTCBList().getDatumById((int)ch-'0')->setState(3);
           }
           break;
         }

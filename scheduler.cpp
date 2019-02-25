@@ -1,5 +1,3 @@
-#ifndef SCHEDULER_CPP
-#define SCHEDULER_CPP
 // Authors: Jakob Schuppan, Robert Davis
 // lastUpdated: 02-21-2019
 #include <pthread.h>
@@ -19,8 +17,6 @@ Semaphore writeSema("write_window");
 
 bool THREAD_SUSPENDED = false;
 
-void* perform_simple_output(void* arguments);
-
 
 Scheduler::Scheduler()
 {
@@ -34,7 +30,6 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
 
   if(processCount > 5 )
     return;
-  int createResult;
 
   threadInfo[processCount].thread_win = threadWin;
   threadInfo[processCount].head_win = headerWin;
@@ -42,13 +37,14 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   threadInfo[processCount].thread_no = processCount;
   TCB tcbTemp;
   tcbTemp.setThreadID(processCount);
-  tcbTemp.setState(3);
+  tcbTemp.setState(1);
   tcbTemp.setThreadData(&threadInfo[processCount]);
   TCBList.addToEnd(tcbTemp, processCount);
-
+  int createResult;
 
   // create a thread
-  createResult = pthread_create(&pthreads[processCount], NULL, perform_simple_output, &threadInfo[processCount]);
+  typedef void * (*TP)(void *);
+  createResult = pthread_create(&pthreads[processCount], NULL, (TP)&Scheduler::perform_simple_output, this);
   //threadInfo[0].thread_win->display_help();
   // wait for termination and check if we ran into issues
   // createResult = pthread_join(pthreads[processCount], NULL);
@@ -62,8 +58,9 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
 
 }
 
-void Scheduler::yield()
+void Scheduler::yield(int threadNum)
 {
+  TCBList.getDatumById(threadNum)->setState(1);
 }
 
 void Scheduler::dump(Window* targetWin, int level)
@@ -81,10 +78,10 @@ void Scheduler::dump(Window* targetWin, int level)
   else
   {
       sprintf(dBuff, "\n \n");
-      usleep(1000);
+      usleep(5000);
       while ((myT = TCBList.getNextElementUntilEnd(myT))) {
-        int tn = myT->getThreadData()->getThreadNo();
-        int ts = myT->getThreadData()->getState();
+        int tn = myT->getThreadID();
+        int ts = myT->getState();
         sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
         sprintf((dBuff  + strlen(dBuff)), "      Status: ");
         if (ts == 0)
@@ -95,6 +92,8 @@ void Scheduler::dump(Window* targetWin, int level)
           sprintf((dBuff  + strlen(dBuff)), "   Blocked\n");
         else if (ts == 3)
           sprintf((dBuff  + strlen(dBuff)), "   Dead\n");
+        else if (ts == 4)
+          sprintf((dBuff  + strlen(dBuff)), "   Killed (Thread terminated)\n");
   }
 }
 
@@ -115,44 +114,54 @@ void Scheduler::resume() {
 }
 
 //thread worker function
-void* perform_simple_output(void* arguments)
+
+void* Scheduler::perform_simple_output(void* arguments)
 {
   int tempCounter = 0;
   char buff[256];
-  int wasLocked = false;
-  Scheduler :: thread_data* td = (Scheduler::thread_data*) arguments;
+  int i = 0;
+  // find out who we are
+  while(pthreads[i] != pthread_self()) {
+    i++;
+  }
+  int threadNum = i;
 
   do {
-  while((1) && (td->state != 4))
-  {
-    // check for suspend called by dump
-    while (THREAD_SUSPENDED);
 
-    if(td->state == 0)
+    // run in endless loop until killed by garbage_collect()
+    while((1) && (TCBList.getDatumById(threadNum)->getState() != 4))
     {
-      tempCounter++;
-      sprintf(buff, "  Task-%d running #%d\n",td->thread_no,tempCounter);
-      writeSema.down(td->thread_no);
-      td->thread_win->write_window(buff);
-      writeSema.up();
-
-      sprintf(buff, "  Thread-%d currently running.\n",td->thread_no);
-      writeSema.down(td->thread_no);
-      td->console_win->write_window(buff);
-      writeSema.up();
-
-
-      // catch a suspend here in case we
-      // didnt get it up top due to timing
+      // check for suspend called by dump
       while (THREAD_SUSPENDED);
-      // setState() --> replace with YIELD()
-      td->state = 1;
+
+      if(TCBList.getDatumById(threadNum)->getState() == 0)
+      {
+        tempCounter++;
+        sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
+        writeSema.down(threadNum);
+        threadInfo[threadNum].getThreadWin()->write_window(buff);
+        // td->thread_win->write_window(buff);
+        writeSema.up();
+
+        sprintf(buff, "  Thread-%d currently running.\n",threadNum);
+        writeSema.down(threadNum);
+        threadInfo[threadNum].getConsoleWin()->write_window(buff);
+        // td->console_win->write_window(buff);
+        writeSema.up();
+
+
+        // catch a suspend here in case we
+        // didnt get it up top due to timing
+        while (THREAD_SUSPENDED);
+
+        // process yields itself after completing run
+        yield(threadNum);
+      }
+      else {
+        pthread_yield();
+      }
     }
-    else {
-      pthread_yield();
-    }
-  }
-} while(!THREAD_SUSPENDED);
+  } while(!THREAD_SUSPENDED);
 }
 
 // running():
@@ -163,23 +172,23 @@ void* Scheduler:: running(void* ID)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
     //If next state is ready set to running
-    if(myT->getThreadData()->getState() == 1)
+    if(myT->getState() == 1)
     {
-      myT->getThreadData()->setState(0);
+      myT->setState(0);
       return (void*) myT;
     }
     //State is blocked or dead don't set running
     return (void*) myT;
   }
   //If last state running is not running
-  else if(((TCB*) ID)->getThreadData()->getState() != 0)
+  else if(((TCB*) ID)->getState() != 0)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
     //If next state is blocked or dead don't set to running
     //If next state is ready set to running
-    if(myT->getThreadData()->getState() == 1)
+    if(myT->getState() == 1)
     {
-      myT->getThreadData()->setState(0);
+      myT->setState(0);
       return (void*) myT;
     }
     //State is blocked or dead don't set running
@@ -190,6 +199,16 @@ void* Scheduler:: running(void* ID)
   return (void*)ID;
 }
 
+// garbage_collect(): Finds all terminated tasks and sets them to
+// state 4 which will end their while loops and the thread dies
+void Scheduler::garbage_collect() {
+  TCB* myT = NULL;
+  while ((myT = TCBList.getNextElementUntilEnd(myT))) {
+    if(myT->getState() == 3) {
+      myT->setState(4);
+    }
+  }
+}
+
 
 //linkedList* Scheduler :: getList(){return TCBList;}
-#endif
