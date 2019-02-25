@@ -85,13 +85,16 @@ void Semaphore::up()
 void Semaphore :: dump(Window* targetWin, int level)
 {
   char buff[256];
-  sprintf(buff,"/n");
-  int *nextElement = NULL;
-  Scheduler* sr = (Scheduler*)schedRef;
+  char resourceName[50];
+  strcpy(resourceName, this->resName.c_str());
+  sprintf(buff,"\n \n  Semaphore:\n");
+  sprintf(buff+ strlen(buff),"    Resource Name: %s \n\n", resourceName);
+  sprintf(buff+ strlen(buff),"    Queue Status: \n", this->resName);
 
+  int *nextElement = NULL;
   if(processQueue.isEmpty())
   {
-      targetWin->write_window(1,1, "Queue is empty");
+      sprintf(buff + strlen(buff), "       Queue is empty");
   }
   else
   {
@@ -100,8 +103,9 @@ void Semaphore :: dump(Window* targetWin, int level)
       {
           sprintf(buff + strlen(buff), "  %d, ", *nextElement);
       }
-      targetWin->write_window(buff);
   }
+
+  targetWin->write_window(buff);
 }
 
 
