@@ -29,13 +29,12 @@ void Semaphore::down(int threadID)
     // set out mutex lock to prevent resource from
     // being used by multiple threads
   }
+
   // case 2: resource is unavailable
   else if (sema_value == 0)
   {
-
     // first push new process request on queue
     processQueue.enQueue(threadID);
-
     // SUSPENDINSCHEDULER()
     // we need to deal with requests until the queue
     // is empty

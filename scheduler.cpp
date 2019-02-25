@@ -71,7 +71,6 @@ void Scheduler::dump(Window* targetWin, int level)
   char dBuff[255];
   SCHEDULER_SUSPENDED = true;
   TCB* myT = NULL;
-  int ts;
 
   if(level == 3 || level == 4) {
     writeSema.dump(targetWin, level);
@@ -85,7 +84,7 @@ void Scheduler::dump(Window* targetWin, int level)
         int tn = myT->getThreadData()->getThreadNo();
         int ts = myT->getThreadData()->getState();
         sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
-        sprintf((dBuff  + strlen(dBuff)), "      Status: ", tn);
+        sprintf((dBuff  + strlen(dBuff)), "      Status: ");
         if (ts == 0)
           sprintf((dBuff  + strlen(dBuff)), "   Running\n");
         else if (ts == 1)
