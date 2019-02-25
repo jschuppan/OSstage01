@@ -87,15 +87,19 @@ void Semaphore::up()
 
 void Semaphore :: dump(Window* targetWin, int level)
 {
-  std :: ofstream debugDump;
-  debugDump.open("semaDump.txt", std::ofstream::app);
-  //TCB* myT = NULL;
-  debugDump <<"Before Loop" << std::endl;
-
-  while (!processQueue.empty())
+  char buff[256];
+  sprintf(buff,"/n");
+  if(processQueue.empty())
   {
-    debugDump << processQueue.front();
+      targetWin->write_window(1,1, "Queue is empty");
   }
-
-  debugDump <<"After loop" << std::endl;
+  else
+  {
+      sprintf(buff, "Queue : ");
+      while (!processQueue.empty())
+      {
+          sprintf(buff + strlen(buff), "  %d, ", processQueue.);
+      }
+      targetWin->write_window();
+  }
 }
