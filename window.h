@@ -1,6 +1,12 @@
-#pragma once
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : window.cpp
+Date          : Febuary 25, 2019
+Purpose       : implementation of window.h
+============================================================================*/
+#ifndef WINDOW_H
+#define WINDOW_H
 
-#include<iostream>
 #include<curses.h>  //Used for curses windows
 #include<stdarg.h> //formatting output to the window
 #include<cstdlib>
@@ -8,11 +14,14 @@
 class Window
 {
 private:
+  /******************************* START PRIVATE MEMBERS ********************/
     WINDOW* window_ptr;
     int x,y;
     int width, height;
+    /******************************* END PRIVATE MEMBERS ********************/
 
 public:
+  /******************************* START PUBLIC MEMBERS *******************/
 	Window();
 	Window(int height, int width, int starty, int startx);
 	void create_window(int height, int width, int starty, int startx);
@@ -40,7 +49,7 @@ public:
   void setWidth(int width);
   void setWindowPtr(WINDOW* window_ptr);
   bool operator== (Window& rhs);
-
-
-
+  /******************************** END PUBLIC MEMBERS **********************/
 };
+
+#endif

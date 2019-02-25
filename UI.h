@@ -5,7 +5,7 @@ Date          : Febuary 25, 2019
 Purpose       : uses window objects to create a user interface
 ============================================================================*/
 #ifndef UI_H
-#definfe UI_H
+#define UI_H
 
 #include<iostream>
 #include "window.h"

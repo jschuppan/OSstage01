@@ -1,9 +1,15 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : window.cpp
+Date          : Febuary 25, 2019
+Purpose       : implementation of window.h
+============================================================================*/
 #include "window.h"
-#include <curses.h>     // needed for Curses windowing
+#include <curses.h>      // needed for Curses windowing
 #include <stdarg.h>
-#include <iostream>
 
 using namespace std;
+
 //defualt constructer
 Window:: Window()
 {
@@ -21,7 +27,12 @@ Window:: Window(int height, int width, int starty, int startx)
   create_window(height, width, y, x);
 }
 
-//creates a window and stores address into window_ptr
+/*-----------------------------------------------------------------
+Function      : create_window(int,int,int,int);
+Parameters    : integers - height, width, y, x
+Returns       : void
+Details       : creates a window the size of the paramenters
+------------------------------------------------------------------*/
 void Window:: create_window(int height, int width, int starty, int startx)
 {
   WINDOW *Win;
@@ -34,7 +45,12 @@ void Window:: create_window(int height, int width, int starty, int startx)
   setWindowPtr(Win);
 }
 
-//Writes to a window and refreshes the window
+/*-----------------------------------------------------------------
+Function      : write_window( const char*);
+Parameters    : string, char[]
+Returns       : void
+Details       : writes the text to the window at default positions
+------------------------------------------------------------------*/
 void Window :: write_window(const char* text)
 {
   wprintw(window_ptr, text);
@@ -42,7 +58,12 @@ void Window :: write_window(const char* text)
   wrefresh(window_ptr); // draw the window
 }
 
-//Determine where in the window you want to write
+/*-----------------------------------------------------------------
+Function      : write_window(int x, int y, const char*);
+Parameters    : integer- x,y : string, char[]
+Returns       : void
+Details       : writes the text to the window at paramenter location
+------------------------------------------------------------------*/
 void Window :: write_window(int y, int x, const char* text)
 {
   mvwprintw(window_ptr, y, x, text);
@@ -50,7 +71,12 @@ void Window :: write_window(int y, int x, const char* text)
   wrefresh(window_ptr); // draw the window
 }
 
-//Will diaplay a help menu to the window
+/*-----------------------------------------------------------------
+Function      : display_help();
+Parameters    :
+Returns       : void
+Details       : displays a help menu to the window
+------------------------------------------------------------------*/
 void Window :: display_help()
 {
   wclear(window_ptr);
@@ -72,7 +98,12 @@ void Window :: display_help()
   write_window(4, 50, "g=..Semap Dump2...");
 }
 
-//meant to be used to change window size
+/*-----------------------------------------------------------------
+Function      : resizeWindow(int,height,int width);
+Parameters    : integers- height, width
+Returns       : void
+Details       : resizes window to the given height and size
+------------------------------------------------------------------*/
 void Window :: resizeWindow(int height,int width)
 {
    setHeight(height);
@@ -80,6 +111,12 @@ void Window :: resizeWindow(int height,int width)
    windowRefresh();
 }
 
+/*-----------------------------------------------------------------
+Function      : windowRefresh();
+Parameters    :
+Returns       : void
+Details       : refreshes and draws a box around the window
+------------------------------------------------------------------*/
 void Window :: windowRefresh()
 {
     //write_window(1,1,"HELLO");
@@ -87,11 +124,23 @@ void Window :: windowRefresh()
     wrefresh(window_ptr);
 }
 
+/*-----------------------------------------------------------------
+Function      : moveWindow(int y, int x);
+Parameters    : integers - y,x
+Returns       : void
+Details       : moves a window to the given location
+------------------------------------------------------------------*/
 void Window :: moveWindow(int y, int x)
 {
     mvwin(window_ptr, y, x);
 }
 
+/*-----------------------------------------------------------------
+Function      : createMaxSizeWindow();
+Parameters    :
+Returns       : void
+Details       : creates a window the same size as the stdscr
+------------------------------------------------------------------*/
 void Window :: createMaxSizeWindow()
 {
     int maxY, maxX;
@@ -99,6 +148,13 @@ void Window :: createMaxSizeWindow()
     create_window(maxY-1, maxX-1, 1,1);
 }
 
+/*-----------------------------------------------------------------
+Function      : clearScreen;
+Parameters    :
+Returns       : void
+Details       : clears the screen, draws a box around the window and
+                refreshes it.
+------------------------------------------------------------------*/
 void Window :: clearScreen()
 {
   wclear(window_ptr);
@@ -107,6 +163,13 @@ void Window :: clearScreen()
   wrefresh(window_ptr);
 
 }
+
+/*-----------------------------------------------------------------
+Function      : operator==(Window &rhs);
+Parameters    : Window object
+Returns       : true if Windows point to the same curses WINDOW
+Details       : checks if two Windows point to the same WINDOW
+------------------------------------------------------------------*/
 bool Window :: operator==(Window& rhs)
 {
   if(this->getWindowPtr() == rhs.getWindowPtr())
@@ -114,11 +177,18 @@ bool Window :: operator==(Window& rhs)
   return false;
 }
 
+/*-----------------------------------------------------------------
+Function      : deleteWindow();
+Parameters    :
+Returns       : void
+Details       : deletes the calling Window
+------------------------------------------------------------------*/
 void Window :: deleteWindow()
 {
   delwin(window_ptr);
   window_ptr = NULL;
 }
+
 //Mutators
 void Window:: setWindowPtr(WINDOW* window_ptr){this->window_ptr = window_ptr;}
 void Window:: setX(int x){this->x = x;}
