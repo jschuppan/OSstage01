@@ -17,6 +17,10 @@ Semaphore::Semaphore(std::string resName)
   this->lastPop = -5;
 }
 
+void Semaphore::retrieveSchedulerObject(void* schedObj) {
+  schedRef = schedObj;
+}
+
 void Semaphore::down(int threadID)
 {
   // case 1: resource is available
@@ -35,13 +39,18 @@ void Semaphore::down(int threadID)
   {
     // first push new process request on queue
     processQueue.enQueue(threadID);
-    // SUSPENDINSCHEDULER()
+    Scheduler* sr = (Scheduler*)schedRef;
+
+    // we'll suspend the process in the scheduler
+    sr->TCBList.getDatumById(threadID)->getThreadData()->setState(2);
+
     // we need to deal with requests until the queue
     // is empty
     while(lastPop != threadID);
     // std::cout << "CLEAR" << std::endl;
 
     //callToScheduler();
+    sr->TCBList.getDatumById(threadID)->getThreadData()->setState(1);
   }
 
   // otherwise there is an issue
@@ -81,6 +90,8 @@ void Semaphore :: dump(Window* targetWin, int level)
   char buff[256];
   sprintf(buff,"/n");
   int *nextElement = NULL;
+  Scheduler* sr = (Scheduler*)schedRef;
+
   if(processQueue.isEmpty())
   {
       targetWin->write_window(1,1, "Queue is empty");

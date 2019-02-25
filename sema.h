@@ -12,6 +12,7 @@ class Semaphore {
     void down(int threadID);
     void up();
     void dump(Window* targetWin,int level);
+    void retrieveSchedulerObject(void* schedObj);
 
   private:
     std::string resName;
@@ -19,6 +20,7 @@ class Semaphore {
     ezQueue<int> processQueue;
     std::mutex resMutex;
     int lastPop;
+    void* schedRef;
 };
 
 #endif

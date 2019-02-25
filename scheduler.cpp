@@ -16,6 +16,7 @@
 #include <random>
 
 Semaphore writeSema("write_window");
+
 bool THREAD_SUSPENDED = false;
 
 void* perform_simple_output(void* arguments);
@@ -25,6 +26,7 @@ Scheduler::Scheduler()
 {
   this->processCount = 0;
   this->tempCounter = 0;
+  writeSema.retrieveSchedulerObject(this);
 }
 //TCB State: 0 running, 1 ready, 2 blocked, 3 dead
 //void Scheduler::create_task(functionPtr, threadArg, threadName)
