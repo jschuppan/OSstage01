@@ -1,3 +1,9 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : ezQueue.h
+Date          : Febuary 25, 2019
+Purpose       : Simple implementation of a Queue
+============================================================================*/
 #ifndef EZQUEUE_H
 #define EZQUEUE_H
 ///// MAKE SURE TO TEMPLATE
