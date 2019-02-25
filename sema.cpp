@@ -90,7 +90,7 @@ void Semaphore :: dump(Window* targetWin, int level)
   strcpy(resourceName, this->resName.c_str());
   sprintf(buff,"\n \n  Semaphore:\n");
   sprintf(buff+ strlen(buff),"    Resource Name: %s \n\n", resourceName);
-  sprintf(buff+ strlen(buff),"    Queue Status: \n", this->resName);
+  sprintf(buff+ strlen(buff),"    Queue Status: \n");
 
   int *nextElement = NULL;
   if(processQueue.isEmpty())
