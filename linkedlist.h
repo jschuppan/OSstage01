@@ -1,7 +1,12 @@
-#pragma once
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : linkedlist.h
+Date          : Febuary 25, 2019
+Purpose       : Simple implementation of a linked list
+============================================================================*/
 
-//#include "window.h"
-
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 
 template <class T>
 class linkedList
@@ -36,3 +41,4 @@ class linkedList
     int getSize();
     void setSize(int size);
 };
+#endif
