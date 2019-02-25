@@ -86,6 +86,7 @@ void Semaphore :: dump(Window* targetWin, int level)
 {
   char buff[256];
   char resourceName[50];
+  // convert our std::string to a c-string for sprintf
   strcpy(resourceName, this->resName.c_str());
   sprintf(buff,"\n \n  Semaphore:\n");
   sprintf(buff+ strlen(buff),"    Resource Name: %s \n\n", resourceName);
