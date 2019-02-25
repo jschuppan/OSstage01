@@ -17,9 +17,6 @@ Semaphore::Semaphore(std::string resName)
   this->lastPop = -5;
 }
 
-void Semaphore::retrieveSchedulerObject(void* schedObj) {
-  schedRef = schedObj;
-}
 
 void Semaphore::down(int threadID)
 {
@@ -105,5 +102,10 @@ void Semaphore :: dump(Window* targetWin, int level)
       }
       targetWin->write_window(buff);
   }
+}
+
+
+void Semaphore::retrieveSchedulerObject(void* schedObj) {
+  schedRef = schedObj;
 }
 #endif
