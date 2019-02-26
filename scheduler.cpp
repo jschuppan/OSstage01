@@ -22,6 +22,8 @@ Scheduler::Scheduler()
 {
   this->processCount = 0;
   this->tempCounter = 0;
+  this->SCHEDULER_SUSPENDED = false;
+  this->SCHEDULER_COMPLETED_RUN = false;
   writeSema.retrieveSchedulerObject(this);
 }
 /*-----------------------------------------------------------------

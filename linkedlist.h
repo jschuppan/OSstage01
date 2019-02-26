@@ -18,7 +18,6 @@ class linkedList
         node* next;
         T datum;
         int id;
-        friend linkedList;
     };
 
     node* head;

@@ -56,8 +56,8 @@ class Scheduler {
     int tempCounter;
     pthread_t pthreads[6];
     thread_data threadInfo[6];
-    bool SCHEDULER_SUSPENDED = false;
-    bool SCHEDULER_COMPLETED_RUN = false;
+    bool SCHEDULER_SUSPENDED;
+    bool SCHEDULER_COMPLETED_RUN;
     void* perform_simple_output(void*);
     /********************************* END PRIVATE MEMBERS *******************************/
 
