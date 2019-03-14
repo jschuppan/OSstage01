@@ -9,6 +9,7 @@ Purpose       : implementation of linkedlist.h
 #include "window.h"
 #include "scheduler.h"
 #include "linkedlist.h"
+#include <ncurses.h>
 
 //defualt constructor
 template<class T>
@@ -293,5 +294,7 @@ template<class T>
 void linkedList<T> :: setSize(int size){size = size;}
 
 template class linkedList<int>;
+template class linkedList<pthread_t>;
+template class linkedList<Scheduler::thread_data>;
 template class linkedList<Window>;
 template class linkedList<Scheduler::TCB>;

@@ -28,6 +28,10 @@ class Scheduler {
         Window* getHeadWin() {return this->head_win;}
         Window* getConsoleWin() {return this->console_win;}
         int getThreadNo() { return thread_no; }
+        bool operator==(const thread_data& rhs)
+        {
+          return (thread_no == rhs.thread_no);
+        }
     };
 
     struct TCB
@@ -54,9 +58,8 @@ class Scheduler {
     linkedList <TCB> TCBList;
     int processCount;
     int tempCounter;
-    pthread_t pthreads[6];
-    thread_data threadInfo[6];
-    bool SCHEDULER_SUSPENDED;
+    linkedList <pthread_t> pthreads;
+    linkedList <thread_data> threadInfo;
     bool SCHEDULER_COMPLETED_RUN;
     void* perform_simple_output(void*);
     /********************************* END PRIVATE MEMBERS *******************************/
@@ -74,6 +77,9 @@ class Scheduler {
     void garbage_collect();
     void stop();
     void resume();
+    bool SCHEDULER_SUSPENDED;
+    bool THREAD_SUSPENDED;
+    void forceWrite(int threadID);
 
     friend class Semaphore;
     /******************************** END PUBLIC MEMBERS ********************************/

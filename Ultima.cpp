@@ -127,19 +127,23 @@ int main()
         case '4':
         case '5':
         {
-          {
+
             if(s.getTCBList().getDatumById((int)ch-'0') == NULL)
             {
                 usleep(1000);
-                userInf.getWindowByID(2)->write_window(1,1,"ERROR DELETING THREAD");
+                userInf.getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
             }
 
             else
                 s.getTCBList().getDatumById((int)ch-'0')->setState(3);
-          }
           break;
         }
-        //Resume running
+        case 'j':
+        {
+          s.forceWrite(rand()%5);
+          break;
+        }
+        //Resume5 running
         case 'r':
         {
               s.resume();
@@ -167,7 +171,7 @@ void wrapperDump(Scheduler &s, UI &userInf, int level)
     Win->createMaxSizeWindow();
     s.dump(Win, level);
     //display dump window for 8 seconds
-    sleep(8);
+    sleep(3);
     userInf.update();
 
 }

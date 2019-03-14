@@ -37,7 +37,7 @@ void ezQueue<T>::enQueue(T inContent) {
     queueElement* temp = head;
 
     // loops until temp = last elemnt
-    while (!temp->next)
+    while (temp->next)
     {
       temp = temp->next;
     }

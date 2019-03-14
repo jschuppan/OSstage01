@@ -12,10 +12,15 @@ Purpose       : implementation of scheduler.h
 #include <mutex>
 #include <unistd.h> //sleep
 #include <random>
+#include <fstream>
 
 //Global Variables
+const int RUNNING = 0;
+const int READY = 1;
+const int BLOCKED = 2;
+const int KILLED = 4;
+const int DEAD = 3;
 Semaphore writeSema("write_window");
-bool THREAD_SUSPENDED = false;
 
 //defualt constructor
 Scheduler::Scheduler()
@@ -23,9 +28,11 @@ Scheduler::Scheduler()
   this->processCount = 0;
   this->tempCounter = 0;
   this->SCHEDULER_SUSPENDED = false;
+  this->THREAD_SUSPENDED = false;
   this->SCHEDULER_COMPLETED_RUN = false;
   writeSema.retrieveSchedulerObject(this);
 }
+
 /*-----------------------------------------------------------------
 Function      : create_task(Window* threadWin, Window* headerWin, Window* consoleWin);
 Parameters    : 3 Window ptrs
@@ -38,28 +45,34 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
 
   if(processCount > 5 )
     return;
+
+  thread_data threadData;
+  threadData.thread_win = threadWin;
+  threadData.head_win = headerWin;
+  threadData.console_win = consoleWin;
+  threadData.thread_no = processCount;
   //Set thread data
-  threadInfo[processCount].thread_win = threadWin;
-  threadInfo[processCount].head_win = headerWin;
-  threadInfo[processCount].console_win = consoleWin;
-  threadInfo[processCount].thread_no = processCount;
+  threadInfo.addToEnd(threadData, processCount);
+
   TCB tcbTemp;
   //set TCB data
   tcbTemp.setThreadID(processCount);
   tcbTemp.setState(1);
-  tcbTemp.setThreadData(&threadInfo[processCount]);
+  //tcbTemp.setThreadData(threadInfo.getDatumById(processCount));
   TCBList.addToEnd(tcbTemp, processCount);
   int createResult;
 
   // create a thread
   typedef void * (*TP)(void *);
-  createResult = pthread_create(&pthreads[processCount], NULL, (TP)&Scheduler::perform_simple_output, this);
+  pthread_t Pt;
+  pthreads.addToEnd(Pt, processCount);
+  createResult = pthread_create(pthreads.getDatumById(processCount), NULL, (TP)&Scheduler::perform_simple_output, this);
   // wait for termination and check if we ran into issues
   assert(!createResult);
   char buff[256];
-  sprintf(buff, " Thread-%d created.\n",threadInfo[processCount].thread_no);
-  threadInfo[processCount].thread_win->write_window("\n");
-  threadInfo[processCount].head_win->write_window(processCount + 1, 1,buff);
+  sprintf(buff, " Thread-%d created.\n",threadInfo.getDatumById(processCount)->thread_no);
+  threadInfo.getDatumById(processCount)->thread_win->write_window("\n");
+  threadInfo.getDatumById(processCount)->head_win->write_window(processCount + 1, 1,buff);
 
   processCount++;
 
@@ -99,33 +112,40 @@ void Scheduler::dump(Window* targetWin, int level)
   //use Scheduler dump
   else
   {
-      sprintf(dBuff, "\n \n");
+      sprintf(dBuff, "\n \n   ThreadNum \t State \t\t ThreadID");
       usleep(5000);
+      targetWin->write_window(dBuff);
       //loop until end of list
       while ((myT = TCBList.getNextElementUntilEnd(myT))) {
         int tn = myT->getThreadID();
         int ts = myT->getState();
-        sprintf((dBuff  + strlen(dBuff)), "   Thread: %d \n", tn);
-        sprintf((dBuff  + strlen(dBuff)), "      Status: ");
+        sprintf(dBuff, "\n");
+        sprintf((dBuff  + strlen(dBuff)), "   %d \t\t", tn);
+
         //Check status of thread and output corresponing value
-        if (ts == 0)
-          sprintf((dBuff  + strlen(dBuff)), "   Running\n");
-        else if (ts == 1)
-          sprintf((dBuff  + strlen(dBuff)), "   Ready\n");
-        else if (ts == 2)
-          sprintf((dBuff  + strlen(dBuff)), "   Blocked\n");
-        else if (ts == 3)
-          sprintf((dBuff  + strlen(dBuff)), "   Dead\n");
-        else if (ts == 4)
-          sprintf((dBuff  + strlen(dBuff)), "   Killed (Thread terminated)\n");
+        if (ts == RUNNING)
+          sprintf((dBuff  + strlen(dBuff)), " Running\t");
+        else if (ts == READY)
+          sprintf((dBuff  + strlen(dBuff)), " Ready\t\t");
+        else if (ts == BLOCKED)
+          sprintf((dBuff  + strlen(dBuff)), " Blocked\t\t");
+        else if (ts == DEAD)
+          sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
+        else if (ts == KILLED)
+          sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
+        sprintf(dBuff  + strlen(dBuff), "  %d", getpid());
+        targetWin->write_window(dBuff);
   }
 }
-
-  targetWin->write_window(dBuff);
-
   SCHEDULER_SUSPENDED = false;
 }
 
+void Scheduler::forceWrite(int threadNum)
+{
+  writeSema.down(threadNum);
+  //while(!THREAD_SUSPENDED);
+  //writeSema.up();
+}
 /*-----------------------------------------------------------------
 Function      : stop();
 Parameters    :
@@ -159,30 +179,30 @@ void* Scheduler::perform_simple_output(void* arguments)
   char buff[256];
   int i = 0;
   // find out who we are
-  while(pthreads[i] != pthread_self()) {
+  while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
   }
   int threadNum = i;
 
   do {
     // run in endless loop until killed by garbage_collect()
-    while((1) && (TCBList.getDatumById(threadNum)->getState() != 4))
+    while((1) && (TCBList.getDatumById(threadNum)->getState() != DEAD))
     {
       // check for suspend called by dump
       while (THREAD_SUSPENDED);
 
-      if(TCBList.getDatumById(threadNum)->getState() == 0)
+      if(TCBList.getDatumById(threadNum)->getState() == RUNNING)
       {
         tempCounter++;
         sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
         writeSema.down(threadNum);
-        threadInfo[threadNum].getThreadWin()->write_window(buff);
+        threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(buff);
         // td->thread_win->write_window(buff);
         writeSema.up();
 
         sprintf(buff, "  Thread-%d currently running.\n",threadNum);
         writeSema.down(threadNum);
-        threadInfo[threadNum].getConsoleWin()->write_window(buff);
+        threadInfo.getDatumById(threadNum)->getConsoleWin()->write_window(buff);
         // td->console_win->write_window(buff);
         writeSema.up();
 
@@ -218,23 +238,23 @@ void* Scheduler:: running(void* ID)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
     //If next state is ready set to running
-    if(myT->getState() == 1)
+    if(myT->getState() == READY)
     {
-      myT->setState(0);
+      myT->setState(RUNNING);
       return (void*) myT;
     }
     //State is blocked or dead don't set running
     return (void*) myT;
   }
   //If last state running is not running
-  else if(((TCB*) ID)->getState() != 0)
+  else if(((TCB*) ID)->getState() != RUNNING)
   {
     TCB* myT = TCBList.getNextElement((TCB*)ID);
     //If next state is blocked or dead don't set to running
     //If next state is ready set to running
-    if(myT->getState() == 1)
+    if(myT->getState() == READY)
     {
-      myT->setState(0);
+      myT->setState(RUNNING);
       return (void*) myT;
     }
     //State is blocked or dead don't set running
@@ -256,9 +276,18 @@ Details       : Finds all terminated tasks and sets them to
 ------------------------------------------------------------------*/
 void Scheduler::garbage_collect() {
   TCB* myT = NULL;
-  while ((myT = TCBList.getNextElementUntilEnd(myT))) {
-    if(myT->getState() == 3) {
-      myT->setState(4);
+  TCB* temp = myT;
+  myT = TCBList.getNextElementUntilEnd(myT);
+
+  while (myT)
+  {
+    if(myT->getState() == DEAD)
+    {
+      temp = myT;
+      stop();
+      myT->setState(KILLED);
+      //TCBList.removeNodeByElement(temp->getThreadID());
     }
+      myT = TCBList.getNextElementUntilEnd(myT);
   }
 }
