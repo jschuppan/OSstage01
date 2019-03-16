@@ -21,6 +21,7 @@ class Semaphore {
     void up();
     void dump(Window* targetWin,int level);
     void retrieveSchedulerObject(void* schedObj);
+    void setMCB(void* mcb);
     /******************************** END PUBLIC MEMBERS **********************/
 
   private:
@@ -30,7 +31,8 @@ class Semaphore {
     ezQueue<int> processQueue;
     std::mutex resMutex;
     int lastPop;
-    void* schedRef;
+    void* schedRef; //need to remove for mcb
+    void* mcb;
     /******************************* END PRIVATE MEMBERS ********************/
 };
 

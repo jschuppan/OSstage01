@@ -4,11 +4,15 @@ File          : Ultima.cpp
 Date          : Febuary 25, 2019
 Purpose       : Driver for project ULTIMA
 ============================================================================*/
+#ifndef MAIN_CPP
+#define MAIN_CPP
+
 #include "window.h"
 #include "UI.h"
 #include "linkedlist.h"
 #include "scheduler.h"
 #include "sema.h"
+#include "IPC.h"
 #include <iostream>
 #include <curses.h>     // neede dfor Curses windowing
 #include <stdarg.h>
@@ -19,13 +23,38 @@ Purpose       : Driver for project ULTIMA
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
-void wrapperDump(Scheduler &s, UI &userInf, int level);
+const int HEADER_WIN = 0;
+const int RUNNING_WINDOW = 1;
+const int CONSOLE_WINDOW = 2;
 
+struct MCB
+{
+  public:
+    Scheduler* s;
+    IPC* ipc;
+    Semaphore* writeSema;
+    Semaphore* messageSema;
+    UI* userInf;
+    MCB()
+    {
+      s = new Scheduler;
+      ipc = new IPC;
+      writeSema = new Semaphore("write_window");
+      messageSema = new Semaphore("message_access");
+      userInf = new UI;
+    }
+};
+void wrapperDump(Scheduler* s, UI* userInf, int level);
+void setMCB(MCB* mcb);
+void endlessLoop(MCB* mcb);
+
+
+
+//main
 int main()
 {
   initscr(); //strart curses
   refresh(); //refreshes virtual window
-
   // disable line buffering
   cbreak();
   // disable automatic echo of characters read by getch(), wgetch()
@@ -33,46 +62,83 @@ int main()
   // nodelay causes getch to be a non-blocking call.
   nodelay(stdscr, true);
 
-  linkedList <int> myList;
-  Scheduler s;
-  UI userInf;
+  MCB* mcb = new MCB;
+
+  setMCB(mcb);
+  //Create starter threads and windows
+  mcb->userInf->addNewWindow();
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
+  mcb->userInf->addNewWindow();
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
+  mcb->userInf->addNewWindow();
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
+
+  endlessLoop(mcb);
+
+  //end curses
+  endwin();
+}
+
+/*-----------------------------------------------------------------
+Function      : wrapperDump(Scheduler &s, UI &userInf, int level);
+Parameters    : Scheduler,UI, integer level
+Returns       : void
+Details       : A wrapper function to encapsulate the call to dump
+------------------------------------------------------------------*/
+void wrapperDump(Scheduler* s, UI* userInf, int level)
+{
+    //pause program
+    s->stop();
+    sleep(1);
+    userInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
+    s->dump(Win, level);
+    //display dump window for 8 seconds
+    sleep(3);
+    userInf->update();
+
+}
+
+
+/*-----------------------------------------------------------------
+Function      : endlessLoop()
+Parameters    :
+Returns       : void
+Details       : A wrapper function to encapsulate an endless loop
+------------------------------------------------------------------*/
+void endlessLoop(MCB* mcb)
+{
+  void* ID = NULL;
   char ch;
   std::clock_t garbageTimerStart = std::clock();
   double timeElapsed;
-  void* ID = NULL;
-
-  //Create starter threads and windows
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-  userInf.addNewWindow();
-  s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
-
-  //loop until q is pressed
+//loop until q is pressed
   while(ch != 'q')
   {
        // start our scheduler which returns the ID
        // to the next node and continous round-robin style
-       ID = s.running(ID);
+       ID = mcb->s->running(ID);
 
        // run garbage_collect() every 30 seconds
        timeElapsed = ((std::clock() - garbageTimerStart) / (double)CLOCKS_PER_SEC);
        if (timeElapsed > 30) {
-         s.garbage_collect();
+         mcb->s->garbage_collect();
          garbageTimerStart = std::clock();
        }
 
        //Get user input
        ch = getch();
+       mcb->userInf->getWindowByID(CONSOLE_WINDOW)->write_window(ch + " ");
        switch (ch)
        {
          //Add new window
          case 'a':
          {
             usleep(1000);
-             userInf.addNewWindow();
-             s.create_task(userInf.getWindowCreated(),userInf.getWindowByID(0),userInf.getWindowByID(1));
+             mcb->userInf->addNewWindow();
+             mcb->s->create_task(mcb->userInf->getWindowCreated(), mcb->userInf->getWindowByID(HEADER_WIN), mcb->userInf->getWindowByID(RUNNING_WINDOW));
              break;
          }
          //Quit program
@@ -83,40 +149,40 @@ int main()
          //Dump(level1)
          case 's':
          {
-             wrapperDump(s,userInf,1);
+             wrapperDump(mcb->s, mcb->userInf,1);
              break;
          }
         //Dump(level2)
         case 'd':
         {
-             wrapperDump(s,userInf,2);
+             wrapperDump(mcb->s, mcb->userInf,2);
              break;
         }
         //Dump(level3)
         case 'f':
         {
-             wrapperDump(s,userInf,3);
+             wrapperDump(mcb->s, mcb->userInf,3);
              break;
         }
        //Dump(level4)
         case 'g':
         {
-            wrapperDump(s,userInf,4);
+            wrapperDump(mcb->s,mcb->userInf,4);
             break;
         }
         //clear console screen
         case  'c':
         {
             usleep(1000);
-            userInf.getWindowByID(2)->clearScreen();
+            mcb->userInf->getWindowByID(CONSOLE_WINDOW)->clearScreen();
             break;
         }
         //Display help
         case 'h':
         {
             usleep(1000);
-            userInf.getWindowByID(2)->display_help();
-            userInf.getWindowByID(2)->write_window( 8, 1, "Ultima # ");
+            mcb->userInf->getWindowByID(CONSOLE_WINDOW)->display_help();
+            mcb->userInf->getWindowByID(CONSOLE_WINDOW)->write_window( 8, 1, "Ultima # ");
             break;
         }
         //Kill thread
@@ -128,50 +194,36 @@ int main()
         case '5':
         {
 
-            if(s.getTCBList().getDatumById((int)ch-'0') == NULL)
+            if(mcb->s->getTCBList().getDatumById((int)ch-'0') == NULL)
             {
                 usleep(1000);
-                userInf.getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
+                mcb->userInf->getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
             }
 
             else
-                s.getTCBList().getDatumById((int)ch-'0')->setState(3);
+                mcb->s->getTCBList().getDatumById((int)ch-'0')->setState(3);
           break;
         }
         case 'j':
         {
-          s.forceWrite(rand()%5);
+          mcb->s->forceWrite(rand()%5);
           break;
         }
         //Resume5 running
         case 'r':
         {
-              s.resume();
+              mcb->s->resume();
         }
       }
     }
-    //end curses
-    endwin();
-}
+  }
 
-/*-----------------------------------------------------------------
-Function      : wrapperDump(Scheduler &s, UI &userInf, int level);
-Parameters    : Scheduler,UI, integer level
-Returns       : void
-Details       : A wrapper function to encapsulate the call to dump
-------------------------------------------------------------------*/
-void wrapperDump(Scheduler &s, UI &userInf, int level)
+void setMCB(MCB* mcb)
 {
-    //pause program
-    s.stop();
-    sleep(1);
-    userInf.clearConsoleScreen();
-    Window * Win = new Window();
-    //create new window to dump to
-    Win->createMaxSizeWindow();
-    s.dump(Win, level);
-    //display dump window for 8 seconds
-    sleep(3);
-    userInf.update();
-
+  mcb->s->setMCB((void*) mcb);
+  mcb->ipc->setMCB((void*) mcb);
+  mcb->writeSema->setMCB((void*) mcb);
+  mcb->messageSema->setMCB((void*) mcb);
 }
+
+#endif

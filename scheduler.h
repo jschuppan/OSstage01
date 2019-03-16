@@ -62,6 +62,7 @@ class Scheduler {
     linkedList <thread_data> threadInfo;
     bool SCHEDULER_COMPLETED_RUN;
     void* perform_simple_output(void*);
+    void *mcb;
     /********************************* END PRIVATE MEMBERS *******************************/
 
 
@@ -77,6 +78,7 @@ class Scheduler {
     void garbage_collect();
     void stop();
     void resume();
+    void setMCB(void* mcb);
     bool SCHEDULER_SUSPENDED;
     bool THREAD_SUSPENDED;
     void forceWrite(int threadID);

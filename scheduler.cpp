@@ -7,6 +7,7 @@ Purpose       : implementation of scheduler.h
 #include <pthread.h>
 #include <string.h>
 #include <assert.h>
+//#include "Ultima.cpp"
 #include "scheduler.h"
 #include "sema.h"
 #include <mutex>
@@ -30,6 +31,7 @@ Scheduler::Scheduler()
   this->SCHEDULER_SUSPENDED = false;
   this->THREAD_SUSPENDED = false;
   this->SCHEDULER_COMPLETED_RUN = false;
+  this->mcb = NULL;
   writeSema.retrieveSchedulerObject(this);
 }
 
@@ -290,4 +292,15 @@ void Scheduler::garbage_collect() {
     }
       myT = TCBList.getNextElementUntilEnd(myT);
   }
+}
+
+/*-----------------------------------------------------------------
+Function      : setMCB()
+Parameters    :
+Returns       : void
+Details       : sets the mcb
+--------------------+++++++----------------------------------------------*/
+void Scheduler::setMCB(void* mcb)
+{
+  this->mcb = mcb;
 }
