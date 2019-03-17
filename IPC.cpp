@@ -64,6 +64,13 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   return 1;
 }
 
+/*-----------------------------------------------------------------
+Function      : Message_Receive
+Parameters    : task_Id - the thread that is wanting to read its messages
+                content - the content of the message
+Returns       : 1 - if successful
+Details       : allows threads to read messages from their virtual mailbox
+------------------------------------------------------------------*/
 int IPC::Message_Receive(int task_Id, std::string& content)
 {
   // think about implementing a safeguard to prevent one thread
@@ -84,6 +91,12 @@ int IPC::Message_Receive(int task_Id, std::string& content)
     return 0;
 }
 
+/*-----------------------------------------------------------------
+Function      : Message_Count
+Parameters    : task_Id - the thread which message_count we will display
+Returns       : 1 - if successful
+Details       : allows us to gain insight into how many messages a thread has
+------------------------------------------------------------------*/
 int IPC::Message_Count(int task_Id)
 {
   std::ofstream mPrint;
@@ -97,11 +110,20 @@ int IPC::Message_Count(int task_Id)
   return 0;
 }
 
+// TBI
 int IPC::Message_Count()
 {
   return 0;
 }
 
+/*-----------------------------------------------------------------
+Function      : Message_Print
+Parameters    : task_Id - the thread which messages we will print
+Returns       : msgPrntBuf - a string containing all infos containing a
+                             threads info
+Details       : this function allows us to print detailed information
+                about the messages of a thread (including its content)
+------------------------------------------------------------------*/
 std::string IPC::Message_Print(int task_Id)
 {
   std::string msgPrntBuf;
@@ -139,6 +161,13 @@ std::string IPC::Message_Print(int task_Id)
   return msgPrntBuf;
 }
 
+/*-----------------------------------------------------------------
+Function      : Message_DeleteAll
+Parameters    : task_Id - the thread which messages we will delete
+Returns       : 1 - if successful
+Details       : this function allows us to delete all messages of a
+                given thread
+------------------------------------------------------------------*/
 int IPC::Message_DeleteAll(int task_Id)
 {
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
@@ -151,8 +180,9 @@ int IPC::Message_DeleteAll(int task_Id)
     stdMessagesArchive->deQueue();
   }
 
-  return 0;
+  return 1;
 }
+
 
 void IPC::setMCB(MCB* mcb)
 {
