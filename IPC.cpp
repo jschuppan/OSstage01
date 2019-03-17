@@ -1,5 +1,6 @@
 #include "IPC.h"
 #include <ctime>
+#include <iomanip>
 #include <string>
 #include <fstream>
 //#include "Ultima.cpp"
@@ -97,11 +98,13 @@ void IPC::Message_Print(int task_Id)
   for (int i = 0; i < stdMessages->getSize(); i++) {
     iter = stdMessages->getNextElement(iter);
     mPrint << "  Message " << i+1 << ": " << std::endl;
-    mPrint << "    " << "Arrival time: " << iter->message_Arrival_Time << std::endl
-           << "    " << "Message size: " << iter->message_Size << std::endl
-           << "    " << "Message text: " << iter->message_Text << std::endl
-           << "    " << "Message dest ThreadID: " << iter->destination_Task_Id << std::endl
-           << "    " << "Message source ThreadID: " << iter->source_Task_Id << std::endl
+    mPrint << "    Arrival time | Message size | Message text | dest ThreadID | source ThreadID"
+    << std::endl;
+    mPrint << "    " << std::setw(10) << iter->message_Arrival_Time //<< std::endl
+           << " " << std::setw(12) << iter->message_Size //<< std::endl
+           << " " << std::setw(15) << iter->message_Text //<< std::endl
+           << " " << std::setw(10) << iter->destination_Task_Id //<< std::endl
+           << " " << std::setw(10) << iter->source_Task_Id //<< std::endl
            << std::endl;
   }
   mPrint << "--------------------------------------------------" << std::endl
