@@ -43,7 +43,7 @@ Details       : TCB State: 0 running, 1 ready, 2 blocked, 3 dead
                 creates a thread and assigns the windows to the threads
                 arguments
 ------------------------------------------------------------------*/
-void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin, IPC* ipc) {
+void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
 
   if(processCount > 5 )
     return;
@@ -59,10 +59,10 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   TCB tcbTemp;
   //set TCB data
   tcbTemp.setThreadID(processCount);
-  tcbTemp.setState(1);
+  tcbTemp.setState(READY);
   //tcbTemp.setThreadData(threadInfo.getDatumById(processCount));
   TCBList.addToEnd(tcbTemp, processCount);
-  ipc->createMailbox(processCount);
+  mcb->ipc->createMailbox(processCount);
   int createResult;
 
   // create a thread
@@ -105,23 +105,20 @@ void Scheduler::dump(Window* targetWin, int level)
   // suspend threads and wait to make sure
   // everything is synced
   char dBuff[255];
-  while(!SCHEDULER_COMPLETED_RUN);
+  //while(!SCHEDULER_COMPLETED_RUN);
   SCHEDULER_SUSPENDED = true;
   TCB* myT = NULL;
 
-  //use semaphore dump
-  if(level == 3 || level == 4) {
-    mcb->writeSema->dump(targetWin, level);
-  }
 
-  //use Scheduler dump
-  else
+  //use Scheduler dump level 1
+  if(level == 1)
   {
-      sprintf(dBuff, "\n \n   ThreadNum \t State \t\t ThreadID");
+      sprintf(dBuff, "\n \n   ThreadNum \t State ");
       usleep(5000);
       targetWin->write_window(dBuff);
       //loop until end of list
-      while ((myT = TCBList.getNextElementUntilEnd(myT))) {
+      while ((myT = TCBList.getNextElementUntilEnd(myT)))
+      {
         int tn = myT->getThreadID();
         int ts = myT->getState();
         sprintf(dBuff, "\n");
@@ -138,10 +135,19 @@ void Scheduler::dump(Window* targetWin, int level)
           sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
         else if (ts == KILLED)
           sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
-        sprintf(dBuff  + strlen(dBuff), "  %d", getpid());
         targetWin->write_window(dBuff);
+      }
   }
-}
+  else if(level == 2)
+  {
+
+  }
+  //use Semaphore dump
+  else
+  {
+    mcb->writeSema->dump(targetWin, level);
+    mcb->messageSema->dump(targetWin, level);
+  }
   SCHEDULER_SUSPENDED = false;
 }
 
@@ -183,6 +189,7 @@ void* Scheduler::perform_simple_output(void* arguments)
   int tempCounter = 0;
   char buff[256];
   int i = 0;
+  int count = -1;
   // find out who we are
   while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
@@ -210,14 +217,26 @@ void* Scheduler::perform_simple_output(void* arguments)
         threadInfo.getDatumById(threadNum)->getConsoleWin()->write_window(buff);
         // td->console_win->write_window(buff);
         mcb->writeSema->up();
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_Send(threadNum,0,"HELLO");
+        mcb->ipc->Message_DeleteAll(threadNum);
 
 
         // catch a suspend here in case we
         // didnt get it up top due to timing
         while (THREAD_SUSPENDED);
 
-        // process yields itself after completing run
-        yield(threadNum);
+        //process yields itself after completing run
+        if(count == threadInfo. getDatumById(threadNum)->getThreadNo())
+        {
+          yield(threadNum);
+          count = -1;
+        }
+        count++;
       }
       else {
         pthread_yield();

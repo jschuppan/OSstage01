@@ -51,11 +51,11 @@ int main()
   setMCB(mcb);
   //Create starter threads and windows
   mcb->userInf->addNewWindow();
-  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW), mcb->ipc);
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
   mcb->userInf->addNewWindow();
-  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW), mcb->ipc);
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
   mcb->userInf->addNewWindow();
-  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW), mcb->ipc);
+  mcb->s->create_task(mcb->userInf->getWindowCreated(),mcb->userInf->getWindowByID(HEADER_WIN),mcb->userInf->getWindowByID(RUNNING_WINDOW));
 
   endlessLoop(mcb);
 
@@ -101,6 +101,7 @@ void endlessLoop(MCB* mcb)
 //loop until q is pressed
   while(ch != 'q')
   {
+      //usleep(20000);
        // start our scheduler which returns the ID
        // to the next node and continous round-robin style
        ID = mcb->s->running(ID);
@@ -122,7 +123,7 @@ void endlessLoop(MCB* mcb)
          {
             usleep(1000);
              mcb->userInf->addNewWindow();
-             mcb->s->create_task(mcb->userInf->getWindowCreated(), mcb->userInf->getWindowByID(HEADER_WIN), mcb->userInf->getWindowByID(RUNNING_WINDOW), mcb->ipc);
+             mcb->s->create_task(mcb->userInf->getWindowCreated(), mcb->userInf->getWindowByID(HEADER_WIN), mcb->userInf->getWindowByID(RUNNING_WINDOW));
              break;
          }
          //Quit program

@@ -10,7 +10,11 @@ Purpose       : implementation of IPC.h
 #include <string>
 #include <fstream>
 
-
+//constructor
+IPC::IPC()
+{
+  this->mcb = NULL;
+}
 /*-----------------------------------------------------------------
 Function      : createMailbox
 Parameters    : int task_Id for which we will create the mailbox
@@ -21,11 +25,12 @@ int IPC::createMailbox(int task_Id)
 {
   // create a mailbox queue for thread
   ezQueue<Message_Type> tMailBox;
-
   // push it on both the regular (unread messages) and
   // archive(unread messages)  mailbox
+  //mcb->messageSema->down(task_Id);
   threadMailboxes.addToEnd(tMailBox, task_Id);
   threadMailboxesArchive.addToEnd(tMailBox, task_Id);
+  //mcb->messageSema->up();
 
   return 1;
 }
@@ -38,7 +43,9 @@ Details       : deletes a mailbox for a thread
 ------------------------------------------------------------------*/
 int IPC::deleteMailbox(int task_Id)
 {
+  //mcb->messageSema->down(task_Id);
   threadMailboxes.removeNodeByElement(task_Id);
+  //mcb->messageSema->up();
   return 0;
 }
 
@@ -59,7 +66,9 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   newMessage.message_Arrival_Time = time(NULL);
   newMessage.message_Size = content.size();
   newMessage.message_Text = content;
+  //mcb->messageSema->down(task_Id);
   threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
+  //mcb->messageSema->up();
 
   return 1;
 }
@@ -75,7 +84,7 @@ int IPC::Message_Receive(int task_Id, std::string& content)
 {
   // think about implementing a safeguard to prevent one thread
   // from reading messages destined for other threads
-
+  //mcb->messageSema->down(task_Id);
   std::ofstream mRec;
   IPC::Message_Type* recvMessage;
   recvMessage = threadMailboxes.getDatumById(task_Id)->deQueue();
@@ -84,7 +93,7 @@ int IPC::Message_Receive(int task_Id, std::string& content)
   content = recvMessage->message_Text;
   threadMailboxesArchive.getDatumById(task_Id)->enQueue(*recvMessage);
   mRec.close();
-
+  //mcb->messageSema->up();
   if (threadMailboxes.getDatumById(task_Id)->getSize() > 0)
     return 1;
   else
@@ -132,7 +141,7 @@ std::string IPC::Message_Print(int task_Id)
   std::string msgContent;
   // struct tm * timeDetail;
   // timeinfo = localtime (&rawtime);
-
+  //mcb->messageSema->down(task_Id);
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
   IPC::Message_Type* iter = NULL;
 
@@ -157,7 +166,7 @@ std::string IPC::Message_Print(int task_Id)
          << std::endl<< std::endl;
 
   mPrint.close();
-
+  //mcb->messageSema->up();
   return msgPrntBuf;
 }
 
@@ -170,6 +179,7 @@ Details       : this function allows us to delete all messages of a
 ------------------------------------------------------------------*/
 int IPC::Message_DeleteAll(int task_Id)
 {
+  //mcb->messageSema->down(task_Id);
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
   ezQueue<IPC::Message_Type>* stdMessagesArchive = threadMailboxesArchive.getDatumById(task_Id);
   while(stdMessages->getSize() > 0) {
@@ -179,7 +189,7 @@ int IPC::Message_DeleteAll(int task_Id)
   while(stdMessagesArchive->getSize() > 0) {
     stdMessagesArchive->deQueue();
   }
-
+  //mcb->messageSema->up();
   return 1;
 }
 

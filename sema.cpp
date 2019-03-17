@@ -15,10 +15,10 @@ Purpose       : implementation of sema.h
 #include "scheduler.h"
 
 //Constructor
-Semaphore::Semaphore(std::string resName)
+Semaphore::Semaphore(std::string resName, int semaValue)
 {
   this->resName = resName;
-  this->sema_value = 1;
+  this->sema_value = semaValue;
   this->lastPop = -5;
 }
 

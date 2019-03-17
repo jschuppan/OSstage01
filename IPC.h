@@ -62,6 +62,7 @@ private:
   MCB* mcb;
   //------------------Start Public Members-------------------
 public:
+  IPC();
   int createMailbox(int task_Id);
   int deleteMailbox(int task_Id);
   int Message_Send(int sourceTask, int destinationTask, std::string content);

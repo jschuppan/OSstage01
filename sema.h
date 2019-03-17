@@ -17,7 +17,7 @@ Purpose       : implementation of a semaphore to regulate what is
 class Semaphore {
   public:
     /******************************* START PUBLIC MEMBERS *******************/
-    Semaphore(std::string resName);
+    Semaphore(std::string resName, int semaValue);
     void down(int threadID);
     void up();
     void dump(Window* targetWin,int level);

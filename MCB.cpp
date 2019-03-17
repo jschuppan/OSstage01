@@ -2,12 +2,13 @@
 #include "scheduler.h"
 #include "IPC.h"
 #include "UI.h"
+#include "sema.h"
 
 MCB::MCB()
 {
   s = new Scheduler();
   ipc = new IPC();
-  writeSema = new Semaphore("write_window");
-  messageSema = new Semaphore("message_access");
+  writeSema = new Semaphore("write_window",1);
+  messageSema = new Semaphore("message_access",1);
   userInf = new UI();
 }
