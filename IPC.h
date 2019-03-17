@@ -4,8 +4,10 @@
 #include <string>
 #include <iostream>
 #include "ezQueue.h"
-#include "linkedlist.h"
+#include <list>
+#include <queue>
 #include "MCB.h"
+#include "linkedlist.h"
 
 class IPC
 {

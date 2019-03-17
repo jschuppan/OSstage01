@@ -88,7 +88,6 @@ void Semaphore::up()
       lastPop = *processQueue.deQueue();
 
   // check if queue is now empty. If so release and unlock
-  }
   sema_value++;
   resMutex.unlock();
 }
