@@ -1,13 +1,17 @@
 #ifndef IPC_H
 #define IPC_H
 
+//=================================
+// Forward declarations
+class MCB;
+
+//=================================
+// necessary includes
 #include <string>
 #include <iostream>
 #include "ezQueue.h"
-#include <list>
-#include <queue>
-#include "MCB.h"
 #include "linkedlist.h"
+
 
 
 

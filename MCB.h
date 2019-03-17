@@ -1,7 +1,8 @@
 #ifndef MCB_H
 #define MCB_H
 
-//Use forward declaration of classes
+//=================================
+// Forward declarations
 class Scheduler;
 class Semaphore;
 class UI;

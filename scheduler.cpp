@@ -4,17 +4,19 @@ File          : scheduler.cpp
 Date          : Febuary 25, 2019
 Purpose       : implementation of scheduler.h
 ============================================================================*/
+
+//=================================
+// necessary includes
 #include <pthread.h>
 #include <string.h>
 #include <assert.h>
-//#include "Ultima.cpp"
-#include "scheduler.h"
-#include "sema.h"
-#include "IPC.h"
 #include <mutex>
 #include <unistd.h> //sleep
 #include <random>
 #include <fstream>
+#include "scheduler.h"
+#include "sema.h"
+#include "IPC.h"
 #include "UI.h"
 
 //struct MCB;

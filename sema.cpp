@@ -6,12 +6,15 @@ Purpose       : implementation of sema.h
 ============================================================================*/
 #ifndef SEMA_CPP
 #define SEMA_CPP
+
+//=================================
+// necessary includes
 #include <stdio.h>
 #include <iostream>
 #include <queue>
-#include "ezQueue.h"
 #include <string.h>
 #include "sema.h"
+#include "ezQueue.h"
 #include "scheduler.h"
 
 //Constructor

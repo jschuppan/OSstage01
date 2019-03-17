@@ -4,24 +4,27 @@ File          : Ultima.cpp
 Date          : Febuary 25, 2019
 Purpose       : Driver for project ULTIMA
 ============================================================================*/
-#ifndef MAIN_CPP
-#define MAIN_CPP
 
-#include "window.h"
-#include "UI.h"
-#include "linkedlist.h"
-#include "scheduler.h"
-#include "sema.h"
-#include "IPC.h"
+
+//=================================
+// Forward declarations
+class Window;
+class MCB;
+
+//=================================
+// necessary includes
 #include <iostream>
-#include <curses.h>     // neede dfor Curses windowing
+#include <curses.h>     // needed for nCurses
 #include <stdarg.h>
 #include <unistd.h>
 #include <string>
 #include <fstream>
 #include <ctime>
-#include "MCB.h"
-using namespace std;
+#include "UI.h"
+#include "scheduler.h"
+#include "sema.h"
+#include "IPC.h"
+
 
 const int MAX_WINDOWS_THREADS = 6;
 const int HEADER_WIN = 0;
@@ -210,5 +213,3 @@ void setMCB(MCB* mcb)
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
 }
-
-#endif

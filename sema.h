@@ -8,10 +8,14 @@ Purpose       : implementation of a semaphore to regulate what is
 #ifndef SEMA_H
 #define SEMA_H
 
+//=================================
+// Forward declarations
+class Window;
+
+//=================================
+// necessary includes
 #include <mutex>
-#include <queue>
 #include "ezQueue.h"
-#include "window.h"
 #include "MCB.h"
 
 class Semaphore {

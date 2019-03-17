@@ -7,10 +7,15 @@ Purpose       : uses window objects to create a user interface
 #ifndef UI_H
 #define UI_H
 
-#include<iostream>
+//=================================
+// Forward declarations
+class MCB;
+
+//=================================
+// necessary includes
+#include <iostream>
 #include "window.h"
 #include "linkedlist.h"
-#include "MCB.h"
 
 class UI
 {

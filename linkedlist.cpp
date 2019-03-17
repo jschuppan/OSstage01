@@ -5,12 +5,17 @@ Date          : Febuary 25, 2019
 Purpose       : implementation of linkedlist.h
 ============================================================================*/
 
-#include "linkedlist.h"
-#include "window.h"
+//=================================
+// Forward declarations
+class Window;
+
+//=================================
+// necessary includes
+#include <ncurses.h>
 #include "scheduler.h"
 #include "linkedlist.h"
 #include "IPC.h"
-#include <ncurses.h>
+
 
 //defualt constructor
 template<class T>

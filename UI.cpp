@@ -4,10 +4,14 @@ File          : UI.cpp
 Date          : Febuary 25, 2019
 Purpose       : implementation of UI.h
 ============================================================================*/
-#include "UI.h"
+
+//=================================
+// necessary includes
 #include <iostream>
-#include<cstdlib>
+#include <cstdlib>
 #include <string>
+#include "UI.h"
+
 
 //default constructor
 UI :: UI()

@@ -7,16 +7,17 @@ Purpose       : implementation of a scheduler for threads
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+//=================================
+// Forward declarations
+class MCB;
+
+//=================================
+// necessary includes
 #include <string>
 #include <pthread.h>
-//#include "sema.h"
 #include "window.h"
 #include "linkedlist.h"
-//#include "IPC.h"
-#include "MCB.h"
 
-
-//struct MCB;
 
 class Scheduler {
 
