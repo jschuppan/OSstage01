@@ -1,6 +1,7 @@
 #include "IPC.h"
 #include <ctime>
 #include <string>
+#include <fstream>
 //#include "Ultima.cpp"
 
 // read and unread queues
@@ -58,8 +59,13 @@ int IPC::Message_Receive(int task_Id, std::string& content)
 
 int IPC::Message_Count(int task_Id)
 {
+  std::ofstream mPrint;
   int sizeUnread = threadMailboxes.getDatumById(task_Id)->getSize();
   int sizeRead = threadMailboxesArchive.getDatumById(task_Id)->getSize();
+  mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
+  mPrint << "There are " << sizeUnread << " unread and "
+         << sizeRead << " read messages"
+         << " for thread " << task_Id << "!" << std::endl;
 
   return 0;
 }
@@ -71,7 +77,13 @@ int IPC::Message_Count()
 
 void IPC::Message_Print(int task_Id)
 {
-  //
+  std::ofstream mPrint;
+  std::string msgContent;
+  mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
+  Message_Receive(task_Id, msgContent);
+  mPrint << "Message for thread " << task_Id << ":"<< std::endl
+         << "  " << msgContent << std::endl;
+  mPrint.close();
 }
 
 int IPC::Message_DeleteAll(int task_Id)
