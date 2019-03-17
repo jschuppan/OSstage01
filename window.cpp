@@ -4,17 +4,19 @@ File          : window.cpp
 Date          : Febuary 25, 2019
 Purpose       : implementation of window.h
 ============================================================================*/
-#include "window.h"
+
+//=================================
+// necessary includes
 #include <curses.h>      // needed for Curses windowing
 #include <stdarg.h>
+#include "window.h"
 
-using namespace std;
 
 //defualt constructer
 Window:: Window()
 {
     this->height = width = x = y = 0;
-    this->window_ptr =NULL;
+    this->window_ptr = NULL;
     this->name = "Default";
 }
 

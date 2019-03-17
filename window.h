@@ -7,10 +7,12 @@ Purpose       : implementation of window.h
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include<curses.h>  //Used for curses windows
-#include<stdarg.h> //formatting output to the window
-#include<cstdlib>
-#include<string>
+//=================================
+// necessary includes
+#include <curses.h>  //Used for curses windows
+#include <stdarg.h> //formatting output to the window
+#include <cstdlib>
+#include <string>
 
 
 class Window
