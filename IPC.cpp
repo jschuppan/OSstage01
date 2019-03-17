@@ -28,7 +28,15 @@ int IPC::deleteMailbox(int task_Id)
 
 int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
 {
-  // threadMailboxes
+  // get mailbox for destinationTask
+  IPC::Message_Type newMessage;
+  newMessage.source_Task_Id = sourceTask;
+  newMessage.destination_Task_Id = destinationTask;
+  // newMessage.message_Arrival_Time = bla;
+  // newMessage.message_Size = bla;
+  newMessage.message_Text = content;
+  threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
+
   return 0;
 }
 

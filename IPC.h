@@ -21,6 +21,12 @@ private:
     int message_Size;
     std::string message_Text;
 
+    // Message_Type(int source_Task_Id, int destination_Task_Id, std::string message_Text) {
+    //   this->source_Task_Id = source_Task_Id;
+    //   this->destination_Task_Id = destination_Task_Id;
+    //   this->message_Text = message_Text;
+    // }
+
     bool operator==(const Message_Type& rhs)
     {
       return (   source_Task_Id == rhs.source_Task_Id
