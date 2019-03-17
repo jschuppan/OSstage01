@@ -25,9 +25,14 @@ public:
   /******************************* START PUBLIC MEMBERS *******************/
   ezQueue();
   void enQueue(T inContent);
-  T deQueue();
+  T* deQueue();
   bool isEmpty();
   T* getNextElement(T* initElement);
+
+  bool operator==(const ezQueue& rhs)
+  {
+    return (head == rhs.head);
+  }
   /******************************** END PUBLIC MEMBERS **********************/
 
 };

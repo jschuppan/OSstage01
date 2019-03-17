@@ -12,11 +12,11 @@ IPC::IPC()
 
 int IPC::createMailbox(int task_Id)
 {
-  Mailbox tempNewMailbox;
-  tempNewMailbox.threadID = task_Id;
-  std::queue<Message_Type> tMailBox;
-  tempNewMailbox.threadMailBox = tMailBox;
-  threadMailboxes.push_back(tempNewMailbox);
+  // Mailbox tempNewMailbox;
+  // tempNewMailbox.threadID = task_Id;
+  ezQueue<Message_Type> tMailBox;
+  // tempNewMailbox.threadMailBox = tMailBox;
+  threadMailboxes.addToEnd(tMailBox, task_Id);
 
   return 0;
 }
@@ -26,9 +26,9 @@ int IPC::deleteMailbox(int task_Id)
   return 0;
 }
 
-int IPC::Message_Send(std::string content, int destinationTask)
+int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
 {
-
+  // threadMailboxes
   return 0;
 }
 
