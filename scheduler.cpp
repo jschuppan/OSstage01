@@ -15,6 +15,7 @@ Purpose       : implementation of scheduler.h
 #include <unistd.h> //sleep
 #include <random>
 #include <fstream>
+#include "UI.h"
 
 //struct MCB;
 //Global Variables
@@ -60,7 +61,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   //set TCB data
   tcbTemp.setThreadID(processCount);
   tcbTemp.setState(READY);
-  //tcbTemp.setThreadData(threadInfo.getDatumById(processCount));
+  tcbTemp.setThreadData(threadData);
   TCBList.addToEnd(tcbTemp, processCount);
   mcb->ipc->createMailbox(processCount);
   int createResult;
@@ -164,11 +165,12 @@ void Scheduler::dump(Window* targetWin, int level)
         sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
       else if (ts == KILLED)
         sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
-      std::string tempString;
-      //tempString = myT->getThreadData()->getThreadWin()->getName();
-      //char ch = *tempString.c_str();
+      //std::string tempString;
+      std::string str = mcb->userInf->getWindowByID(tn)->getName();
+       //std::string tempString = myT->getThreadData()->getThreadWin()->getName();
+      //char ch = *str.c_str();
       //char* c = &ch;
-      sprintf((dBuff + strlen(dBuff)),"HELLO" ); // need to use tempString istead of hello
+      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff),"HI %s", str);
       targetWin->write_window(dBuff);
     }
   }

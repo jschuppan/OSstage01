@@ -47,7 +47,7 @@ class Scheduler {
         thread_data* threadData;
         int TthreadID, Tstate;
       public:
-        void setThreadData(thread_data* d){this->threadData = d;}
+        void setThreadData(thread_data d){this->threadData = &d;}
         void setThreadID(int ID){this->TthreadID = ID;}
         void setState(int state){this->Tstate = state;}
         thread_data* getThreadData(){return threadData;}

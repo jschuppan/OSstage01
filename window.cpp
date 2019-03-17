@@ -15,6 +15,7 @@ Window:: Window()
 {
     this->height = width = x = y = 0;
     this->window_ptr =NULL;
+    this->name = "Default";
 }
 
 //constructor
