@@ -40,7 +40,7 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   newMessage.message_Text = content;
   threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
 
-  return 0;
+  return 1;
 }
 
 int IPC::Message_Receive(int task_Id, std::string& content)
@@ -48,13 +48,19 @@ int IPC::Message_Receive(int task_Id, std::string& content)
   // think about implementing a safeguard to prevent one thread
   // from reading messages destined for other threads
 
+  std::ofstream mRec;
+  IPC::Message_Type* recvMessage;
+  recvMessage = threadMailboxes.getDatumById(task_Id)->deQueue();
+  mRec.open("messageReceiveDebug.txt", std::ofstream::out | std::ofstream::app);
+  mRec << recvMessage << std::endl;
+  content = recvMessage->message_Text;
+  threadMailboxesArchive.getDatumById(task_Id)->enQueue(*recvMessage);
+  mRec.close();
 
-  IPC::Message_Type recvMessage;
-  recvMessage = *(threadMailboxes.getDatumById(task_Id)->deQueue());
-  content = recvMessage.message_Text;
-  threadMailboxesArchive.getDatumById(task_Id)->enQueue(recvMessage);
-
-  return 0;
+  if (threadMailboxes.getDatumById(task_Id)->getSize() > 0)
+    return 1;
+  else
+    return 0;
 }
 
 int IPC::Message_Count(int task_Id)
@@ -66,7 +72,7 @@ int IPC::Message_Count(int task_Id)
   mPrint << "There are " << sizeUnread << " unread and "
          << sizeRead << " read messages"
          << " for thread " << task_Id << "!" << std::endl;
-
+  mPrint.close();
   return 0;
 }
 
@@ -80,8 +86,8 @@ void IPC::Message_Print(int task_Id)
   std::ofstream mPrint;
   std::string msgContent;
   mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
-  Message_Receive(task_Id, msgContent);
-  mPrint << "Message for thread " << task_Id << ":"<< std::endl
+  // Message_Receive(task_Id, msgContent);
+  mPrint << "Messages for thread " << task_Id << ":"<< std::endl
          << "  " << msgContent << std::endl;
   mPrint.close();
 }

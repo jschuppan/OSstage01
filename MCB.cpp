@@ -5,9 +5,9 @@
 
 MCB::MCB()
 {
-  s = new Scheduler;
-  ipc = new IPC;
+  s = new Scheduler();
+  ipc = new IPC();
   writeSema = new Semaphore("write_window");
   messageSema = new Semaphore("message_access");
-  userInf = new UI;
+  userInf = new UI();
 }
