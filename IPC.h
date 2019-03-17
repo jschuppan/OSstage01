@@ -56,6 +56,8 @@ private:
   // };
 
   linkedList<ezQueue<Message_Type>> threadMailboxes;
+  linkedList<ezQueue<Message_Type>> threadMailboxesArchive;
+
 
   MCB* mcb;
   //------------------Start Public Members-------------------

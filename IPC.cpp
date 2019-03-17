@@ -17,6 +17,7 @@ int IPC::createMailbox(int task_Id)
   ezQueue<Message_Type> tMailBox;
   // tempNewMailbox.threadMailBox = tMailBox;
   threadMailboxes.addToEnd(tMailBox, task_Id);
+  threadMailboxesArchive.addToEnd(tMailBox, task_Id);
 
   return 0;
 }
@@ -45,12 +46,14 @@ int IPC::Message_Receive(int task_Id, std::string& content)
   IPC::Message_Type recvMessage;
   recvMessage = *(threadMailboxes.getDatumById(task_Id)->deQueue());
   content = recvMessage.message_Text;
+  threadMailboxesArchive.getDatumById(task_Id)->enQueue(recvMessage);
 
   return 0;
 }
 
 int IPC::Message_Count(int task_Id)
 {
+
   return 0;
 }
 
