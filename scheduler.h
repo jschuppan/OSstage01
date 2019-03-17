@@ -12,6 +12,7 @@ Purpose       : implementation of a scheduler for threads
 #include "sema.h"
 #include "window.h"
 #include "linkedlist.h"
+#include "IPC.h"
 class Scheduler {
 
   private:
@@ -71,7 +72,7 @@ class Scheduler {
     Scheduler();
     linkedList<TCB> getTCBList() { return this->TCBList; }
     void* running(void* ID);
-    void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
+    void create_task(Window* win, Window* headerWin, Window* consoleWin, IPC* ipc);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
     void yield(int);  // strict round robin process switch.
     void dump(Window* targetWin, int level);

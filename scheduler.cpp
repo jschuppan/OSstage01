@@ -10,6 +10,7 @@ Purpose       : implementation of scheduler.h
 //#include "Ultima.cpp"
 #include "scheduler.h"
 #include "sema.h"
+#include "IPC.h"
 #include <mutex>
 #include <unistd.h> //sleep
 #include <random>
@@ -43,7 +44,7 @@ Details       : TCB State: 0 running, 1 ready, 2 blocked, 3 dead
                 creates a thread and assigns the windows to the threads
                 arguments
 ------------------------------------------------------------------*/
-void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin) {
+void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consoleWin, IPC* ipc) {
 
   if(processCount > 5 )
     return;
@@ -62,6 +63,7 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   tcbTemp.setState(1);
   //tcbTemp.setThreadData(threadInfo.getDatumById(processCount));
   TCBList.addToEnd(tcbTemp, processCount);
+  ipc->createMailbox(processCount);
   int createResult;
 
   // create a thread
@@ -75,6 +77,8 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   sprintf(buff, " Thread-%d created.\n",threadInfo.getDatumById(processCount)->thread_no);
   threadInfo.getDatumById(processCount)->thread_win->write_window("\n");
   threadInfo.getDatumById(processCount)->head_win->write_window(processCount + 1, 1,buff);
+
+
 
   processCount++;
 

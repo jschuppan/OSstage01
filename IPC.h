@@ -1,8 +1,11 @@
 #ifndef IPC_H
 #define IPC_H
 
-#include<string.h>
-#include<iostream>
+#include <string>
+#include <iostream>
+#include "ezQueue.h"
+#include <list>
+#include <queue>
 
 class IPC
 {
@@ -16,12 +19,22 @@ private:
     int message_Size;
     std::string message_Text;
   };
+
+  struct Mailbox {
+    int threadID;
+    std::queue<Message_Type> threadMailBox;
+  };
+
+  std::list<Mailbox> threadMailboxes;
+
   void* mcb;
   //------------------Start Public Members-------------------
 public:
   IPC();
-  int Message_Send(Message_Type *message);
-  int Message_Recieve(int task_Id, Message_Type *message);
+  int createMailbox(int task_Id);
+  int deleteMailbox(int task_Id);
+  int Message_Send(std::string content, int destinationTask);
+  int Message_Receive(int task_Id, Message_Type *message);
   int Message_Count(int task_Id);
   int Message_Count();
   void Message_Print(int task_Id);

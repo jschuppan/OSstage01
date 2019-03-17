@@ -9,6 +9,7 @@ Purpose       : implementation of linkedlist.h
 #include "window.h"
 #include "scheduler.h"
 #include "linkedlist.h"
+#include "IPC.h"
 #include <ncurses.h>
 
 //defualt constructor
