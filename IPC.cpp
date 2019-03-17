@@ -1,35 +1,55 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : scheduler.cpp
+Date          : March 17, 2019
+Purpose       : implementation of IPC.h
+============================================================================*/
 #include "IPC.h"
 #include <ctime>
 #include <iomanip>
 #include <string>
 #include <fstream>
-//#include "Ultima.cpp"
 
-// read and unread queues
 
-//default constructor
-IPC::IPC()
-{
-  // create linkedList of mailbox queues
-}
-
+/*-----------------------------------------------------------------
+Function      : createMailbox
+Parameters    : int task_Id for which we will create the mailbox
+Returns       : 1 - if successful
+Details       : creates a mailbox for a thread
+------------------------------------------------------------------*/
 int IPC::createMailbox(int task_Id)
 {
-  // Mailbox tempNewMailbox;
-  // tempNewMailbox.threadID = task_Id;
+  // create a mailbox queue for thread
   ezQueue<Message_Type> tMailBox;
-  // tempNewMailbox.threadMailBox = tMailBox;
+
+  // push it on both the regular (unread messages) and
+  // archive(unread messages)  mailbox
   threadMailboxes.addToEnd(tMailBox, task_Id);
   threadMailboxesArchive.addToEnd(tMailBox, task_Id);
 
-  return 0;
+  return 1;
 }
 
+/*-----------------------------------------------------------------
+Function      : deleteMailbox
+Parameters    : int task_Id for which we will delete the mailbox
+Returns       : 1 - if successful
+Details       : deletes a mailbox for a thread
+------------------------------------------------------------------*/
 int IPC::deleteMailbox(int task_Id)
 {
+  threadMailboxes.removeNodeByElement(task_Id);
   return 0;
 }
 
+/*-----------------------------------------------------------------
+Function      : Message_Send
+Parameters    : sourceTask - the thread that is sending the message
+                destinationTask - the thread the message is supposed to go to
+                content - the actual body of the message
+Returns       : 1 - if successful
+Details       : allows threads to send messages to other threads
+------------------------------------------------------------------*/
 int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
 {
   // get mailbox for destinationTask
