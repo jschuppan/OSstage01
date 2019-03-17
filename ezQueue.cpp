@@ -7,6 +7,7 @@ Purpose       : implementation of ezQueue.h
 
 #include <string>
 #include "ezQueue.h"
+#include "IPC.h"
 
 // Default Constructor
 template <typename T>
@@ -55,9 +56,9 @@ Returns       : template T
 Details       : removes first element in the queue and returns it
 ------------------------------------------------------------------*/
 template <typename T>
-T ezQueue<T>::deQueue()
+T* ezQueue<T>::deQueue()
 {
-  std::string contentCopy;
+  T contentCopy;
   queueElement* temp = head;
 
   // check if QUEUE is empty
@@ -113,10 +114,12 @@ T* ezQueue<T>::getNextElement(T* initElement)
   //parameter is empty
   if(initElement == NULL)
     return &head->content;
+
   //first elemnet is correct element
   if(head->content == *initElement)
     return &head->next->content;
   queueElement* temp = head;
+
   //loop until list = last element
   while(temp->next)
   {
@@ -133,3 +136,4 @@ T* ezQueue<T>::getNextElement(T* initElement)
 
 template class ezQueue<std::string>;
 template class ezQueue<int>;
+template class ezQueue<IPC::Message_Type>;

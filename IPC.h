@@ -4,9 +4,13 @@
 #include <string>
 #include <iostream>
 #include "ezQueue.h"
+<<<<<<< HEAD
 #include <list>
 #include <queue>
 #include "MCB.h"
+=======
+#include "linkedlist.h"
+>>>>>>> 4b91861decfd32652abc844b4da64aa93079de66
 
 class IPC
 {
@@ -19,14 +23,36 @@ private:
     time_t message_Arrival_Time;
     int message_Size;
     std::string message_Text;
+
+    bool operator==(const Message_Type& rhs)
+    {
+      return (   source_Task_Id == rhs.source_Task_Id
+              && destination_Task_Id == rhs.destination_Task_Id
+              && message_Arrival_Time == rhs.message_Arrival_Time
+              && message_Size == rhs.message_Size);
+    }
+
+    // void operator=(const Message_Type& rhs)
+    // {
+    //   source_Task_Id = rhs.source_Task_Id;
+    //   destination_Task_Id = rhs.destination_Task_Id;
+    //   message_Arrival_Time = rhs.message_Arrival_Time;
+    //   message_Size = rhs.message_Size;
+    //   message_Text = rhs.message_Text;
+    // }
   };
 
-  struct Mailbox {
-    int threadID;
-    std::queue<Message_Type> threadMailBox;
-  };
+  // struct Mailbox {
+  //   int threadID;
+  //   ezQueue<Message_Type> threadMailBox;
+  //
+  //   bool operator==(const Mailbox& rhs)
+  //   {
+  //     return (threadID == rhs.threadID);
+  //   }
+  // };
 
-  std::list<Mailbox> threadMailboxes;
+  linkedList<ezQueue<Message_Type>> threadMailboxes;
 
   MCB* mcb;
   //------------------Start Public Members-------------------
@@ -34,7 +60,7 @@ public:
   IPC();
   int createMailbox(int task_Id);
   int deleteMailbox(int task_Id);
-  int Message_Send(std::string content, int destinationTask);
+  int Message_Send(int sourceTask, int destinationTask, std::string content);
   int Message_Receive(int task_Id, Message_Type *message);
   int Message_Count(int task_Id);
   int Message_Count();
