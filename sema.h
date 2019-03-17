@@ -12,6 +12,7 @@ Purpose       : implementation of a semaphore to regulate what is
 #include <queue>
 #include "ezQueue.h"
 #include "window.h"
+#include "MCB.h"
 
 class Semaphore {
   public:
@@ -21,7 +22,7 @@ class Semaphore {
     void up();
     void dump(Window* targetWin,int level);
     void retrieveSchedulerObject(void* schedObj);
-    void setMCB(void* mcb);
+    void setMCB(MCB* mcb);
     /******************************** END PUBLIC MEMBERS **********************/
 
   private:
@@ -32,7 +33,7 @@ class Semaphore {
     std::mutex resMutex;
     int lastPop;
     void* schedRef; //need to remove for mcb
-    void* mcb;
+    MCB* mcb;
     /******************************* END PRIVATE MEMBERS ********************/
 };
 

@@ -13,6 +13,11 @@ Purpose       : implementation of a scheduler for threads
 #include "window.h"
 #include "linkedlist.h"
 #include "IPC.h"
+#include "MCB.h"
+
+
+struct MCB;
+
 class Scheduler {
 
   private:
@@ -63,7 +68,7 @@ class Scheduler {
     linkedList <thread_data> threadInfo;
     bool SCHEDULER_COMPLETED_RUN;
     void* perform_simple_output(void*);
-    void *mcb;
+    MCB *mcb;
     /********************************* END PRIVATE MEMBERS *******************************/
 
 
@@ -79,7 +84,7 @@ class Scheduler {
     void garbage_collect();
     void stop();
     void resume();
-    void setMCB(void* mcb);
+    void setMCB(MCB* mcb);
     bool SCHEDULER_SUSPENDED;
     bool THREAD_SUSPENDED;
     void forceWrite(int threadID);

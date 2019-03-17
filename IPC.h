@@ -6,6 +6,7 @@
 #include "ezQueue.h"
 #include <list>
 #include <queue>
+#include "MCB.h"
 
 class IPC
 {
@@ -27,7 +28,7 @@ private:
 
   std::list<Mailbox> threadMailboxes;
 
-  void* mcb;
+  MCB* mcb;
   //------------------Start Public Members-------------------
 public:
   IPC();
@@ -39,7 +40,7 @@ public:
   int Message_Count();
   void Message_Print(int task_Id);
   int Message_DeleteAll(int task_Id);
-  void setMCB(void* mcb);
+  void setMCB(MCB* mcb);
 };
 
 #endif

@@ -153,7 +153,7 @@ void Semaphore::retrieveSchedulerObject(void* schedObj)
   schedRef = schedObj;
 }
 
-void Semaphore::setMCB(void* mcb)
+void Semaphore::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
 }

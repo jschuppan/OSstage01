@@ -20,6 +20,7 @@ Purpose       : Driver for project ULTIMA
 #include <string>
 #include <fstream>
 #include <ctime>
+#include "MCB.h"
 using namespace std;
 
 const int MAX_WINDOWS_THREADS = 6;
@@ -27,23 +28,6 @@ const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
 
-struct MCB
-{
-  public:
-    Scheduler* s;
-    IPC* ipc;
-    Semaphore* writeSema;
-    Semaphore* messageSema;
-    UI* userInf;
-    MCB()
-    {
-      s = new Scheduler;
-      ipc = new IPC;
-      writeSema = new Semaphore("write_window");
-      messageSema = new Semaphore("message_access");
-      userInf = new UI;
-    }
-};
 void wrapperDump(Scheduler* s, UI* userInf, int level);
 void setMCB(MCB* mcb);
 void endlessLoop(MCB* mcb);
@@ -220,10 +204,10 @@ void endlessLoop(MCB* mcb)
 
 void setMCB(MCB* mcb)
 {
-  mcb->s->setMCB((void*) mcb);
-  mcb->ipc->setMCB((void*) mcb);
-  mcb->writeSema->setMCB((void*) mcb);
-  mcb->messageSema->setMCB((void*) mcb);
+  mcb->s->setMCB(mcb);
+  mcb->ipc->setMCB(mcb);
+  mcb->writeSema->setMCB(mcb);
+  mcb->messageSema->setMCB(mcb);
 }
 
 #endif

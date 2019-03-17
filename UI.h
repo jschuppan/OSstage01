@@ -10,6 +10,7 @@ Purpose       : uses window objects to create a user interface
 #include<iostream>
 #include "window.h"
 #include "linkedlist.h"
+#include "MCB.h"
 
 class UI
 {

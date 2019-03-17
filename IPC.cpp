@@ -57,7 +57,7 @@ int IPC::Message_DeleteAll(int task_Id)
   return 0;
 }
 
-void IPC::setMCB(void* mcb)
+void IPC::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
 }

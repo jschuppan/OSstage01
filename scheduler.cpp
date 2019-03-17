@@ -16,13 +16,13 @@ Purpose       : implementation of scheduler.h
 #include <random>
 #include <fstream>
 
+//struct MCB;
 //Global Variables
 const int RUNNING = 0;
 const int READY = 1;
 const int BLOCKED = 2;
 const int KILLED = 4;
 const int DEAD = 3;
-Semaphore writeSema("write_window");
 
 //defualt constructor
 Scheduler::Scheduler()
@@ -33,7 +33,6 @@ Scheduler::Scheduler()
   this->THREAD_SUSPENDED = false;
   this->SCHEDULER_COMPLETED_RUN = false;
   this->mcb = NULL;
-  writeSema.retrieveSchedulerObject(this);
 }
 
 /*-----------------------------------------------------------------
@@ -112,7 +111,7 @@ void Scheduler::dump(Window* targetWin, int level)
 
   //use semaphore dump
   if(level == 3 || level == 4) {
-    writeSema.dump(targetWin, level);
+    mcb->writeSema->dump(targetWin, level);
   }
 
   //use Scheduler dump
@@ -148,7 +147,7 @@ void Scheduler::dump(Window* targetWin, int level)
 
 void Scheduler::forceWrite(int threadNum)
 {
-  writeSema.down(threadNum);
+  mcb->writeSema->down(threadNum);
   //while(!THREAD_SUSPENDED);
   //writeSema.up();
 }
@@ -201,16 +200,16 @@ void* Scheduler::perform_simple_output(void* arguments)
       {
         tempCounter++;
         sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
-        writeSema.down(threadNum);
+        mcb->writeSema->down(threadNum);
         threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(buff);
         // td->thread_win->write_window(buff);
-        writeSema.up();
+        mcb->writeSema->up();
 
         sprintf(buff, "  Thread-%d currently running.\n",threadNum);
-        writeSema.down(threadNum);
+        mcb->writeSema->down(threadNum);
         threadInfo.getDatumById(threadNum)->getConsoleWin()->write_window(buff);
         // td->console_win->write_window(buff);
-        writeSema.up();
+        mcb->writeSema->up();
 
 
         // catch a suspend here in case we
@@ -304,7 +303,7 @@ Parameters    :
 Returns       : void
 Details       : sets the mcb
 --------------------+++++++----------------------------------------------*/
-void Scheduler::setMCB(void* mcb)
+void Scheduler::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
 }
