@@ -83,12 +83,30 @@ int IPC::Message_Count()
 
 void IPC::Message_Print(int task_Id)
 {
+  // wirte in reference buffer?
   std::ofstream mPrint;
   std::string msgContent;
+  ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
+  IPC::Message_Type* iter = NULL;
+
   mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
   // Message_Receive(task_Id, msgContent);
-  mPrint << "Messages for thread " << task_Id << ":"<< std::endl
-         << "  " << msgContent << std::endl;
+
+  mPrint << "--------------------------------------------------" << std::endl
+         << "Messages for thread " << task_Id << ":" << std::endl;
+  for (int i = 0; i < stdMessages->getSize(); i++) {
+    iter = stdMessages->getNextElement(iter);
+    mPrint << "  Message " << i+1 << ": " << std::endl;
+    mPrint << "    " << "Arrival time: " << iter->message_Arrival_Time << std::endl
+           << "    " << "Message size: " << iter->message_Size << std::endl
+           << "    " << "Message text: " << iter->message_Text << std::endl
+           << "    " << "Message dest ThreadID: " << iter->destination_Task_Id << std::endl
+           << "    " << "Message source ThreadID: " << iter->source_Task_Id << std::endl
+           << std::endl;
+  }
+  mPrint << "--------------------------------------------------" << std::endl
+         << std::endl<< std::endl;
+
   mPrint.close();
 }
 
