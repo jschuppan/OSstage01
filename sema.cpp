@@ -33,38 +33,35 @@ Details       : checks if resource is available and allows the thread
 ------------------------------------------------------------------*/
 void Semaphore::down(int threadID)
 {
-  Scheduler* sr = (Scheduler*)schedRef;
 
   // we'll suspend the process in the scheduler
   // case 1: resource is available
   if (sema_value > 0)
   {
-    resMutex.lock();
     // make resource unavailable
     sema_value--;
-
-    // set out mutex lock to prevent resource from
-    // being used by multiple threads
   }
 
   // case 2: resource is unavailable
   else if (sema_value <= 0)
   {
+    resMutex.lock();
+    // set out mutex lock to prevent resource from
+    // being used by multiple threads
     // first push new process request on queue
     processQueue.enQueue(threadID);
     // we'll suspend the process in the scheduler
-    sr->TCBList.getDatumById(threadID)->setState(2);
+    mcb->s->TCBList.getDatumById(threadID)->setState(2);
 
     // we need to deal with requests until the queue
     // is empty
-    if(!sr->THREAD_SUSPENDED)
+    if(!mcb->s->THREAD_SUSPENDED)
     {
         while(lastPop != threadID);
         //callToScheduler();
-        sr->TCBList.getDatumById(threadID)->setState(1);
+        mcb->s->TCBList.getDatumById(threadID)->setState(1);
     }
-
-    //resMScheduler* sr = (Scheduler*)schedRef;utex.unlock();
+      resMutex.unlock();
   }
 
   // otherwise there is an issue
@@ -73,7 +70,6 @@ void Semaphore::down(int threadID)
     perror("Invalid Semaphore state. Quitting!");
     exit(0);
   }
-  resMutex.unlock();
 }
 
 /*-----------------------------------------------------------------
@@ -85,25 +81,16 @@ Details       : unlocks the mutex and allows the resource to be used
 ------------------------------------------------------------------*/
 void Semaphore::up()
 {
-  Scheduler* sr = (Scheduler*)schedRef;
-  // if nothing is queued we can
-  // simply release the lock and reset
-  // our status to available
-  if(processQueue.isEmpty())
-  {
-    resMutex.unlock();
-  }
-  else {
-    //resMutex.lock();
-    // next in queue gets released
-    // get threadID from pop
-    if(!sr->THREAD_SUSPENDED)
-        lastPop = *processQueue.deQueue();
+  resMutex.lock();
+  // next in queue gets released
+  // get threadID from pop
+  if(!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
+      lastPop = *processQueue.deQueue();
 
-    // check if queue is now empty. If so release and unlock
-    }
-  resMutex.unlock();
+  // check if queue is now empty. If so release and unlock
+  }
   sema_value++;
+  resMutex.unlock();
 }
 
 /*-----------------------------------------------------------------
