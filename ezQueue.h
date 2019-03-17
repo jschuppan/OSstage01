@@ -19,6 +19,7 @@ private:
   };
 
   queueElement* head;
+  int size;
   /******************************* END PRIVATE MEMBERS ********************/
 
 public:
@@ -27,6 +28,7 @@ public:
   void enQueue(T inContent);
   T* deQueue();
   bool isEmpty();
+  int getSize() {return this->size;}
   T* getNextElement(T* initElement);
 
   bool operator==(const ezQueue& rhs)

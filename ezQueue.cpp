@@ -15,6 +15,7 @@ ezQueue<T>::ezQueue()
 {
   // queue has no elements at time of creation
   head = nullptr;
+  size = 0;
 }
 
 /*-----------------------------------------------------------------
@@ -30,6 +31,7 @@ void ezQueue<T>::enQueue(T inContent) {
   {
     head = new queueElement();
     head->content = inContent;
+    size++;
   }
   else
   {
@@ -46,6 +48,7 @@ void ezQueue<T>::enQueue(T inContent) {
     // once at end add new element
     temp->next = new queueElement();
     temp->next->content = inContent;
+    size++;
   }
 }
 
@@ -72,6 +75,7 @@ T* ezQueue<T>::deQueue()
     // remove old node and return content
     delete temp;
     temp = nullptr;
+    size--;
     return NULL;
   }
 

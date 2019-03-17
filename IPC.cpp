@@ -44,6 +44,10 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
 
 int IPC::Message_Receive(int task_Id, std::string& content)
 {
+  // think about implementing a safeguard to prevent one thread
+  // from reading messages destined for other threads
+
+
   IPC::Message_Type recvMessage;
   recvMessage = *(threadMailboxes.getDatumById(task_Id)->deQueue());
   content = recvMessage.message_Text;
@@ -54,7 +58,8 @@ int IPC::Message_Receive(int task_Id, std::string& content)
 
 int IPC::Message_Count(int task_Id)
 {
-
+  int sizeUnread = threadMailboxes.getDatumById(task_Id)->getSize();
+  int sizeRead = threadMailboxesArchive.getDatumById(task_Id)->getSize();
 
   return 0;
 }
