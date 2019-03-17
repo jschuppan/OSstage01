@@ -1,4 +1,5 @@
 #include "IPC.h"
+#include <ctime>
 #include <string>
 //#include "Ultima.cpp"
 
@@ -33,8 +34,8 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   IPC::Message_Type newMessage;
   newMessage.source_Task_Id = sourceTask;
   newMessage.destination_Task_Id = destinationTask;
-  // newMessage.message_Arrival_Time = bla;
-  // newMessage.message_Size = bla;
+  newMessage.message_Arrival_Time = time(NULL);
+  newMessage.message_Size = content.size();
   newMessage.message_Text = content;
   threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
 
@@ -53,6 +54,7 @@ int IPC::Message_Receive(int task_Id, std::string& content)
 
 int IPC::Message_Count(int task_Id)
 {
+
 
   return 0;
 }
