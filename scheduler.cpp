@@ -18,6 +18,7 @@ Purpose       : implementation of scheduler.h
 #include "sema.h"
 #include "IPC.h"
 #include "UI.h"
+#include <stdlib.h>
 
 //struct MCB;
 //Global Variables
@@ -170,7 +171,7 @@ void Scheduler::dump(Window* targetWin, int level)
       //std::string tempString;
       std::string str = "ThreadWin ";
       char* chr = strdup(str.c_str());
-      
+
       snprintf((dBuff + strlen(dBuff)),sizeof(dBuff), "%s %d", chr, tn);
       free(chr);
       targetWin->write_window(dBuff);
@@ -239,6 +240,7 @@ void* Scheduler::perform_simple_output(void* arguments)
 
       if(TCBList.getDatumById(threadNum)->getState() == RUNNING)
       {
+        usleep(150000);
         tempCounter++;
         sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
         mcb->writeSema->down(threadNum);
@@ -251,13 +253,15 @@ void* Scheduler::perform_simple_output(void* arguments)
         threadInfo.getDatumById(threadNum)->getConsoleWin()->write_window(buff);
         // td->console_win->write_window(buff);
         mcb->writeSema->up();
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        // mcb->ipc->Message_Receive(0);
+
+        int num = rand() % processCount;
+        char chr[255];
+        sprintf(chr,"Thread %d sending message to Thread %d", threadNum, num);
+        std::string str(chr);
+        mcb->ipc->Message_Send(threadNum,num,str);
+
+        //mcb->ipc->Message_DeleteAll();
+        // mcb->ipc->Messsage_Receive(0);
 
 
         // catch a suspend here in case we
@@ -265,8 +269,10 @@ void* Scheduler::perform_simple_output(void* arguments)
         while (THREAD_SUSPENDED);
 
         //process yields itself after completing run
-        if(count == threadInfo. getDatumById(threadNum)->getThreadNo())
+        if(count-1 == threadInfo. getDatumById(threadNum)->getThreadNo())
         {
+          mcb->ipc->Message_Print(threadNum);
+          mcb->ipc->Message_DeleteAll(threadNum);
           yield(threadNum);
           count = -1;
         }
