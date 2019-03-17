@@ -130,7 +130,7 @@ void endlessLoop(MCB* mcb)
 
        //Get user input
        ch = getch();
-       mcb->userInf->getWindowByID(CONSOLE_WINDOW)->write_window(ch + " ");
+       //mcb->userInf->getWindowByID(CONSOLE_WINDOW)->write_window(ch + " ");
        switch (ch)
        {
          //Add new window
