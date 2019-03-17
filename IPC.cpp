@@ -82,11 +82,15 @@ int IPC::Message_Count()
   return 0;
 }
 
-void IPC::Message_Print(int task_Id)
+std::string IPC::Message_Print(int task_Id)
 {
+  std::string msgPrntBuf;
   // wirte in reference buffer?
   std::ofstream mPrint;
   std::string msgContent;
+  // struct tm * timeDetail;
+  // timeinfo = localtime (&rawtime);
+
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
   IPC::Message_Type* iter = NULL;
 
@@ -98,23 +102,35 @@ void IPC::Message_Print(int task_Id)
   for (int i = 0; i < stdMessages->getSize(); i++) {
     iter = stdMessages->getNextElement(iter);
     mPrint << "  Message " << i+1 << ": " << std::endl;
-    mPrint << "    Arrival time | Message size | Message text | dest ThreadID | source ThreadID"
+    mPrint << "    Arrival time | size | text                | dest. Thread | source Thread"
     << std::endl;
-    mPrint << "    " << std::setw(10) << iter->message_Arrival_Time //<< std::endl
-           << " " << std::setw(12) << iter->message_Size //<< std::endl
-           << " " << std::setw(15) << iter->message_Text //<< std::endl
-           << " " << std::setw(10) << iter->destination_Task_Id //<< std::endl
-           << " " << std::setw(10) << iter->source_Task_Id //<< std::endl
+    mPrint << "    " << std::setw(12) << iter->message_Arrival_Time //<< std::endl
+           << " " << std::setw(7) << iter->message_Size //<< std::endl
+           << " " << std::setw(20) << iter->message_Text //<< std::endl
+           << " " << std::setw(13) << iter->destination_Task_Id //<< std::endl
+           << " " << std::setw(12) << iter->source_Task_Id //<< std::endl
            << std::endl;
   }
   mPrint << "--------------------------------------------------" << std::endl
          << std::endl<< std::endl;
 
   mPrint.close();
+
+  return msgPrntBuf;
 }
 
 int IPC::Message_DeleteAll(int task_Id)
 {
+  ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
+  ezQueue<IPC::Message_Type>* stdMessagesArchive = threadMailboxesArchive.getDatumById(task_Id);
+  while(stdMessages->getSize() > 0) {
+    stdMessages->deQueue();
+  }
+
+  while(stdMessagesArchive->getSize() > 0) {
+    stdMessagesArchive->deQueue();
+  }
+
   return 0;
 }
 
