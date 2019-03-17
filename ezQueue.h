@@ -6,8 +6,7 @@ Purpose       : Simple implementation of a Queue
 ============================================================================*/
 #ifndef EZQUEUE_H
 #define EZQUEUE_H
-///// MAKE SURE TO TEMPLATE
-#include <string>
+
 
 template <typename T>
 class ezQueue {

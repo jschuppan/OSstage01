@@ -13,7 +13,6 @@ class MCB;
 
 //=================================
 // necessary includes
-#include <iostream>
 #include "window.h"
 #include "linkedlist.h"
 
