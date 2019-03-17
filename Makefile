@@ -1,5 +1,5 @@
 OBJS	= Ultima.o scheduler.o sema.o UI.o window.o linkedlist.o ezQueue.o IPC.o MCB.o
-SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp linkedlist.cpp ezQueue.cpp ICP.cpp
+SOURCE	= scheduler.cpp sema.cpp ultima.cpp UI.cpp window.cpp linkedlist.cpp ezQueue.cpp IPC.cpp
 OUT	= phase01
 CC	 = g++
 FLAGS	 = -g -c -Wall
