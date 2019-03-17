@@ -13,18 +13,19 @@ using namespace std;
 //defualt constructer
 Window:: Window()
 {
-    height = width = x = y = 0;
-    window_ptr =NULL;
+    this->height = width = x = y = 0;
+    this->window_ptr =NULL;
 }
 
 //constructor
-Window:: Window(int height, int width, int starty, int startx)
+Window:: Window(int height, int width, int starty, int startx,std::string name)
 {
   setHeight(height);
   setWidth(width);
   setX(startx);
   setY(starty);
   create_window(height, width, y, x);
+  this->name = name;
 }
 
 /*-----------------------------------------------------------------
@@ -195,10 +196,12 @@ void Window:: setX(int x){this->x = x;}
 void Window:: setY(int y){this->y = y;}
 void Window:: setHeight(int height){this->height = height;}
 void Window:: setWidth(int width){this->width = width;}
+void Window:: setName(std::string name){this->name = name;}
 
 //Accessors
 int Window:: getX(){return x;}
 int Window:: getY(){return y;}
 int Window:: getWidth(){return width;}
 int Window:: getHeight(){return height;}
+std::string Window:: getName(){return name;}
 WINDOW* Window :: getWindowPtr(){return window_ptr;}

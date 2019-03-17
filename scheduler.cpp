@@ -116,6 +116,7 @@ void Scheduler::dump(Window* targetWin, int level)
       sprintf(dBuff, "\n \n   ThreadNum \t State ");
       usleep(5000);
       targetWin->write_window(dBuff);
+
       //loop until end of list
       while ((myT = TCBList.getNextElementUntilEnd(myT)))
       {
@@ -140,7 +141,36 @@ void Scheduler::dump(Window* targetWin, int level)
   }
   else if(level == 2)
   {
+    sprintf(dBuff, "\n \n   Thread_Num \t State \t Window_ID ");
+    usleep(5000);
+    targetWin->write_window(dBuff);
 
+    //loop until end of list
+    while ((myT = TCBList.getNextElementUntilEnd(myT)))
+    {
+      int tn = myT->getThreadID();
+      int ts = myT->getState();
+      sprintf(dBuff, "\n");
+      sprintf((dBuff  + strlen(dBuff)), "   %d \t\t", tn);
+
+      //Check status of thread and output corresponing value
+      if (ts == RUNNING)
+        sprintf((dBuff  + strlen(dBuff)), " Running\t");
+      else if (ts == READY)
+        sprintf((dBuff  + strlen(dBuff)), " Ready\t\t");
+      else if (ts == BLOCKED)
+        sprintf((dBuff  + strlen(dBuff)), " Blocked\t\t");
+      else if (ts == DEAD)
+        sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
+      else if (ts == KILLED)
+        sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
+      std::string tempString;
+      //tempString = myT->getThreadData()->getThreadWin()->getName();
+      //char ch = *tempString.c_str();
+      //char* c = &ch;
+      sprintf((dBuff + strlen(dBuff)),"HELLO" ); // need to use tempString istead of hello
+      targetWin->write_window(dBuff);
+    }
   }
   //use Semaphore dump
   else

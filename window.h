@@ -10,6 +10,8 @@ Purpose       : implementation of window.h
 #include<curses.h>  //Used for curses windows
 #include<stdarg.h> //formatting output to the window
 #include<cstdlib>
+#include<string>
+
 
 class Window
 {
@@ -18,12 +20,13 @@ private:
     WINDOW* window_ptr;
     int x,y;
     int width, height;
+    std::string name;
     /******************************* END PRIVATE MEMBERS ********************/
 
 public:
   /******************************* START PUBLIC MEMBERS *******************/
 	Window();
-	Window(int height, int width, int starty, int startx);
+	Window(int height, int width, int starty, int startx, std::string name);
 	void create_window(int height, int width, int starty, int startx);
   void display_help();
   void write_window(const char* text);
@@ -40,10 +43,12 @@ public:
   int getY();
   int getWidth();
   int getHeight();
+  std::string getName();
   WINDOW* getWindowPtr();
 
    //Mutators
   void setX(int x);
+  void setName(std::string name);
   void setY(int y);
   void setHeight(int height);
   void setWidth(int width);

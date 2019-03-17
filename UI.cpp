@@ -6,6 +6,8 @@ Purpose       : implementation of UI.h
 ============================================================================*/
 #include "UI.h"
 #include <iostream>
+#include<cstdlib>
+#include <string>
 
 //default constructor
 UI :: UI()
@@ -27,19 +29,19 @@ Details       : creates three starter windows
 void UI :: addStarterWindows()
 {
     //Header Window
-      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2), windowCreatedCount);
+      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2,"HeaderWin "), windowCreatedCount);
       windowCreatedCount++;
 
      //Control window
      int y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*1/3-2, y2, 2),windowCreatedCount);
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*1/3-2, y2, 2,"RunningWin "),windowCreatedCount);
      windowCreatedCount++;
 
      int tempx =  windowList.getDatumById(1)->getX() +  windowList.getDatumById(1)->getWidth();
      int tempy =  windowList.getDatumById(1)->getY();
 
      //Input window
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, tempy, tempx), windowCreatedCount);
+     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, tempy, tempx,"ConsoleWin "), windowCreatedCount);
      windowList.getDatumById(2)->write_window(1,1,"Press h for help.");
      windowCreatedCount++;
 
@@ -56,7 +58,7 @@ void UI :: addNewWindow()
      int height = getMaxY() /2;
      int width = (getMaxX()-3) /3;
      int y2;
-
+     std::string tempString = "ThreadWin " + windowCreatedCount;
      //Only create 9 windows
      if(windowCreatedCount >= 9)
         return;
@@ -66,7 +68,7 @@ void UI :: addNewWindow()
      {
          //Middle left Window
          y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-         windowList.addToEnd(Window(height, width, y2, 2),windowCreatedCount);
+         windowList.addToEnd(Window(height, width, y2, 2,tempString),windowCreatedCount);
          windowCreatedCount++;
 
          windowList.getDatumById(1)->moveWindow(windowList.getDatumById(3)->getY()+windowList.getDatumById(3)->getHeight(), 2);
@@ -77,7 +79,7 @@ void UI :: addNewWindow()
      {
          resize();
          y2 = windowList.getDatumById(windowCreatedCount - 1)->getY() + windowList.getDatumById(windowCreatedCount - 1)->getHeight();
-         windowList.addToEnd(Window(height/2, width, y2, 2), windowCreatedCount);
+         windowList.addToEnd(Window(height/2, width, y2, 2,tempString), windowCreatedCount);
          windowCreatedCount++;
          update();
      }
@@ -86,7 +88,7 @@ void UI :: addNewWindow()
         //Middle windows
          int tempx = windowList.getDatumById(windowCreatedCount - 1)->getX() + windowList.getDatumById(windowCreatedCount - 1)->getWidth();
          int tempy = windowList.getDatumById(windowCreatedCount - 1)->getY();
-         windowList.addToEnd(Window(height, width, tempy, tempx), windowCreatedCount);
+         windowList.addToEnd(Window(height, width, tempy, tempx,tempString), windowCreatedCount);
          windowCreatedCount++;
      }
 
@@ -95,7 +97,7 @@ void UI :: addNewWindow()
          //Middle windows
          int tempx = windowList.getDatumById(windowCreatedCount - 1)->getX() + windowList.getDatumById(windowCreatedCount - 1)->getWidth();
          int tempy = windowList.getDatumById(windowCreatedCount - 1)->getY();
-         windowList.addToEnd(Window(height/2, width, tempy, tempx), windowCreatedCount);
+         windowList.addToEnd(Window(height/2, width, tempy, tempx,tempString), windowCreatedCount);
          windowCreatedCount++;
      }
 }
