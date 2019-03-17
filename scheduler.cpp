@@ -269,7 +269,7 @@ void* Scheduler::perform_simple_output(void* arguments)
         while (THREAD_SUSPENDED);
 
         //process yields itself after completing run
-        if(count-1 == threadInfo. getDatumById(threadNum)->getThreadNo())
+        if(count == threadInfo. getDatumById(threadNum)->getThreadNo())
         {
           mcb->ipc->Message_Print(threadNum);
           mcb->ipc->Message_DeleteAll(threadNum);
