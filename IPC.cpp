@@ -40,8 +40,12 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   return 0;
 }
 
-int IPC::Message_Receive(int task_Id, Message_Type *message)
+int IPC::Message_Receive(int task_Id, std::string& content)
 {
+  IPC::Message_Type recvMessage;
+  recvMessage = *(threadMailboxes.getDatumById(task_Id)->deQueue());
+  content = recvMessage.message_Text;
+
   return 0;
 }
 
@@ -57,7 +61,7 @@ int IPC::Message_Count()
 
 void IPC::Message_Print(int task_Id)
 {
-
+  //
 }
 
 int IPC::Message_DeleteAll(int task_Id)
