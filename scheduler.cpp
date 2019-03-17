@@ -144,7 +144,7 @@ void Scheduler::dump(Window* targetWin, int level)
   }
   else if(level == 2)
   {
-    sprintf(dBuff, "\n \n   Thread_Num \t State \t Window_ID ");
+    sprintf(dBuff, "\n \n   Thread_Num \t State \t\t Window_Name ");
     usleep(5000);
     targetWin->write_window(dBuff);
 
@@ -168,12 +168,10 @@ void Scheduler::dump(Window* targetWin, int level)
       else if (ts == KILLED)
         sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
       //std::string tempString;
-      std::string str = mcb->userInf->getWindowByID(tn)->getName();
+      std::string str = "ThreadWin ";
       char* chr = strdup(str.c_str());
-       //std::string tempString = myT->getThreadData()->getThreadWin()->getName();
-      //char ch = *str.c_str();
-      //char* c = &ch;
-      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff),"HI %s", chr);
+      
+      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff), "%s %d", chr, tn);
       free(chr);
       targetWin->write_window(dBuff);
     }
