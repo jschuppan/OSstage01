@@ -4,11 +4,13 @@ File          : scheduler.cpp
 Date          : March 17, 2019
 Purpose       : implementation of IPC.h
 ============================================================================*/
-#include "IPC.h"
 #include <ctime>
 #include <iomanip>
 #include <string>
 #include <fstream>
+#include "IPC.h"
+#include "sema.h"
+
 
 //constructor
 IPC::IPC()
@@ -43,7 +45,7 @@ Details       : deletes a mailbox for a thread
 ------------------------------------------------------------------*/
 int IPC::deleteMailbox(int task_Id)
 {
-  //mcb->messageSema->down(task_Id);
+  mcb->messageSema->down(task_Id);
   threadMailboxes.removeNodeByElement(task_Id);
   //mcb->messageSema->up();
   return 0;
