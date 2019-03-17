@@ -167,10 +167,12 @@ void Scheduler::dump(Window* targetWin, int level)
         sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
       //std::string tempString;
       std::string str = mcb->userInf->getWindowByID(tn)->getName();
+      char* chr = strdup(str.c_str());
        //std::string tempString = myT->getThreadData()->getThreadWin()->getName();
       //char ch = *str.c_str();
       //char* c = &ch;
-      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff),"HI %s", str);
+      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff),"HI %s", chr);
+      free(chr);
       targetWin->write_window(dBuff);
     }
   }
@@ -255,7 +257,7 @@ void* Scheduler::perform_simple_output(void* arguments)
         mcb->ipc->Message_Send(threadNum,0,"HELLO");
         mcb->ipc->Message_Send(threadNum,0,"HELLO");
         mcb->ipc->Message_Send(threadNum,0,"HELLO");
-        mcb->ipc->Message_DeleteAll(threadNum);
+        // mcb->ipc->Message_Receive(0);
 
 
         // catch a suspend here in case we
