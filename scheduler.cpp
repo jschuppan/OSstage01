@@ -145,7 +145,7 @@ void Scheduler::dump(Window* targetWin, int level)
   }
   else if(level == 2)
   {
-    sprintf(dBuff, "\n \n   Thread_Num \t State \t\t Window_Name \t MessageCount");
+    sprintf(dBuff, "\n \n   Thread_Num \t State \t\t Window_Name ");
     usleep(5000);
     targetWin->write_window(dBuff);
 
@@ -172,10 +172,8 @@ void Scheduler::dump(Window* targetWin, int level)
       std::string str = "ThreadWin ";
       char* chr = strdup(str.c_str());
 
-      snprintf((dBuff + strlen(dBuff)),strlen(dBuff), "%s %d", chr, tn);
+      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff), "%s %d", chr, tn);
       free(chr);
-      sprintf((dBuff + strlen(dBuff)), "\t\t%d", mcb->ipc->threadMailboxes.getDatumById(tn)->getSize());
-
       targetWin->write_window(dBuff);
     }
   }
@@ -194,6 +192,33 @@ void Scheduler::forceWrite(int threadNum)
   //while(!THREAD_SUSPENDED);
   //writeSema.up();
 }
+
+/*-----------------------------------------------------------------
+Function      : messageDump(Window* targetWin, int level);
+Parameters    : ptr to Window object, int level to be dumped
+Returns       : void
+Details       : dumps message info out to a screen
+------------------------------------------------------------------*/
+void Scheduler::messageDump(Window* targetWin, int level)
+{
+  char mBuff[4096];
+  std::string tempString;
+  // traverse linkedlist of running threads, since each thread has
+  // a mailbox
+    //
+  tempString = mcb->ipc->Message_Print(0);
+  char* chr = strdup(tempString.c_str());
+
+  usleep(5000);
+  sprintf(mBuff, "%s", chr);
+  free(chr);
+
+  // SEMA CALL
+  targetWin->write_window(mBuff);
+
+}
+
+
 /*-----------------------------------------------------------------
 Function      : stop();
 Parameters    :

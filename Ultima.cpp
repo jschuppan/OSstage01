@@ -88,6 +88,26 @@ void wrapperDump(Scheduler* s, UI* userInf, int level)
 
 }
 
+/*-----------------------------------------------------------------
+Function      : wrapperDump(Scheduler &s, UI &userInf, int level);
+Parameters    : Scheduler,UI, integer level
+Returns       : void
+Details       : A wrapper function to encapsulate the call to dump
+------------------------------------------------------------------*/
+void IPCwrapperDump(Scheduler* s, UI* userInf, int level)
+{
+    sleep(1);
+    userInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
+    s->messageDump(Win, level);
+    //display dump window for 8 seconds
+    sleep(3);
+    userInf->update();
+
+}
+
 
 /*-----------------------------------------------------------------
 Function      : endlessLoop()
@@ -159,6 +179,12 @@ void endlessLoop(MCB* mcb)
             wrapperDump(mcb->s,mcb->userInf,4);
             break;
         }
+        //message Dump(level1)
+         case 'y':
+         {
+             IPCwrapperDump(mcb->s,mcb->userInf,1);
+             break;
+         }
         //clear console screen
         case  'c':
         {
