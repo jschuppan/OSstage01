@@ -25,7 +25,7 @@ class MCB;
 #include "sema.h"
 #include "IPC.h"
 
-
+const int DUMP_SLEEP = 3;
 const int MAX_WINDOWS_THREADS = 6;
 const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;
@@ -82,8 +82,9 @@ void wrapperDump(Scheduler* s, UI* userInf, int level)
     //create new window to dump to
     Win->createMaxSizeWindow();
     s->dump(Win, level);
-    //display dump window for 8 seconds
-    sleep(3);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
     userInf->update();
 
 }
@@ -97,14 +98,17 @@ Details       : A wrapper function to encapsulate the call to dump
 void IPCwrapperDump(Scheduler* s, UI* userInf, int level)
 {
     sleep(1);
-    userInf->clearConsoleScreen();
+    //suserInf->clearConsoleScreen();
     Window * Win = new Window();
     //create new window to dump to
     Win->createMaxSizeWindow();
+
     s->messageDump(Win, level);
-    //display dump window for 8 seconds
-    sleep(3);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
     userInf->update();
+    //Win->clearScreen();
 
 }
 

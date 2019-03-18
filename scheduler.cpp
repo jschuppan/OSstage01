@@ -205,6 +205,7 @@ void Scheduler::messageDump(Window* targetWin, int level)
   char mBuff[16384];
   std::string tempString;
   char* chr;
+  stop();
   SCHEDULER_SUSPENDED = true;
 
   // get threadID of current element
@@ -212,15 +213,15 @@ void Scheduler::messageDump(Window* targetWin, int level)
 
   // store returned string into buffer
   chr = strdup(tempString.c_str());
-  sprintf((mBuff  + strlen(mBuff)), "%s", chr);
-
-  // deallocate memory for chr
-  free(chr);
+  //chr = "HELLO";
+  sprintf(mBuff, "%s",chr);
 
   // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // write buffer to window
   usleep(5000);
   targetWin->write_window(mBuff);
+  // deallocate memory for chr
+  free(chr);
   // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   SCHEDULER_SUSPENDED = false;
 

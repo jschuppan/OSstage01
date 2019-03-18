@@ -174,7 +174,6 @@ std::string IPC::Message_Print(int task_Id)
 
   // dump contents from stringstream into string
   msgPrntBuf = msgSS.str();
-
   // mPrint.close();
   //mcb->messageSema->up();
   return msgPrntBuf;
@@ -200,12 +199,12 @@ std::string IPC::Message_Print()
     IPC::Message_Type* iter = NULL;
 
 
-    msgSS << "  --------------------------------------------------" << std::endl
-           << "  Messages for thread " << i << ":" << std::endl;
+    msgSS << " \n    --------------------------------------------------" << std::endl
+           << "    Messages for thread " << i << ":" << std::endl;
     for (int i = 0; i < stdMessages->getSize(); i++) {
       iter = stdMessages->getNextElement(iter);
       msgSS << "    Message " << i+1 << ": " << std::endl;
-      msgSS << "      Arrival time | size | text                | dest. Thread | source Thread"
+      msgSS << "      Arrival time | size |               text                | dest. Thread | source Thread"
       << std::endl;
       msgSS << "    " << std::setw(12) << iter->message_Arrival_Time //<< std::endl
              << " " << std::setw(7) << iter->message_Size //<< std::endl
@@ -214,7 +213,7 @@ std::string IPC::Message_Print()
              << " " << std::setw(12) << iter->source_Task_Id //<< std::endl
              << std::endl;
     }
-    msgSS << "--------------------------------------------------" << std::endl
+    msgSS << "    --------------------------------------------------" << std::endl
            << std::endl<< std::endl;
 
     // dump contents from stringstream into string
