@@ -17,6 +17,9 @@ Purpose       : implementation of sema.h
 #include "ezQueue.h"
 #include "scheduler.h"
 
+const int BLOCKED = 2;
+const int READY = 1;
+
 //Constructor
 Semaphore::Semaphore(std::string resName, int semaValue)
 {
@@ -54,16 +57,16 @@ void Semaphore::down(int threadID)
     // first push new process request on queue
     processQueue.enQueue(threadID);
     // we'll suspend the process in the scheduler
-    mcb->s->TCBList.getDatumById(threadID)->setState(2);
+    mcb->s->TCBList.getDatumById(threadID)->setState(BLOCKED);
 
     // we need to deal with requests until the queue
     // is empty
-    if(!mcb->s->THREAD_SUSPENDED)
-    {
-        while(lastPop != threadID);
-        //callToScheduler();
-        mcb->s->TCBList.getDatumById(threadID)->setState(1);
-    }
+    // if(!mcb->s->THREAD_SUSPENDED)
+    // {
+    //     while(lastPop != threadID);
+    //     //callToScheduler();
+    //     mcb->s->TCBList.getDatumById(threadID)->setState(READY);
+    // }
       resMutex.unlock();
   }
 

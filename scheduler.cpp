@@ -163,7 +163,7 @@ void Scheduler::dump(Window* targetWin, int level)
       else if (ts == READY)
         sprintf((dBuff  + strlen(dBuff)), " Ready\t\t");
       else if (ts == BLOCKED)
-        sprintf((dBuff  + strlen(dBuff)), " Blocked\t\t");
+        sprintf((dBuff  + strlen(dBuff)), " Blocked\t");
       else if (ts == DEAD)
         sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
       else if (ts == KILLED)
