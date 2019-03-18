@@ -201,20 +201,39 @@ Details       : dumps message info out to a screen
 ------------------------------------------------------------------*/
 void Scheduler::messageDump(Window* targetWin, int level)
 {
-  char mBuff[4096];
+  char mBuff[16384];
   std::string tempString;
+  char* chr;
+  SCHEDULER_SUSPENDED = true;
+
   // traverse linkedlist of running threads, since each thread has
   // a mailbox
-    //
-  tempString = mcb->ipc->Message_Print(0);
-  char* chr = strdup(tempString.c_str());
+  TCB* myT = NULL;
+  TCB* temp = myT;
+  myT = TCBList.getNextElementUntilEnd(myT);
 
-  usleep(5000);
-  sprintf(mBuff, "%s", chr);
+  while (myT)
+  {
+    // get threadID of current element
+    tempString = mcb->ipc->Message_Print(myT->getThreadID());
+
+    // store returned string into buffer
+    chr = strdup(tempString.c_str());
+    sprintf((mBuff  + strlen(mBuff)), "%s", chr);
+
+    // get next thread until we reach end
+    myT = TCBList.getNextElementUntilEnd(myT);
+  }
+
+  // deallocate memory for chr
   free(chr);
 
-  // SEMA CALL
+  // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // write buffer to window
+  usleep(5000);
   targetWin->write_window(mBuff);
+  // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  SCHEDULER_SUSPENDED = false;
 
 }
 

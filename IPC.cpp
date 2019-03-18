@@ -155,12 +155,12 @@ std::string IPC::Message_Print(int task_Id)
   // mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
   // Message_Receive(task_Id, msgContent);
 
-  msgSS << "--------------------------------------------------" << std::endl
-         << "Messages for thread " << task_Id << ":" << std::endl;
+  msgSS << "  --------------------------------------------------" << std::endl
+         << "  Messages for thread " << task_Id << ":" << std::endl;
   for (int i = 0; i < stdMessages->getSize(); i++) {
     iter = stdMessages->getNextElement(iter);
-    msgSS << "  Message " << i+1 << ": " << std::endl;
-    msgSS << "    Arrival time | size | text                | dest. Thread | source Thread"
+    msgSS << "    Message " << i+1 << ": " << std::endl;
+    msgSS << "      Arrival time | size | text                | dest. Thread | source Thread"
     << std::endl;
     msgSS << "    " << std::setw(12) << iter->message_Arrival_Time //<< std::endl
            << " " << std::setw(7) << iter->message_Size //<< std::endl
