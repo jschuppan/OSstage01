@@ -206,24 +206,12 @@ void Scheduler::messageDump(Window* targetWin, int level)
   char* chr;
   SCHEDULER_SUSPENDED = true;
 
-  // traverse linkedlist of running threads, since each thread has
-  // a mailbox
-  TCB* myT = NULL;
-  TCB* temp = myT;
-  myT = TCBList.getNextElementUntilEnd(myT);
+  // get threadID of current element
+  tempString = mcb->ipc->Message_Print();
 
-  while (myT)
-  {
-    // get threadID of current element
-    tempString = mcb->ipc->Message_Print(myT->getThreadID());
-
-    // store returned string into buffer
-    chr = strdup(tempString.c_str());
-    sprintf((mBuff  + strlen(mBuff)), "%s", chr);
-
-    // get next thread until we reach end
-    myT = TCBList.getNextElementUntilEnd(myT);
-  }
+  // store returned string into buffer
+  chr = strdup(tempString.c_str());
+  sprintf((mBuff  + strlen(mBuff)), "%s", chr);
 
   // deallocate memory for chr
   free(chr);

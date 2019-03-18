@@ -132,7 +132,7 @@ int IPC::Message_Count()
 }
 
 /*-----------------------------------------------------------------
-Function      : Message_Print
+Function      : Message_Print(int task_Id)
 Parameters    : task_Id - the thread which messages we will print
 Returns       : msgPrntBuf - a string containing all infos containing a
                              threads info
@@ -177,6 +177,52 @@ std::string IPC::Message_Print(int task_Id)
 
   // mPrint.close();
   //mcb->messageSema->up();
+  return msgPrntBuf;
+}
+
+/*-----------------------------------------------------------------
+Function      : Message_Print()
+Parameters    : none
+Returns       : msgPrntBuf - a string containing all infos containing a
+                             threads info
+Details       : this function allows us to print detailed information
+                about the messages of a all threads (including its content)
+------------------------------------------------------------------*/
+std::string IPC::Message_Print()
+{
+  std::stringstream msgSS;
+  std::string msgPrntBuf;
+  std::string msgContent;
+
+  //mcb->messageSema->down(task_Id);
+  for (int i = 0; i < threadMailboxes.getSize(); i++) {
+    ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(i);
+    IPC::Message_Type* iter = NULL;
+
+
+    msgSS << "  --------------------------------------------------" << std::endl
+           << "  Messages for thread " << i << ":" << std::endl;
+    for (int i = 0; i < stdMessages->getSize(); i++) {
+      iter = stdMessages->getNextElement(iter);
+      msgSS << "    Message " << i+1 << ": " << std::endl;
+      msgSS << "      Arrival time | size | text                | dest. Thread | source Thread"
+      << std::endl;
+      msgSS << "    " << std::setw(12) << iter->message_Arrival_Time //<< std::endl
+             << " " << std::setw(7) << iter->message_Size //<< std::endl
+             << " " << std::setw(20) << iter->message_Text //<< std::endl
+             << " " << std::setw(13) << iter->destination_Task_Id //<< std::endl
+             << " " << std::setw(12) << iter->source_Task_Id //<< std::endl
+             << std::endl;
+    }
+    msgSS << "--------------------------------------------------" << std::endl
+           << std::endl<< std::endl;
+
+    // dump contents from stringstream into string
+    msgPrntBuf = msgSS.str();
+
+    //mcb->messageSema->up();
+  }
+
   return msgPrntBuf;
 }
 

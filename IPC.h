@@ -79,6 +79,7 @@ public:
   int Message_Count(int task_Id);
   int Message_Count();
   std::string Message_Print(int task_Id);
+  std::string Message_Print();
   int Message_DeleteAll(int task_Id);
   void setMCB(MCB* mcb);
 };
