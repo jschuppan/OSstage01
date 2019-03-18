@@ -269,8 +269,7 @@ void* Scheduler::perform_simple_output(void* arguments)
         while (THREAD_SUSPENDED);
 
         //process yields itself after completing run
-        if(count == threadInfo. getDatumById(threadNum)->getThreadNo())
-        {
+
           if(!mcb->ipc->threadMailboxes.getDatumById(threadNum)->isEmpty())
           {
             std:: string message;
@@ -290,8 +289,7 @@ void* Scheduler::perform_simple_output(void* arguments)
           mcb->ipc->Message_Print(threadNum);
           mcb->ipc->Message_DeleteAll(threadNum);
           yield(threadNum);
-          count = -1;
-        }
+
         count++;
       }
       else {
