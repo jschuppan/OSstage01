@@ -145,7 +145,7 @@ void Scheduler::dump(Window* targetWin, int level)
   }
   else if(level == 2)
   {
-    sprintf(dBuff, "\n \n   Thread_Num \t State \t\t Window_Name ");
+    sprintf(dBuff, "\n \n   Thread_Num \t State \t\t Window_Name \t MessageCount");
     usleep(5000);
     targetWin->write_window(dBuff);
 
@@ -172,8 +172,10 @@ void Scheduler::dump(Window* targetWin, int level)
       std::string str = "ThreadWin ";
       char* chr = strdup(str.c_str());
 
-      snprintf((dBuff + strlen(dBuff)),sizeof(dBuff), "%s %d", chr, tn);
+      snprintf((dBuff + strlen(dBuff)),strlen(dBuff), "%s %d", chr, tn);
       free(chr);
+      sprintf((dBuff + strlen(dBuff)), "\t\t%d", mcb->ipc->threadMailboxes.getDatumById(tn)->getSize());
+
       targetWin->write_window(dBuff);
     }
   }
