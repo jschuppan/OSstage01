@@ -40,7 +40,8 @@ private:
               && message_Arrival_Time == rhs.message_Arrival_Time
               && message_Size == rhs.message_Size);
     }
-
+  public:
+    std::string getMessageText(){return message_Text;}
     // void operator=(const Message_Type& rhs)
     // {
     //   source_Task_Id = rhs.source_Task_Id;
@@ -61,14 +62,16 @@ private:
   //   }
   // };
 
-  linkedList<ezQueue<Message_Type>> threadMailboxes;
-  linkedList<ezQueue<Message_Type>> threadMailboxesArchive;
 
-
+  //Message_Type message;
   MCB* mcb;
   //------------------Start Public Members-------------------
 public:
+
+  linkedList<ezQueue<Message_Type>> threadMailboxes;
+  linkedList<ezQueue<Message_Type>> threadMailboxesArchive;
   IPC();
+  //Message_Type getMessage();
   int createMailbox(int task_Id);
   int deleteMailbox(int task_Id);
   int Message_Send(int sourceTask, int destinationTask, std::string content);

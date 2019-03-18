@@ -61,16 +61,16 @@ Returns       : template T
 Details       : removes first element in the queue and returns it
 ------------------------------------------------------------------*/
 template <typename T>
-T* ezQueue<T>::deQueue()
+T ezQueue<T>::deQueue()
 {
-  T* contentCopy;
+  T contentCopy;
   queueElement* temp = head;
 
   // check if QUEUE is empty
   if (head != nullptr)
   {
     // make a copy of our content
-    contentCopy = &head->content;
+    contentCopy = head->content;
     // move head pointer to next element
     head = head->next;
 
@@ -83,7 +83,7 @@ T* ezQueue<T>::deQueue()
 
   // in case queue is empty say so
   else
-    return NULL;
+    return contentCopy;
 }
 
 /*-----------------------------------------------------------------

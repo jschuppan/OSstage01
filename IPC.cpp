@@ -90,13 +90,14 @@ int IPC::Message_Receive(int task_Id, std::string& content)
   // think about implementing a safeguard to prevent one thread
   // from reading messages destined for other threads
   //mcb->messageSema->down(task_Id);
+  Message_Type message;
   std::ofstream mRec;
-  IPC::Message_Type* recvMessage;
-  recvMessage = threadMailboxes.getDatumById(task_Id)->deQueue();
+  message = threadMailboxes.getDatumById(task_Id)->deQueue();
   mRec.open("messageReceiveDebug.txt", std::ofstream::out | std::ofstream::app);
-  mRec << recvMessage << std::endl;
-  content = recvMessage->message_Text;
-  threadMailboxesArchive.getDatumById(task_Id)->enQueue(*recvMessage);
+  mRec << message.message_Text << std::endl;
+  //message->message_Text ="  THIS IS BULLSHIT\n";
+  content = message.message_Text;
+  threadMailboxesArchive.getDatumById(task_Id)->enQueue(message);
   mRec.close();
   //mcb->messageSema->up();
   if (threadMailboxes.getDatumById(task_Id)->getSize() > 0)
@@ -203,3 +204,8 @@ void IPC::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
 }
+
+// IPC::Message_Type IPC::getMessage()
+// {
+//   return message;
+// }

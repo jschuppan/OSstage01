@@ -240,7 +240,7 @@ void* Scheduler::perform_simple_output(void* arguments)
 
       if(TCBList.getDatumById(threadNum)->getState() == RUNNING)
       {
-        usleep(150000);
+        usleep(200000);
         tempCounter++;
         sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
         mcb->writeSema->down(threadNum);
@@ -256,7 +256,7 @@ void* Scheduler::perform_simple_output(void* arguments)
 
         int num = rand() % processCount;
         char chr[255];
-        sprintf(chr,"Thread %d sending message to Thread %d", threadNum, num);
+        sprintf(chr,"  Message from Thread %d", threadNum);
         std::string str(chr);
         mcb->ipc->Message_Send(threadNum,num,str);
 
@@ -271,6 +271,22 @@ void* Scheduler::perform_simple_output(void* arguments)
         //process yields itself after completing run
         if(count == threadInfo. getDatumById(threadNum)->getThreadNo())
         {
+          if(!mcb->ipc->threadMailboxes.getDatumById(threadNum)->isEmpty())
+          {
+            std:: string message;
+            char *chr;
+            //only works if message exists
+            if(mcb->ipc->Message_Receive(threadNum, message))
+            {
+              //message = mcb->ipc->getMessage()->getMessageText();
+              message+= "\n";
+              //message = "HELLO ALL";
+              chr = strdup(message.c_str());
+              mcb->writeSema->down(threadNum);
+              threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(chr);
+              mcb->writeSema->up();
+            }
+          }
           mcb->ipc->Message_Print(threadNum);
           mcb->ipc->Message_DeleteAll(threadNum);
           yield(threadNum);

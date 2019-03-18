@@ -25,7 +25,7 @@ public:
   /******************************* START PUBLIC MEMBERS *******************/
   ezQueue();
   void enQueue(T inContent);
-  T* deQueue();
+  T deQueue();
   bool isEmpty();
   int getSize() {return this->size;}
   T* getNextElement(T* initElement);

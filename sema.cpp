@@ -88,7 +88,7 @@ void Semaphore::up()
   // next in queue gets released
   // get threadID from pop
   if(!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
-      lastPop = *processQueue.deQueue();
+      lastPop = processQueue.deQueue();
 
   // check if queue is now empty. If so release and unlock
   sema_value++;
