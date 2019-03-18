@@ -6,6 +6,7 @@
 #include "UI.h"
 #include "sema.h"
 
+//Constructor
 MCB::MCB()
 {
   s = new Scheduler();

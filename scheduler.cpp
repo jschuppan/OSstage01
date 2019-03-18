@@ -168,12 +168,14 @@ void Scheduler::dump(Window* targetWin, int level)
         sprintf((dBuff  + strlen(dBuff)), " Dead\t\t");
       else if (ts == KILLED)
         sprintf((dBuff  + strlen(dBuff)), " Killed\t\t");
-      //std::string tempString;
+
+      //Additional print from level 1 follows
       std::string str = "ThreadWin ";
       char* chr = strdup(str.c_str());
 
       snprintf((dBuff + strlen(dBuff)),sizeof(dBuff), "%s %d", chr, tn);
       free(chr);
+      //Number of messages
       sprintf(dBuff + strlen(dBuff), "\t\t %d", mcb->ipc->threadMailboxes.getDatumById(tn)->getSize());
       targetWin->write_window(dBuff);
     }

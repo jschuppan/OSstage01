@@ -100,6 +100,7 @@ void Window :: display_help()
   write_window(2, 50, "d=..Sched Dump2...");
   write_window(3, 50, "f=..Sema Dump1...");
   write_window(4, 50, "g=..Semap Dump2...");
+  write_window(1, 70, "y=..Message Dump..");
 }
 
 /*-----------------------------------------------------------------

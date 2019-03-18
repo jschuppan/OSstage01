@@ -12,9 +12,6 @@ class MCB;
 #include "ezQueue.h"
 #include "linkedlist.h"
 
-
-
-
 class IPC
 {
 //-------------------Start Private Members------------------
@@ -42,28 +39,10 @@ private:
     }
   public:
     std::string getMessageText(){return message_Text;}
-    // void operator=(const Message_Type& rhs)
-    // {
-    //   source_Task_Id = rhs.source_Task_Id;
-    //   destination_Task_Id = rhs.destination_Task_Id;
-    //   message_Arrival_Time = rhs.message_Arrival_Time;
-    //   message_Size = rhs.message_Size;
-    //   message_Text = rhs.message_Text;
-    // }
+
   };
 
-  // struct Mailbox {
-  //   int threadID;
-  //   ezQueue<Message_Type> threadMailBox;
-  //
-  //   bool operator==(const Mailbox& rhs)
-  //   {
-  //     return (threadID == rhs.threadID);
-  //   }
-  // };
 
-
-  //Message_Type message;
   MCB* mcb;
   //------------------Start Public Members-------------------
 public:

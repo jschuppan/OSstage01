@@ -142,6 +142,12 @@ void Semaphore::retrieveSchedulerObject(void* schedObj)
   schedRef = schedObj;
 }
 
+/*-----------------------------------------------------------------
+Function      : stMCB
+Parameters    : MCB*
+Returns       :
+Details       : Sets the MCB pointer within the class
+------------------------------------------------------------------*/
 void Semaphore::setMCB(MCB* mcb)
 {
   this->mcb = mcb;

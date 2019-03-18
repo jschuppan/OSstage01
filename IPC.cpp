@@ -248,7 +248,12 @@ int IPC::Message_DeleteAll(int task_Id)
   return 1;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : stMCB
+Parameters    : MCB*
+Returns       :
+Details       : Sets the MCB pointer within the class
+------------------------------------------------------------------*/
 void IPC::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
