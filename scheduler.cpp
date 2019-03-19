@@ -189,10 +189,12 @@ void Scheduler::dump(Window* targetWin, int level)
   SCHEDULER_SUSPENDED = false;
 }
 
+//=======================================
+//This is used to test Semaphore
+//=======================================
 void Scheduler::forceWrite(int threadNum)
 {
   mcb->writeSema->down(threadNum);
-  //while(!THREAD_SUSPENDED);
   //writeSema.up();
 }
 
