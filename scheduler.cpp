@@ -215,16 +215,14 @@ void Scheduler::messageDump(Window* targetWin, int level)
 
   // store returned string into buffer
   chr = strdup(tempString.c_str());
-  //chr = "HELLO";
   sprintf(mBuff, "%s",chr);
 
-  // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // write buffer to window
   usleep(5000);
   targetWin->write_window(mBuff);
   // deallocate memory for chr
   free(chr);
-  // SEMA CALL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   SCHEDULER_SUSPENDED = false;
 
 }
@@ -298,10 +296,6 @@ void* Scheduler::perform_simple_output(void* arguments)
         std::string str(chr);
         mcb->ipc->Message_Send(threadNum,num,str);
 
-        //mcb->ipc->Message_DeleteAll();
-        // mcb->ipc->Messsage_Receive(0);
-
-
         // catch a suspend here in case we
         // didnt get it up top due to timing
         while (THREAD_SUSPENDED);
@@ -334,6 +328,9 @@ void* Scheduler::perform_simple_output(void* arguments)
         pthread_yield();
       }
     }
+
+    // if thread is about to die lets make sure its mailbox gets cleared out
+    mcb->ipc->Message_DeleteAll(threadNum);
   } while(!THREAD_SUSPENDED);
 }
 

@@ -52,7 +52,6 @@ public:
   IPC();
   //Message_Type getMessage();
   int createMailbox(int task_Id);
-  int deleteMailbox(int task_Id);
   int Message_Send(int sourceTask, int destinationTask, std::string content);
   int Message_Receive(int task_Id, std::string& content);
   int Message_Count(int task_Id);

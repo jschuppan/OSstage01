@@ -13,6 +13,7 @@ Purpose       : implementation of IPC.h
 #include <bits/stdc++.h> // stringstream
 #include "IPC.h"
 #include "sema.h"
+#include "scheduler.h"
 
 
 //constructor
@@ -32,27 +33,14 @@ int IPC::createMailbox(int task_Id)
   ezQueue<Message_Type> tMailBox;
   // push it on both the regular (unread messages) and
   // archive(unread messages)  mailbox
-  //mcb->messageSema->down(task_Id);
+  mcb->messageSema->down(task_Id);
   threadMailboxes.addToEnd(tMailBox, task_Id);
   threadMailboxesArchive.addToEnd(tMailBox, task_Id);
-  //mcb->messageSema->up();
+  mcb->messageSema->up();
 
   return 1;
 }
 
-/*-----------------------------------------------------------------
-Function      : deleteMailbox
-Parameters    : int task_Id for which we will delete the mailbox
-Returns       : 1 - if successful
-Details       : deletes a mailbox for a thread
-------------------------------------------------------------------*/
-int IPC::deleteMailbox(int task_Id)
-{
-  mcb->messageSema->down(task_Id);
-  threadMailboxes.removeNodeByElement(task_Id);
-  //mcb->messageSema->up();
-  return 0;
-}
 
 /*-----------------------------------------------------------------
 Function      : Message_Send
@@ -71,9 +59,13 @@ int IPC::Message_Send(int sourceTask, int destinationTask, std::string content)
   newMessage.message_Arrival_Time = time(NULL);
   newMessage.message_Size = content.size();
   newMessage.message_Text = content;
-  //mcb->messageSema->down(task_Id);
-  threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
-  //mcb->messageSema->up();
+
+  mcb->messageSema->down(sourceTask);
+  // make sure destionation task is alive before we write
+  if (mcb->s->getTCBList().getDatumById(destinationTask)->getState() < 3) {
+    threadMailboxes.getDatumById(destinationTask)->enQueue(newMessage);
+  }
+  mcb->messageSema->up();
 
   return 1;
 }
@@ -87,19 +79,18 @@ Details       : allows threads to read messages from their virtual mailbox
 ------------------------------------------------------------------*/
 int IPC::Message_Receive(int task_Id, std::string& content)
 {
-  // think about implementing a safeguard to prevent one thread
-  // from reading messages destined for other threads
-  //mcb->messageSema->down(task_Id);
+  // receive a message and deQueue
   Message_Type message;
-  std::ofstream mRec;
+  mcb->messageSema->down(task_Id);
   message = threadMailboxes.getDatumById(task_Id)->deQueue();
-  mRec.open("messageReceiveDebug.txt", std::ofstream::out | std::ofstream::app);
-  mRec << message.message_Text << std::endl;
-  //message->message_Text ="  THIS IS BULLSHIT\n";
+  mcb->messageSema->up();
+
+  // store deQueued message in archive (we are not using this feature yet!)
   content = message.message_Text;
+  mcb->messageSema->down(task_Id);
   threadMailboxesArchive.getDatumById(task_Id)->enQueue(message);
-  mRec.close();
-  //mcb->messageSema->up();
+  mcb->messageSema->up();
+
   if (threadMailboxes.getDatumById(task_Id)->getSize() > 0)
     return 1;
   else
@@ -143,30 +134,25 @@ std::string IPC::Message_Print(int task_Id)
 {
   std::stringstream msgSS;
   std::string msgPrntBuf;
-  // wirte in reference buffer?
-  // std::ofstream mPrint;
-  std::string msgContent;
-  // struct tm * timeDetail;
-  // timeinfo = localtime (&rawtime);
-  //mcb->messageSema->down(task_Id);
+  mcb->messageSema->down(task_Id);
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
+  mcb->messageSema->up();
   IPC::Message_Type* iter = NULL;
 
-  // mPrint.open("messageDebug.txt", std::ofstream::out | std::ofstream::app);
-  // Message_Receive(task_Id, msgContent);
 
   msgSS << "  --------------------------------------------------" << std::endl
          << "  Messages for thread " << task_Id << ":" << std::endl;
   for (int i = 0; i < stdMessages->getSize(); i++) {
     iter = stdMessages->getNextElement(iter);
+
     msgSS << "    Message " << i+1 << ": " << std::endl;
     msgSS << "      Arrival time | size | text                | dest. Thread | source Thread"
     << std::endl;
-    msgSS << "    " << std::setw(12) << iter->message_Arrival_Time //<< std::endl
-           << " " << std::setw(7) << iter->message_Size //<< std::endl
-           << " " << std::setw(20) << iter->message_Text //<< std::endl
-           << " " << std::setw(13) << iter->destination_Task_Id //<< std::endl
-           << " " << std::setw(12) << iter->source_Task_Id //<< std::endl
+    msgSS << "    " << std::setw(12) << iter->message_Arrival_Time
+           << " " << std::setw(7) << iter->message_Size
+           << " " << std::setw(20) << iter->message_Text
+           << " " << std::setw(13) << iter->destination_Task_Id
+           << " " << std::setw(12) << iter->source_Task_Id
            << std::endl;
   }
   msgSS << "--------------------------------------------------" << std::endl
@@ -174,8 +160,6 @@ std::string IPC::Message_Print(int task_Id)
 
   // dump contents from stringstream into string
   msgPrntBuf = msgSS.str();
-  // mPrint.close();
-  //mcb->messageSema->up();
   return msgPrntBuf;
 }
 
@@ -191,13 +175,13 @@ std::string IPC::Message_Print()
 {
   std::stringstream msgSS;
   std::string msgPrntBuf;
-  std::string msgContent;
 
-  //mcb->messageSema->down(task_Id);
   for (int i = 0; i < threadMailboxes.getSize(); i++) {
+    mcb->messageSema->down(i);
     ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(i);
-    IPC::Message_Type* iter = NULL;
+    mcb->messageSema->up();
 
+    IPC::Message_Type* iter = NULL;
 
     msgSS << " \n    --------------------------------------------------" << std::endl
            << "    Messages for thread " << i << ":" << std::endl;
@@ -218,8 +202,6 @@ std::string IPC::Message_Print()
 
     // dump contents from stringstream into string
     msgPrntBuf = msgSS.str();
-
-    //mcb->messageSema->up();
   }
 
   return msgPrntBuf;

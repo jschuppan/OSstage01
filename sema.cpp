@@ -61,12 +61,12 @@ void Semaphore::down(int threadID)
 
     // we need to deal with requests until the queue
     // is empty
-    // if(!mcb->s->THREAD_SUSPENDED)
-    // {
-    //     while(lastPop != threadID);
-    //     //callToScheduler();
-    //     mcb->s->TCBList.getDatumById(threadID)->setState(READY);
-    // }
+    if(!mcb->s->THREAD_SUSPENDED)
+    {
+        while(lastPop != threadID);
+        //callToScheduler();
+        mcb->s->TCBList.getDatumById(threadID)->setState(READY);
+    }
       resMutex.unlock();
   }
 
