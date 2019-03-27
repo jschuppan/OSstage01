@@ -25,7 +25,7 @@ class MCB;
 #include "sema.h"
 #include "IPC.h"
 
-const int DUMP_SLEEP = 3;
+const int DUMP_SLEEP = 8;
 const int MAX_WINDOWS_THREADS = 6;
 const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;

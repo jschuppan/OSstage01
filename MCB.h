@@ -1,3 +1,10 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis
+File          : MCB.h
+Date          : March 18, 2019
+Purpose       : Help prevent circular dependancy
+============================================================================*/
+
 #ifndef MCB_H
 #define MCB_H
 
