@@ -5,7 +5,7 @@ mem_mgr::mem_mgr(int size, char default_init_val) {
 }
 
 
-int mem_mgr::mam_alloc(int size) {
+int mem_mgr::mem_alloc(int size) {
 
 }
 
@@ -41,12 +41,12 @@ void mem_mgr::set_mcb(MCB *mcb) {
 
 
 int mem_mgr::mem_left() {
-
+  return available;
 }
 
 
 int mem_mgr::mem_largest() {
-
+  
 }
 
 

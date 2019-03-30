@@ -19,7 +19,7 @@ class mem_mgr {
  public:
 
   mem_mgr(int size, char default_init_val);
-  int mam_alloc(int size);
+  int mem_alloc(int size);
   int mem_free(int handle);
 
   int mem_read(int handle, char *c);
