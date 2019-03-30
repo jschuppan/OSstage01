@@ -5,28 +5,33 @@
 
 class MCB;
 
-struct mem_segment {
+//memory segment
+struct mem_seg {
   int handle;
   int owner_tid;
-  int start, end, size;
-  int read_curser, write_curser;  //indeces for mem_read() and mem_write()
-  bool used;
+  unsigned int start, end, size;
+  unsigned int read_curser, write_curser;  //indeces for mem_read() and mem_write()
+  bool free;
 };
 
-class mem_mgr {
+
+//memory manager
+class Mem_Mgr {
 
   /****************************  Public start  ********************************/
  public:
 
-  mem_mgr(int size, char default_init_val);
-  int mem_alloc(int size);
-  int mem_free(int handle);
+  Mem_Mgr(unsigned int size = 1024, unsigned char default_init_val = '.');
+  ~Mem_Mgr();
 
-  int mem_read(int handle, char *c);
-  int mem_read(int handle, int offset, int text_size, char *text);
+  int mem_alloc(unsigned int size,  int tid);
+  int mem_free(int handle, int tid);
 
-  int mem_write(int handle, char c);
-  int mem_write(int handle, int offset, int text_size, char *text);
+  int mem_read(int handle, unsigned char *c, int tid);
+  int mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
+
+  int mem_write(int handle, unsigned char c, int tid);
+  int mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
 
   void set_mcb(MCB *mcb);
 
@@ -37,8 +42,11 @@ class mem_mgr {
 
   MCB *mcb;
   unsigned char *memory;
-  int capacity, available, used;
-  linkedList<mem_segment> segments;
+  unsigned char default_mem_fill;  // '.'
+  unsigned char freed_mem_fill;  // '#'
+  unsigned int capacity, available, used;
+  int next_handle;
+  linkedList<mem_seg> segments;
 
   int mem_left();
   int mem_largest();
