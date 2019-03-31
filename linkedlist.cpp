@@ -291,6 +291,51 @@ T* linkedList<T> ::  getNextElementUntilEnd(T* ndv)
   }
 }
 
+/*-----------------------------------------------------------------
+Function      : insertNode
+Parameters    : template T* type, integer ID, integer position
+Returns       :
+Details       : inserts a node at given position if position exists
+------------------------------------------------------------------*/
+template<class T>
+void linkedList<T> :: insertNode(T datum, int id, int position)
+{
+  node* temp = head;
+  //position does not exist
+  if(size < position || position < 0)
+  {
+    return;
+  }
+  //Position exists
+  else if (position == 0)
+  {
+    head = new node;
+    head -> next = temp;
+    head->datum = datum;
+    head->id = id;
+    size++;
+  }
+  else
+  {
+    int count = 1;
+    //loop until position found
+    while (count != position)
+    {
+      temp = temp->next;
+      count++;
+    }
+    //delete last node
+    node* tempNext = temp->next;
+    temp->next = new node;
+    temp = temp->next;
+    temp->datum = datum;
+    temp->id = id;
+    temp->next = tempNext;
+    size++;
+    //cout<<"inserted";
+  }
+}
+
 //Accessors
 template<class T>
 int linkedList<T> :: getSize(){return size;}

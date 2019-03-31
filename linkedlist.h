@@ -34,6 +34,7 @@ class linkedList
     void deleteList();
     void removeFromFront();
     void removeFromEnd();
+    void insertNode(T datum, int id, int position);
     T* getDatumById(int id);
     void removeNodeByElement(int element);
     T* getNextElement(T* ndv);
