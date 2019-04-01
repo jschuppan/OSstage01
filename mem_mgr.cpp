@@ -312,7 +312,7 @@ int Mem_Mgr::mem_largest() {
   unsigned int largest = 0;
 
   mem_seg *ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  while (ms_ptr) {
+  while (ms_ptr = getNextElementUntilEnd(ms_ptr)) {
     if (ms_ptr->free && ms_ptr->size > largest)
       largest = ms_ptr->size;
 
@@ -332,7 +332,7 @@ int Mem_Mgr::mem_smallest() {
   unsigned int smallest = capacity;
 
   mem_seg *ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  while (ms_ptr)
+  while (ms_ptr = getNextElementUntilEnd(ms_ptr))
   {
     if (ms_ptr->free && ms_ptr->size < smallest)
       smallest = ms_ptr->size;
