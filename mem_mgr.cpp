@@ -52,6 +52,10 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
     // the smallest amount of space between them left to right
   }
 
+  // RAM IS empty
+  if (sPtr == NULL)
+    // code here
+
 
   mem_seg ms;
   ms.handle = next_handle++;
@@ -185,7 +189,7 @@ int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
     return -1;  //error: access denied
   }
 
-  if (ms_ptr->write_cursor > ms_ptr->end) 
+  if (ms_ptr->write_cursor > ms_ptr->end)
   {
     cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
