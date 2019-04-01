@@ -1,8 +1,6 @@
 #include "mem_mgr.h"
 #include <iostream>
 
-using namespace std;
-
 //Constructor and default Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   default_mem_fill = default_init_val;
@@ -45,7 +43,7 @@ Details       : allocates memory space and returns the handle
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   if (size > available) {
-    cout << "\nmem_alloc() : not enough memory\n";
+    std::cout << "\nmem_alloc() : not enough memory\n";
     return -1;  //error: not enough memory
   }
 
@@ -92,12 +90,12 @@ int Mem_Mgr::mem_free(int handle, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
   if (ms_ptr == NULL) {
-    cout << "\nmem_free() : Item segment doesn't exist\n";
+    std::cout << "\nmem_free() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid) {
-    cout << "\nmem_free() : access denied\n";
+    std::cout << "\nmem_free() : access denied\n";
     return -1;  //error: access denied
   }
 
@@ -142,13 +140,13 @@ int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
 
   if (ms_ptr == NULL)
   {
-    cout << "\nmem_read() : Item segment doesn't exist\n";
+    std::cout << "\nmem_read() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid)
   {
-    cout << "\nmem_read() : access denied\n";
+    std::cout << "\nmem_read() : access denied\n";
     return -1;  //error: access denied
   }
 
@@ -176,12 +174,12 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
   if (ms_ptr == NULL) {
-    cout << "\nmem_read() : Item segment doesn't exist\n";
+    std::cout << "\nmem_read() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid || offset > ms_ptr->end) {
-    cout << "\nmem_read() : access denied\n";
+    std::cout << "\nmem_read() : access denied\n";
     return -1;  //error: access denied
   }
 
@@ -216,19 +214,19 @@ int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
 
   if (ms_ptr == NULL)
   {
-    cout << "\nmem_write() : Item segment doesn't exist\n";
+    std::cout << "\nmem_write() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid)
   {
-    cout << "\nmem_write() : access denied\n";
+    std::cout << "\nmem_write() : access denied\n";
     return -1;  //error: access denied
   }
 
   if (ms_ptr->write_cursor > ms_ptr->end)
   {
-    cout << "\nmem_write() : segment is full\n";
+    std::cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
   }
 
@@ -251,19 +249,19 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
 
   if (ms_ptr == NULL)
   {
-    cout << "\nmem_write() : Item segment doesn't exist\n";
+    std::cout << "\nmem_write() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid)
   {
-    cout << "\nmem_write() : access denied\n";
+    std::cout << "\nmem_write() : access denied\n";
     return -1;  //error: access denied
   }
 
   if (ms_ptr->write_cursor > ms_ptr->end)
   {
-    cout << "\nmem_write() : segment is full\n";
+    std::cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
   }
 
