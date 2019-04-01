@@ -11,6 +11,7 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   next_handle = 0;
 
   mem_seg ms;
+  // why are we increasing the count here? 
   ms.handle = next_handle++;
   ms.owner_tid = -1;
   ms.start = 0;
@@ -41,8 +42,16 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
     return -1;  //error: not enough memory
   }
 
-  //look for a free node
-  //code here
+  //look for a free node (code not finished!!!!)
+  // traverse segments looking for smallest gap that fulfills size
+  // requirement
+  mem_seg* sPtr = NULL;
+  while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
+  {
+    // we will have to sort the node in a way where we can determine
+    // the smallest amount of space between them left to right
+  }
+
 
   mem_seg ms;
   ms.handle = next_handle++;
@@ -98,12 +107,14 @@ int Mem_Mgr::mem_free(int handle, int tid) {
 int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
-  if (ms_ptr == NULL) {
+  if (ms_ptr == NULL) 
+  {
     cout << "\nmem_read() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
-  if (tid != ms_ptr->owner_tid) {
+  if (tid != ms_ptr->owner_tid) 
+  {
     cout << "\nmem_read() : access denied\n";
     return -1;  //error: access denied
   }
@@ -114,7 +125,9 @@ int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
 
   //if read_curser goes past write_curser, wrap around to start
   if (ms_ptr->read_curser >= ms_ptr->write_curser)
+  {
     ms_ptr->read_curser = ms_ptr->start;
+  }
 
   return 1;  //success
 }
@@ -134,7 +147,24 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
     return -1;  //error: access denied
   }
 
-  //code here
+  // set read cursor
+  ms_ptr->read_curser = ms_ptr->start;
+
+  // return all characters of what is in the memory space
+  int i = 0;
+  while (ms_ptr->read_curser < ms_ptr->end) 
+  {
+    // this is not setting any actual text since read cursor is an index
+    // its just a place holder for now
+    text[i] = ms_ptr->read_curser;
+    ms_ptr->read_curser++;
+    i++;
+  }
+  // null terminate
+  text[ms_ptr->end] = '\0';
+  // reset cursor
+  ms_ptr->read_curser = ms_ptr->start;
+
 
   return 1;  //success
 }
@@ -143,24 +173,27 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
 int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
-  if (ms_ptr == NULL) {
+  if (ms_ptr == NULL) 
+  {
     cout << "\nmem_write() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
-  if (tid != ms_ptr->owner_tid) {
+  if (tid != ms_ptr->owner_tid) 
+  {
     cout << "\nmem_write() : access denied\n";
     return -1;  //error: access denied
   }
 
-  if (ms_ptr->write_curser > ms_ptr->end) {
+  if (ms_ptr->write_curser > ms_ptr->end) 
+  {
     cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
   }
 
   memory[ ms_ptr->write_curser ] = c;
 
-  ms_ptr->write_curser ++;
+  ms_ptr->write_curser++;
 
   return 1;  //success
 }
@@ -170,33 +203,54 @@ int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
 int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
-  if (ms_ptr == NULL) {
+  if (ms_ptr == NULL) 
+  {
     cout << "\nmem_write() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
-  if (tid != ms_ptr->owner_tid) {
+  if (tid != ms_ptr->owner_tid) 
+  {
     cout << "\nmem_write() : access denied\n";
     return -1;  //error: access denied
   }
 
-  if (ms_ptr->write_curser > ms_ptr->end) {
+  if (ms_ptr->write_curser > ms_ptr->end) 
+  {
     cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
   }
 
-  //code here
+  int i = 0;
+  while (ms_ptr->write_curser < ms_ptr->end)
+  {
+    // this is not setting any actual text since write cursor is an index
+    // its just a place holder for now
+    ms_ptr->write_curser = text[i];
+    ms_ptr->write_curser++;
+    i++;
+  }
+  // make sure message was null terminated, if not return error
+  if (text[i] != '\0')
+  {
+    return -1; // error
+  }
+  // reset cursor
+  ms_ptr->write_curser = ms_ptr->start;
+
 
   return 1;  //success
 }
 
 
-void Mem_Mgr::set_mcb(MCB *mcb) {
+void Mem_Mgr::set_mcb(MCB *mcb) 
+{
   this->mcb = mcb;
 }
 
 
-int Mem_Mgr::mem_left() {
+int Mem_Mgr::mem_left() 
+{
   return available;
 }
 
@@ -220,7 +274,8 @@ int Mem_Mgr::mem_smallest() {
   unsigned int smallest = capacity;
 
   mem_seg *ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  while (ms_ptr) {
+  while (ms_ptr) 
+  {
     if (ms_ptr->free && ms_ptr->size < smallest)
       smallest = ms_ptr->size;
     
@@ -238,19 +293,21 @@ int Mem_Mgr::mem_coalesce() {
     if (prev_ms_ptr->free && ms_ptr->free) {  //adjacent free segments
 
       //fill prev_mem_ptr with '.'
-      if (memory[ prev_ms_ptr->start ] != default_mem_fill) {
-	int start = prev_ms_ptr->start;
-	int end = prev_ms_ptr->end;
-	for (int i = start; i <= end; i++)
-	  memory[i] = default_mem_fill;
+      if (memory[ prev_ms_ptr->start ] != default_mem_fill) 
+      {
+        int start = prev_ms_ptr->start;
+        int end = prev_ms_ptr->end;
+        for (int i = start; i <= end; i++)
+          memory[i] = default_mem_fill;
       }
 
       //fill mem_ptr with '.'
-      if (memory[ ms_ptr->start ] != default_mem_fill) {
-	int start = ms_ptr->start;
-	int end = ms_ptr->end;
-	for (int i = start; i <= end; i++)
-	  memory[i] = default_mem_fill;
+      if (memory[ ms_ptr->start ] != default_mem_fill) 
+      {
+        int start = ms_ptr->start;
+        int end = ms_ptr->end;
+        for (int i = start; i <= end; i++)
+          memory[i] = default_mem_fill;
       }
 
       //combine
@@ -268,6 +325,8 @@ int Mem_Mgr::mem_coalesce() {
 }
 
 
-int Mem_Mgr::mem_dump() {
+// 
+int Mem_Mgr::mem_dump() 
+{
 
 }
