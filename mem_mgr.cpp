@@ -3,6 +3,7 @@
 
 using namespace std;
 
+//Constructor and default Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   default_mem_fill = default_init_val;
   freed_mem_fill = '#';
@@ -29,13 +30,18 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
     memory[i] = default_mem_fill;
 }
 
-
+//destructer
 Mem_Mgr::~Mem_Mgr() {
   delete memory;
   segments.deleteList();
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_alloc();
+Parameters    : int handle, int size, int tid
+Returns       : -1 if not enough memory, returns handle
+Details       : allocates memory space and returns the handle
+------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   if (size > available) {
@@ -76,7 +82,12 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   return ms.handle;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_free();
+Parameters    : int handle,int tid
+Returns       : -1 if no access, 1 if success
+Details       : Sets free variable to true, So memory can be used by another
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_free(int handle, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
@@ -108,7 +119,12 @@ int Mem_Mgr::mem_free(int handle, int tid) {
   return 1;  //success
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_read();
+Parameters    : int handle, char c, int tid
+Returns       : -1 if no access, 1 if success
+Details       : Reads from a given memory space
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
@@ -137,7 +153,12 @@ int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
   return 1;  //success
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_read();
+Parameters    : int handle, int offset, int text_size, char* text, in tid
+Returns       : -1 if no access, 1 if success
+Details       : reads from a given memory space
+------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
@@ -172,7 +193,12 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
   return 1;  //success
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_write();
+Parameters    : int handle, char c, int tid
+Returns       : -1 if no access, 1 if success
+Details       : Writes to a given memory space
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
@@ -201,7 +227,12 @@ int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
   return 1;  //success
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_write();
+Parameters    : int handle, int offset, int text_size, char* text, in tid
+Returns       : -1 if access denied, 1 with success
+Details       : Writes to a gien memory space
+------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
@@ -245,13 +276,23 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   return 1;  //success
 }
 
-
-void Mem_Mgr::set_mcb(MCB *mcb)
+/*-----------------------------------------------------------------
+Function      : setMCB();
+Parameters    :
+Returns       : void
+Details       : sets MCB pointer
+------------------------------------------------------------------*/
+void Mem_Mgr::setMCB(MCB *mcb)
 {
   this->mcb = mcb;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : left();
+Parameters    :
+Returns       : returns available memory
+Details       :  "
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_left()
 {
   return available;
@@ -272,7 +313,12 @@ int Mem_Mgr::mem_largest() {
   return largest;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_smallest();
+Parameters    :
+Returns       : smallest capacity
+Details       : finds the smallest capacity and returns it
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_smallest() {
   unsigned int smallest = capacity;
 

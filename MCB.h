@@ -14,6 +14,7 @@ class Scheduler;
 class Semaphore;
 class UI;
 class IPC;
+class Mem_Mgr;
 
 
 struct MCB
@@ -24,6 +25,7 @@ struct MCB
     Semaphore* writeSema;
     Semaphore* messageSema;
     UI* userInf;
+    Mem_Mgr* mem_mgr;
     MCB();
 };
 

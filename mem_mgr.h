@@ -23,17 +23,13 @@ class Mem_Mgr {
 
   Mem_Mgr(unsigned int size = 1024, unsigned char default_init_val = '.');
   ~Mem_Mgr();
-
   int mem_alloc(unsigned int size,  int tid);
   int mem_free(int handle, int tid);
-
   int mem_read(int handle, unsigned char *c, int tid);
   int mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
-
   int mem_write(int handle, unsigned char c, int tid);
   int mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
-
-  void set_mcb(MCB *mcb);
+  void setMCB(MCB *mcb);
 
   /*****************************  Public end  *********************************/
 

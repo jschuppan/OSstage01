@@ -24,6 +24,7 @@ class MCB;
 #include "scheduler.h"
 #include "sema.h"
 #include "IPC.h"
+#include "mem_mgr.h"
 
 const int DUMP_SLEEP = 8;
 const int MAX_WINDOWS_THREADS = 6;
@@ -243,4 +244,5 @@ void setMCB(MCB* mcb)
   mcb->ipc->setMCB(mcb);
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
+  mcb->mem_mgr->setMCB(mcb);
 }
