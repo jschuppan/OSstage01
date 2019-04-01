@@ -334,7 +334,12 @@ int Mem_Mgr::mem_smallest() {
   return smallest;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_coalesce();
+Parameters    :
+Returns       : returns 1 on success
+Details       : combines holes in the memory
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_coalesce() {
   mem_seg *prev_ms_ptr = getNextElementUntilEnd(NULL);  //get first element
   mem_seg *ms_ptr = getNextElementUntilEnd(prev_ms_ptr);
@@ -374,8 +379,13 @@ int Mem_Mgr::mem_coalesce() {
 }
 
 
-//
-int Mem_Mgr::mem_dump()
+/*-----------------------------------------------------------------
+Function      : mem_dump();
+Parameters    :
+Returns       : void
+Details       : Outputs the memory to a Window
+------------------------------------------------------------------*/
+void Mem_Mgr::mem_dump()
 {
 
 }

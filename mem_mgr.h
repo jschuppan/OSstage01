@@ -48,7 +48,7 @@ class Mem_Mgr {
   int mem_largest();
   int mem_smallest();
   int mem_coalesce();
-  int mem_dump();
+  void mem_dump();
   /****************************  Private end   ********************************/
 
 };
