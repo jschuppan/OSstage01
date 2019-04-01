@@ -101,7 +101,19 @@ int Mem_Mgr::mem_free(int handle, int tid) {
     return -1;  //error: access denied
   }
 
-  unsigned int start = ms_ptr->start;
+  unsigned int start = ms_ptr->start;  return smallest;
+}
+
+
+/*-----------------------------------------------------------------
+Function      : mem_coalesce();
+Parameters    :
+Returns       : returns 1 on success
+Details       : combines holes in the memory
+------------------------------------------------------------------*/
+int Mem_Mgr::mem_coalesce() {
+  mem_seg *prev_ms_ptr = getNextElementUntilEnd(NULL);  //get first element
+  mem_seg *ms_ptr = getNextElementUntilEnd(prev_ms_ptr);
   unsigned int end = ms_ptr->end;
   for (unsigned int i = start; i <= end; i++)
     memory[i] = freed_mem_fill;
@@ -258,9 +270,8 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   int i = 0;
   while (ms_ptr->write_cursor < ms_ptr->end)
   {
-    // this is not setting any actual text since write cursor is an index
-    // its just a place holder for now
-    ms_ptr->write_cursor = text[i];
+
+    message[ms_ptr->write_cursor] = text[i];
     ms_ptr->write_cursor++;
     i++;
   }
