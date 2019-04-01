@@ -21,6 +21,7 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   ms.write_cursor = 0;
   ms.free = true;
 
+
   segments.addToFront(ms, ms.handle);
 
   memory = new unsigned char[capacity];
@@ -158,9 +159,7 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
   int i = 0;
   while (ms_ptr->read_cursor < ms_ptr->end)
   {
-    // this is not setting any actual text since read cursor is an index
-    // its just a place holder for now
-    text[i] = ms_ptr->read_cursor;
+    text[i] = message[ms_ptr->read_cursor];
     ms_ptr->read_cursor++;
     i++;
   }
