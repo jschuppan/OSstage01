@@ -10,7 +10,7 @@ struct mem_seg {
   int handle;
   int owner_tid;
   unsigned int start, end, size;
-  unsigned int read_curser, write_curser;  //indeces for mem_read() and mem_write()
+  unsigned int read_cursor, write_cursor;  //indeces for mem_read() and mem_write()
   bool free;
 };
 
