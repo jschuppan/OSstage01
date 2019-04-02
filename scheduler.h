@@ -27,6 +27,8 @@ class Scheduler {
     struct thread_data
     {
         int thread_no;
+        int mem_handle;
+        int mem_size;
         Window* thread_win;
         Window* head_win;
         Window* console_win;

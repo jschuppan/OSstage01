@@ -263,6 +263,11 @@ void* Scheduler::perform_simple_output(void* arguments)
   char buff[256];
   int i = 0;
   int count = -1;
+
+  // Uncomment when mem_alloc is finished
+  //mem_mgr ->mem_size = 255;
+  //threadData -> mem_handle = mcb.mem_mgr->mem_alloc(threadData->mem_size, i);
+
   // find out who we are
   while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
@@ -324,7 +329,24 @@ void* Scheduler::perform_simple_output(void* arguments)
           mcb->ipc->Message_DeleteAll(threadNum);
           yield(threadNum);
 
-        count++;
+          //Uncomment when mem_Read and mem_Write  finished
+          /*
+          //Every 5 cycles write to memory
+          if(count % 5)
+          {
+            char *mem_ch = "Write to Memory";
+            threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(mem_ch);
+            mcb.mem_mgr->mem_write(threadData->mem_handle, mem_ch, threadNum);
+          }
+          //Every 6 cycles read from memory
+          if(count % 6)
+          {
+            char *mem_c = "Read From Memory";
+            threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(mem_c);
+            mcb.mem_mgr->mem_write(threadData->mem_handle, mem_ch, threadNum);
+          }
+          */
+          count++;
       }
       else {
         pthread_yield();
