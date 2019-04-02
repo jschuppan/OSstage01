@@ -35,6 +35,10 @@ const int CONSOLE_WINDOW = 2;
 void wrapperDump(Scheduler* s, UI* userInf, int level);
 void setMCB(MCB* mcb);
 void endlessLoop(MCB* mcb);
+//void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level);
+void IPCwrapperDump(Scheduler* s, UI* userInf, int level);
+
+
 
 
 
@@ -73,6 +77,7 @@ Parameters    : Scheduler,UI, integer level
 Returns       : void
 Details       : A wrapper function to encapsulate the call to dump
 ------------------------------------------------------------------*/
+
 void wrapperDump(Scheduler* s, UI* userInf, int level)
 {
     //pause program
@@ -90,8 +95,33 @@ void wrapperDump(Scheduler* s, UI* userInf, int level)
 
 }
 
+
 /*-----------------------------------------------------------------
-Function      : wrapperDump(Scheduler &s, UI &userInf, int level);
+Function      : mem_wrapperDump(Scheduler &s, UI &userInf, int level);
+Parameters    : Scheduler,UI, integer level
+Returns       : void
+Details       : A wrapper function to encapsulate the call to dump
+------------------------------------------------------------------*/
+/*
+void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level)
+{
+    //pause program
+    s->stop();
+    sleep(1);
+    userInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
+    m->mem_dump(Win);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
+    userInf->update();
+
+}
+*/
+/*-----------------------------------------------------------------
+Function      : IPCwrapperDump(Scheduler &s, UI &userInf, int level);
 Parameters    : Scheduler,UI, integer level
 Returns       : void
 Details       : A wrapper function to encapsulate the call to dump
@@ -244,5 +274,5 @@ void setMCB(MCB* mcb)
   mcb->ipc->setMCB(mcb);
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
-  mcb->mem_mgr->setMCB(mcb);
+  //mcb->mem_mgr->setMCB(mcb);
 }

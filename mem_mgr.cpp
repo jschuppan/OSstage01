@@ -1,6 +1,6 @@
 #include "mem_mgr.h"
 #include <iostream>
-
+#include "window.h"
 //Constructor and default Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   default_mem_fill = default_init_val;
@@ -394,7 +394,26 @@ Parameters    :
 Returns       : void
 Details       : Outputs the memory to a Window
 ------------------------------------------------------------------*/
-void Mem_Mgr::mem_dump()
+void Mem_Mgr::mem_dump(Window* Win)
 {
 
+  char mBuff[16384];
+  std::string tempString;
+  char* chr;
+  mcb->s->SCHEDULER_SUSPENDED = true;
+
+  // get threadID of current element
+  tempString = mcb->ipc->Message_Print();
+
+  // store returned string into buffer
+  chr = strdup(tempString.c_str());
+  sprintf(mBuff, "%s",chr);
+
+  // write buffer to window
+  usleep(5000);
+  targetWin->write_window(mBuff);
+  // deallocate memory for chr
+  free(chr);
+
+  mcb->s->SCHEDULER_SUSPENDED = false;
 }

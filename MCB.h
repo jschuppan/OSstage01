@@ -25,7 +25,7 @@ struct MCB
     Semaphore* writeSema;
     Semaphore* messageSema;
     UI* userInf;
-    Mem_Mgr* mem_mgr;
+  //  Mem_Mgr* mem_mgr;
     MCB();
 };
 
