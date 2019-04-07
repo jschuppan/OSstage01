@@ -74,7 +74,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   // otherwise we need to go to the end after burping to add element
   else 
   {
-    // burp()
+    burp()
 
     int maxEnd = -1;
     while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
