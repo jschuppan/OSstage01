@@ -27,4 +27,4 @@ IPC.o: IPC.cpp
 	$(CC) $(FLAGS) IPC.cpp
 
 clean:
-	rm -f $(OBJS) $(OUT) *.txt
+	rm -f $(OBJS) $(OUT) *.txt *.gch *~
