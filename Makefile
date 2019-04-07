@@ -12,7 +12,7 @@ Ultima.o: Ultima.cpp
 	$(CC) $(FLAGS) Ultima.cpp
 
 scheduler.o: scheduler.cpp
-	$(CC) $(FLAGS) scheduler.cpp
+	$(CC) $(FLAGS) scheduler.cpp -std=c++11
 
 MCB.o: MCB.cpp
 	$(CC) $(FLAGS) MCB.cpp

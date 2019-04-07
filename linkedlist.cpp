@@ -349,4 +349,4 @@ template class linkedList<pthread_t>;
 template class linkedList<Scheduler::thread_data>;
 template class linkedList<Window>;
 template class linkedList<Scheduler::TCB>;
-template class linkedList<ezQueue<IPC::Message_Type>>;
+template class linkedList<ezQueue<IPC::Message_Type> >;

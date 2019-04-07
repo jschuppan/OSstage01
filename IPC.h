@@ -54,8 +54,8 @@ private:
   //------------------Start Public Members-------------------
 public:
 
-  linkedList<ezQueue<Message_Type>> threadMailboxes;
-  linkedList<ezQueue<Message_Type>> threadMailboxesArchive;
+  linkedList<ezQueue<Message_Type> > threadMailboxes;
+  linkedList<ezQueue<Message_Type> > threadMailboxesArchive;
   IPC();
   //Message_Type getMessage();
   int createMailbox(int task_Id);

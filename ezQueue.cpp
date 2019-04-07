@@ -16,7 +16,7 @@ template <typename T>
 ezQueue<T>::ezQueue()
 {
   // queue has no elements at time of creation
-  head = nullptr;
+  head = NULL;
   size = 0;
 }
 
@@ -67,7 +67,7 @@ T ezQueue<T>::deQueue()
   queueElement* temp = head;
 
   // check if QUEUE is empty
-  if (head != nullptr)
+  if (head != NULL)
   {
     // make a copy of our content
     contentCopy = head->content;
@@ -76,7 +76,7 @@ T ezQueue<T>::deQueue()
 
     // remove old node and return content
     delete temp;
-    temp = nullptr;
+    temp = NULL;
     size--;
     return contentCopy;
   }
@@ -97,7 +97,7 @@ template <typename T>
 bool ezQueue<T>::isEmpty()
 {
   //list is empty
-  if (head == nullptr)
+  if (head == NULL)
     return true;
   //List is not empty
   else

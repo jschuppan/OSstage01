@@ -14,7 +14,7 @@ class Window;
 
 //=================================
 // necessary includes
-#include <mutex>
+//#include <mutex>
 #include "ezQueue.h"
 #include "MCB.h"
 
@@ -22,6 +22,7 @@ class Semaphore {
   public:
     /******************************* START PUBLIC MEMBERS *******************/
     Semaphore(std::string resName, int semaValue);
+    ~Semaphore();
     void down(int threadID);
     void up();
     void dump(Window* targetWin,int level);
@@ -34,7 +35,9 @@ class Semaphore {
     std::string resName;
     int sema_value;
     ezQueue<int> processQueue;
-    std::mutex resMutex;
+    //std::mutex resMutex;
+    pthread_mutex_t resMutex;
+    
     int lastPop;
     void* schedRef; //need to remove for mcb
     MCB* mcb;

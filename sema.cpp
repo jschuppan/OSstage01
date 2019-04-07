@@ -26,7 +26,16 @@ Semaphore::Semaphore(std::string resName, int semaValue)
   this->resName = resName;
   this->sema_value = semaValue;
   this->lastPop = -5;
+  pthread_mutex_init(&resMutex, NULL);
 }
+
+
+//Destructor
+Semaphore::~Semaphore()
+{
+  pthread_mutex_destroy(&resMutex);
+}
+
 
 /*-----------------------------------------------------------------
 Function      : down(int id);
@@ -51,7 +60,8 @@ void Semaphore::down(int threadID)
   // case 2: resource is unavailable
   else if (sema_value <= 0)
   {
-    resMutex.lock();
+    //resMutex.lock();
+    pthread_mutex_lock(&resMutex);
     // set out mutex lock to prevent resource from
     // being used by multiple threads
     // first push new process request on queue
@@ -67,7 +77,8 @@ void Semaphore::down(int threadID)
         //callToScheduler();
         mcb->s->TCBList.getDatumById(threadID)->setState(READY);
     }
-      resMutex.unlock();
+    //resMutex.unlock();
+    pthread_mutex_unlock(&resMutex);
   }
 
   // otherwise there is an issue
@@ -87,7 +98,8 @@ Details       : unlocks the mutex and allows the resource to be used
 ------------------------------------------------------------------*/
 void Semaphore::up()
 {
-  resMutex.lock();
+  //resMutex.lock();
+  pthread_mutex_lock(&resMutex);
   // next in queue gets released
   // get threadID from pop
   if(!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
@@ -95,7 +107,8 @@ void Semaphore::up()
 
   // check if queue is now empty. If so release and unlock
   sema_value++;
-  resMutex.unlock();
+  //resMutex.unlock();
+  pthread_mutex_unlock(&resMutex);
 }
 
 /*-----------------------------------------------------------------
