@@ -1,6 +1,8 @@
 #include "mem_mgr.h"
 #include <iostream>
 #include "window.h"
+#include <assert.h> 
+
 //Constructor and default Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   default_mem_fill = default_init_val;
@@ -47,37 +49,63 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
     return -1;  //error: not enough memory
   }
 
-  //look for a free node (code not finished!!!!)
-  // traverse segments looking for smallest gap that fulfills size
-  // requirement
-  mem_seg* sPtr = NULL;
-  while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
+  // allocate new memort at end
+  // traverse segments looking where the last element ends before the
+  // free space starts
+  mem_seg* sPtr = segments.getNextElementUntilEnd(NULL);
+
+
+  mem_seg tmpDatum;
+  tmpDatum.handle = next_handle++;
+  tmpDatum.owner_tid = tid;
+  tmpDatum.size = size;
+  tmpDatum.write_cursor = tmpDatum.read_cursor = tmpDatum.start;
+  tmpDatum.free = false;
+
+  // if we have nothing in RAM 
+  if (sPtr == NULL) 
   {
-    // we will have to sort the node in a way where we can determine
-    // the smallest amount of space between them left to right
+    // allocate first node
+    tmpDatum.start = 0;
+    tmpDatum.end = size - 1;
+    segments.addToEnd(tmpDatum, tmpDatum.handle);
   }
 
-  // RAM IS empty
-  if (sPtr == NULL)
-    // code here
+  // otherwise we need to go to the end after burping to add element
+  else 
+  {
+    // burp()
+
+    int maxEnd = -1;
+    while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
+    {
+      maxEnd = 0;
+      if (sPtr->end > maxEnd) 
+      {
+        maxEnd = sPtr->end;
+      }
+    }
+
+    // we start our node right after the last found element
+    tmpDatum.start = maxEnd + 1;
+    tmpDatum.end = tmpDatum.start + size;
+
+    // do some boundary checking as a safeguard
+    assert(!(tmpDatum.end > (capacity - 1));
+
+    // if we have no issues push to linked list
+    segments.addToEnd(tmpDatum, tmpDatum.handle);
 
 
-  mem_seg ms;
-  ms.handle = next_handle++;
-  ms.owner_tid = tid;
-  //ms.start = ;
-  //ms.end = ;
-  //ms.size = ;
-  ms.write_cursor = ms.read_cursor = ms.start;
-  ms.free = false;
+  }
 
-  //add new node
-  //code here
 
+  // adjust variables
   available -= size;
   used += size;
 
-  return ms.handle;
+  // return our handle
+  return tmpDatum.handle;
 }
 
 /*-----------------------------------------------------------------
@@ -99,7 +127,8 @@ int Mem_Mgr::mem_free(int handle, int tid) {
     return -1;  //error: access denied
   }
 
-  unsigned int start = ms_ptr->start;  return smallest;
+  unsigned int start = ms_ptr->start;  
+  return smallest;
 }
 
 
