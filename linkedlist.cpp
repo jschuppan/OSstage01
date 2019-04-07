@@ -15,6 +15,7 @@ class Window;
 #include "scheduler.h"
 #include "linkedlist.h"
 #include "IPC.h"
+#include "mem_mgr.h"
 
 
 //defualt constructor
@@ -350,3 +351,4 @@ template class linkedList<Scheduler::thread_data>;
 template class linkedList<Window>;
 template class linkedList<Scheduler::TCB>;
 template class linkedList<ezQueue<IPC::Message_Type> >;
+template class linkedList<Mem_Mgr::mem_seg>;

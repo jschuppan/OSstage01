@@ -1,8 +1,19 @@
 #include "mem_mgr.h"
 #include <iostream>
 #include "window.h"
-#include <assert.h> 
+#include <assert.h>
+#include <string.h>
+#include "scheduler.h"
+#include "IPC.h"
+#include <unistd.h> //sleep
 
+
+Mem_Mgr::Mem_Mgr()
+{
+  unsigned int size = 1024;
+  unsigned int default_init_val = '.';
+  Mem_Mgr(size, default_init_val);
+}
 //Constructor and default Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   default_mem_fill = default_init_val;
@@ -62,8 +73,8 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   tmpDatum.write_cursor = tmpDatum.read_cursor = tmpDatum.start;
   tmpDatum.free = false;
 
-  // if we have nothing in RAM 
-  if (sPtr == NULL) 
+  // if we have nothing in RAM
+  if (sPtr == NULL)
   {
     // allocate first node
     tmpDatum.start = 0;
@@ -72,15 +83,15 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   }
 
   // otherwise we need to go to the end after burping to add element
-  else 
+  else
   {
-    burp()
+    burp();
 
     int maxEnd = -1;
     while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
     {
       maxEnd = 0;
-      if (sPtr->end > maxEnd) 
+      if (sPtr->end > maxEnd)
       {
         maxEnd = sPtr->end;
       }
@@ -118,12 +129,12 @@ int Mem_Mgr::mem_free(int handle, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
   if (ms_ptr == NULL) {
-    cout << "\nmem_free() : Item segment doesn't exist\n";
+    //cout << "\nmem_free() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid) {
-    cout << "\nmem_free() : access denied\n";
+    //cout << "\nmem_free() : access denied\n";
     return -1;  //error: access denied
   }
 
@@ -132,7 +143,7 @@ int Mem_Mgr::mem_free(int handle, int tid) {
   for (unsigned int i = start; i <= end; i++)
     memory[i] = freed_mem_fill;
 
-  ms_ptr->write_curser = ms_ptr->read_curser = start;
+  ms_ptr->write_cursor = ms_ptr->read_cursor = start;
 
   ms_ptr->free = true;
   ms_ptr->owner_tid = -1;
@@ -207,7 +218,7 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
   int i = 0;
   while (ms_ptr->read_cursor < ms_ptr->end)
   {
-    text[i] = message[ms_ptr->read_cursor];
+    //text[i] = message[ms_ptr->read_cursor];
     ms_ptr->read_cursor++;
     i++;
   }
@@ -286,7 +297,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   while (ms_ptr->write_cursor < ms_ptr->end)
   {
 
-    message[ms_ptr->write_cursor] = text[i];
+    //message[ms_ptr->write_cursor] = text[i];
     ms_ptr->write_cursor++;
     i++;
   }
@@ -428,7 +439,7 @@ void Mem_Mgr::mem_dump(Window* Win)
 
   // write buffer to window
   usleep(5000);
-  targetWin->write_window(mBuff);
+  Win->write_window(mBuff);
   // deallocate memory for chr
   free(chr);
 
@@ -455,7 +466,7 @@ int Mem_Mgr::burp() {
       //shift all following nodes and memory back by the size of the hole
       shift_index = prev_ms_ptr->start;
       shift_ptr = ms_ptr;
-      
+
       while (shift_ptr) {
 
 	//if a node is free, don't shift the contents
@@ -478,8 +489,8 @@ int Mem_Mgr::burp() {
       hole.start = capacity - 1 - prev_ms_ptr->size;
       hole.end = capacity - 1;
       hole.size = prev_ms_ptr->size;
-      hole.read_curser = 0;
-      hole.write_curser = 0;
+      hole.read_cursor = 0;
+      hole.write_cursor = 0;
       hole.free = true;
 
       segments.removeNodeByElement(prev_ms_ptr->handle);

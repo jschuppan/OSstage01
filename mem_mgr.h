@@ -3,17 +3,8 @@
 
 #include "linkedlist.h"
 #include "window.h"
+#include "MCB.h"
 
-class MCB;
-
-//memory segment
-struct mem_seg {
-  int handle;
-  int owner_tid;
-  unsigned int start, end, size;
-  unsigned int read_cursor, write_cursor;  //indeces for mem_read() and mem_write()
-  bool free;
-};
 
 
 //memory manager
@@ -22,7 +13,8 @@ class Mem_Mgr {
   /****************************  Public start  ********************************/
  public:
 
-  Mem_Mgr(unsigned int size = 1024, unsigned char default_init_val = '.');
+  Mem_Mgr();
+  Mem_Mgr(unsigned int size, unsigned char default_init_val);
   ~Mem_Mgr();
   int mem_alloc(unsigned int size,  int tid);
   int mem_free(int handle, int tid);
@@ -37,6 +29,19 @@ class Mem_Mgr {
 
   /***************************  Private start  ********************************/
  private:
+   //memory segment
+   struct mem_seg
+   {
+     int handle;
+     int owner_tid;
+     unsigned int start, end, size;
+     unsigned int read_cursor, write_cursor;  //indeces for mem_read() and mem_write()
+     bool free;
+     bool operator==(const mem_seg& rhs)
+     {
+       return (handle == rhs.handle);
+     }
+   };
 
   MCB *mcb;
   unsigned char *memory;

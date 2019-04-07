@@ -102,7 +102,6 @@ Parameters    : Scheduler,UI, integer level
 Returns       : void
 Details       : A wrapper function to encapsulate the call to dump
 ------------------------------------------------------------------*/
-/*
 void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level)
 {
     //pause program
@@ -119,7 +118,7 @@ void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level)
     userInf->update();
 
 }
-*/
+
 /*-----------------------------------------------------------------
 Function      : IPCwrapperDump(Scheduler &s, UI &userInf, int level);
 Parameters    : Scheduler,UI, integer level
@@ -274,5 +273,5 @@ void setMCB(MCB* mcb)
   mcb->ipc->setMCB(mcb);
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
-  //mcb->mem_mgr->setMCB(mcb);
+  mcb->mem_mgr->setMCB(mcb);
 }
