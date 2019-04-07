@@ -50,6 +50,7 @@ class Mem_Mgr {
   int mem_largest();
   int mem_smallest();
   int mem_coalesce();
+  int burp();
   /****************************  Private end   ********************************/
 
 };

@@ -91,7 +91,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
     tmpDatum.end = tmpDatum.start + size;
 
     // do some boundary checking as a safeguard
-    assert(!(tmpDatum.end > (capacity - 1));
+    assert(!(tmpDatum.end > (capacity - 1)));
 
     // if we have no issues push to linked list
     segments.addToEnd(tmpDatum, tmpDatum.handle);
@@ -118,34 +118,21 @@ int Mem_Mgr::mem_free(int handle, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
   if (ms_ptr == NULL) {
-    std::cout << "\nmem_free() : Item segment doesn't exist\n";
+    cout << "\nmem_free() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid) {
-    std::cout << "\nmem_free() : access denied\n";
+    cout << "\nmem_free() : access denied\n";
     return -1;  //error: access denied
   }
 
-  unsigned int start = ms_ptr->start;  
-  return smallest;
-}
-
-
-/*-----------------------------------------------------------------
-Function      : mem_coalesce();
-Parameters    :
-Returns       : returns 1 on success
-Details       : combines holes in the memory
-------------------------------------------------------------------*/
-int Mem_Mgr::mem_coalesce() {
-  mem_seg *prev_ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  mem_seg *ms_ptr = getNextElementUntilEnd(prev_ms_ptr);
+  unsigned int start = ms_ptr->start;
   unsigned int end = ms_ptr->end;
   for (unsigned int i = start; i <= end; i++)
     memory[i] = freed_mem_fill;
 
-  ms_ptr->write_cursor = ms_ptr->read_cursor = start;
+  ms_ptr->write_curser = ms_ptr->read_curser = start;
 
   ms_ptr->free = true;
   ms_ptr->owner_tid = -1;
@@ -157,6 +144,7 @@ int Mem_Mgr::mem_coalesce() {
 
   return 1;  //success
 }
+
 
 /*-----------------------------------------------------------------
 Function      : mem_read();
@@ -340,12 +328,12 @@ int Mem_Mgr::mem_left()
 int Mem_Mgr::mem_largest() {
   unsigned int largest = 0;
 
-  mem_seg *ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  while (ms_ptr = getNextElementUntilEnd(ms_ptr)) {
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
+  while (ms_ptr = segments.getNextElementUntilEnd(ms_ptr)) {
     if (ms_ptr->free && ms_ptr->size > largest)
       largest = ms_ptr->size;
 
-    ms_ptr = getNextElementUntilEnd(ms_ptr);
+    ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
 
   return largest;
@@ -360,13 +348,13 @@ Details       : finds the smallest capacity and returns it
 int Mem_Mgr::mem_smallest() {
   unsigned int smallest = capacity;
 
-  mem_seg *ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  while (ms_ptr = getNextElementUntilEnd(ms_ptr))
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
+  while (ms_ptr = segments.getNextElementUntilEnd(ms_ptr))
   {
     if (ms_ptr->free && ms_ptr->size < smallest)
       smallest = ms_ptr->size;
 
-    ms_ptr = getNextElementUntilEnd(ms_ptr);
+    ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
 
   return smallest;
@@ -379,8 +367,8 @@ Returns       : returns 1 on success
 Details       : combines holes in the memory
 ------------------------------------------------------------------*/
 int Mem_Mgr::mem_coalesce() {
-  mem_seg *prev_ms_ptr = getNextElementUntilEnd(NULL);  //get first element
-  mem_seg *ms_ptr = getNextElementUntilEnd(prev_ms_ptr);
+  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   while (ms_ptr) {
     if (prev_ms_ptr->free && ms_ptr->free) {  //adjacent free segments
 
@@ -405,12 +393,12 @@ int Mem_Mgr::mem_coalesce() {
       //combine
       ms_ptr->start = prev_ms_ptr->start;
       ms_ptr->size += prev_ms_ptr->size;
-      removeNodeByElement(prev_ms_ptr->handle);
+      segments.removeNodeByElement(prev_ms_ptr->handle);
       ms_ptr->write_cursor = ms_ptr->read_cursor = ms_ptr->start;
     }
 
     prev_ms_ptr = ms_ptr;
-    ms_ptr = getNextElementUntilEnd(ms_ptr);
+    ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
 
   return 1;  //success
@@ -445,4 +433,64 @@ void Mem_Mgr::mem_dump(Window* Win)
   free(chr);
 
   mcb->s->SCHEDULER_SUSPENDED = false;
+}
+
+
+/*-----------------------------------------------------------------
+Function      : burp();
+Parameters    :
+Returns       : int
+Details       : Moves the the holes to the end of the memory
+------------------------------------------------------------------*/
+int Mem_Mgr::burp() {
+  int shift_index = 0;
+  mem_seg hole;
+  mem_seg *shift_ptr = NULL;
+  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
+  while (ms_ptr) {
+
+    if (prev_ms_ptr->free && !ms_ptr->free) {  //hole followed by data
+
+      //shift all following nodes and memory back by the size of the hole
+      shift_index = prev_ms_ptr->start;
+      shift_ptr = ms_ptr;
+      
+      while (shift_ptr) {
+
+	//if a node is free, don't shift the contents
+	if (!shift_ptr->free) {
+	  int start = shift_ptr->start;
+	  int end = shift_ptr->end;
+	  for (int i = start; i <= end; i++) {
+	    memory[ shift_index++ ] = memory[i];
+	  }
+	}
+	shift_ptr->start -= prev_ms_ptr->size;
+	shift_ptr->end -= prev_ms_ptr->size;
+
+	shift_ptr = segments.getNextElementUntilEnd(shift_ptr);
+      }
+
+      //remove the hole and add it to the end
+      hole.handle = prev_ms_ptr->handle;
+      hole.owner_tid = -1;
+      hole.start = capacity - 1 - prev_ms_ptr->size;
+      hole.end = capacity - 1;
+      hole.size = prev_ms_ptr->size;
+      hole.read_curser = 0;
+      hole.write_curser = 0;
+      hole.free = true;
+
+      segments.removeNodeByElement(prev_ms_ptr->handle);
+      segments.addToEnd(hole, hole.handle);
+    }
+
+    prev_ms_ptr = ms_ptr;
+    ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
+  }
+
+  mem_coalesce();
+
+  return 1;
 }
