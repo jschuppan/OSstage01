@@ -271,11 +271,7 @@ void* Scheduler::perform_simple_output(void* arguments)
   while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
   }
-  int threadNum = i;
-
-  // Uncomment when mem_alloc is finished
-  threadInfo.getDatumById(threadNum)->mem_size = 100;
-  threadInfo.getDatumById(threadNum)-> mem_handle = mcb->mem_mgr->mem_alloc(threadInfo.getDatumById(threadNum)->mem_size, threadNum);
+  int threadNum = i;  
 
   do {
     // run in endless loop until killed by garbage_collect()

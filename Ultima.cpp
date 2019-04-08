@@ -279,7 +279,31 @@ void endlessLoop(MCB* mcb)
 
           break;
         }
-        case 'l':
+        case 'b':
+        {
+          mcb->s->getThreadInfo().getDatumById(0)->mem_size = 300;
+          mcb->s->getThreadInfo().getDatumById(0)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(0)->mem_size, 0);
+          break;
+        }
+        case 'v':
+        {
+          mcb->s->getThreadInfo().getDatumById(1)->mem_size = 300;
+          mcb->s->getThreadInfo().getDatumById(1)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(1)->mem_size, 1);
+          break;
+        }
+        case 'x':
+        {
+          mcb->s->getThreadInfo().getDatumById(2)->mem_size = 300;
+          mcb->s->getThreadInfo().getDatumById(2)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(2)->mem_size, 2);
+          break;
+        }
+        case 'z':
+        {
+          mcb->s->getThreadInfo().getDatumById(0)->mem_size = 400;
+          mcb->s->getThreadInfo().getDatumById(0)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(0)->mem_size, 0);
+          break;
+        }
+      case 'l':
         {
           mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(),1);
           break;

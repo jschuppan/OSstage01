@@ -83,7 +83,6 @@ Details       : allocates memory space and returns the handle
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   char buff[255];
-  available = 1024;
   if (size > available) {
     mcb->writeSema->down(tid);
     sprintf(buff, "\n  mem_alloc() : not enough memory\n  available size: %d \n  Requested Size %d\n",available,size);
@@ -97,7 +96,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   // free space starts
   mem_seg* sPtr;
   sPtr = segments.getNextElementUntilEnd(NULL);
-
+  int countPos = 0;
   while(sPtr->size < size)
   {
     if(sPtr = segments.getNextElementUntilEnd(NULL))
@@ -108,6 +107,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
       mcb->writeSema->up();
       return -1;
     }
+    countPos++;
   }
 
 
@@ -119,8 +119,8 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   tmpDatum.free = false;
 
   tmpDatum.start = sPtr->start;
-  tmpDatum.end = sPtr->start + size;
-  segments.addToEnd(tmpDatum, tmpDatum.handle);
+  tmpDatum.end = sPtr->start + size -1;
+  segments.insertNode(tmpDatum,countPos, tmpDatum.handle);
 
   sPtr->start = tmpDatum.end + 1;
   sPtr->size = sPtr->size - size;

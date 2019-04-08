@@ -105,7 +105,13 @@ void Window :: display_help()
   write_window(3, 75, "m= Write in Bounds");
   write_window(4, 75, "l= Free Memory 2");
   write_window(5, 75, "o= Free Memory 1");
-  write_window(5, 18, "p= Memory Dump");
+  write_window(5, 35, "p= Memory Dump");
+  write_window(5, 50, "b= Allocate Mem_1 = 300");
+  write_window(6, 1, "v= Allocate Mem_2 = 300");
+  write_window(6, 18, "x= Allocate_Mem_3 = 300");
+  write_window(6, 35, "z= Allocate Mem_1 = 400");
+
+
 
 }
 
