@@ -6,6 +6,7 @@
 #include "scheduler.h"
 #include "IPC.h"
 #include "sema.h"
+#include "UI.h"
 #include <unistd.h> //sleep
 
 
@@ -13,10 +14,8 @@ Mem_Mgr::Mem_Mgr()
 {
   unsigned int size = 1024;
   unsigned int default_init_val = '.';
-  Mem_Mgr(size, default_init_val);
-}
-//Constructor and default Constructor
-Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
+  char buff[255];
+
   default_mem_fill = default_init_val;
   freed_mem_fill = '#';
   capacity = available = size;
@@ -34,6 +33,33 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   ms.write_cursor = 0;
   ms.free = true;
 
+  segments.addToFront(ms, ms.handle);
+
+  memory = new unsigned char[capacity];
+  for (unsigned int i = 0; i < capacity; i++)
+    memory[i] = default_mem_fill;
+}
+
+//Constructor and default Constructor
+Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
+  char buff[255];
+
+  default_mem_fill = default_init_val;
+  freed_mem_fill = '#';
+  capacity = available = size;
+  used = 0;
+  next_handle = 0;
+
+  mem_seg ms;
+  // why are we increasing the count here?
+  ms.handle = next_handle++;
+  ms.owner_tid = -1;
+  ms.start = 0;
+  ms.end = capacity - 1;
+  ms.size = capacity;
+  ms.read_cursor = 0;
+  ms.write_cursor = 0;
+  ms.free = true;
 
   segments.addToFront(ms, ms.handle);
 
@@ -70,42 +96,40 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   // traverse segments looking where the last element ends before the
   // free space starts
   mem_seg* sPtr;
-  sPtr = segments.getNextElement(NULL);
-  if(!sPtr)
+  sPtr = segments.getNextElementUntilEnd(NULL);
+
+  while(sPtr->size < size)
   {
-    mcb->writeSema->down(tid);
-    sprintf(buff, "\n  List is NULL\n");
-    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
+    if(sPtr = segments.getNextElementUntilEnd(NULL))
+    {
+      mcb->writeSema->down(tid);
+      sprintf(buff, "\n  Not Enough Consecutive Memory\n");
+      mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+      mcb->writeSema->up();
+      return -1;
+    }
   }
-  // while(sPtr->size < size)
-  // {
-  //   if(sPtr = segments.getNextElementUntilEnd(NULL))
-  //   {
-  //     mcb->writeSema->down(tid);
-  //     sprintf(buff, "\n  Not Enough Consecutive Memory\n");
-  //     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-  //     mcb->writeSema->up();
-  //     return -1;
-  //   }
-  // }
 
-  //
-  // mem_seg tmpDatum;
-  // tmpDatum.handle = next_handle++;
-  // tmpDatum.owner_tid = tid;
-  // tmpDatum.size = size;
-  // tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
-  // tmpDatum.free = false;
-  //
-  // tmpDatum.start = sPtr->start;
-  // tmpDatum.end = sPtr->start + size;
-  // segments.addToEnd(tmpDatum, tmpDatum.handle);
-  //
-  // sPtr->start = tmpDatum.end + 1;
-  // sPtr->size = sPtr->size - size;
-  // tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
 
+  mem_seg tmpDatum;
+  tmpDatum.handle = next_handle++;
+  tmpDatum.owner_tid = tid;
+  tmpDatum.size = size;
+  tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
+  tmpDatum.free = false;
+
+  tmpDatum.start = sPtr->start;
+  tmpDatum.end = sPtr->start + size;
+  segments.addToEnd(tmpDatum, tmpDatum.handle);
+
+  sPtr->start = tmpDatum.end + 1;
+  sPtr->size = sPtr->size - size;
+  tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
+
+  mcb->writeSema->down(tid);
+  sprintf(buff, "\n  Memory Allocated \n");
+  mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+  mcb->writeSema->up();
 
   // otherwise we need to go to the end after burping to add element
   // else
@@ -141,7 +165,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   used += size;
 
   // return our handle
-  return 0;//tmpDatum.handle;
+  return tmpDatum.handle;
 }
 
 /*-----------------------------------------------------------------
@@ -448,26 +472,36 @@ Details       : Outputs the memory to a Window
 ------------------------------------------------------------------*/
 void Mem_Mgr::mem_dump(Window* Win)
 {
+   mem_seg* myT = NULL;
+   char mBuff[16384];
+   std::string tempString;
+   char* chr;
+   mcb->s->SCHEDULER_SUSPENDED = true;
 
-  char mBuff[16384];
-  std::string tempString;
-  char* chr;
-  mcb->s->SCHEDULER_SUSPENDED = true;
+   tempString = "\n\n   Status \t Memory Handle \t Starting Location \t Ending Location \t Size \t task-ID\n";
+   chr = strdup(tempString.c_str());
+   sprintf(mBuff, "%s",chr);
+   Win->write_window(mBuff);
 
-  // get threadID of current element
-  tempString = mcb->ipc->Message_Print();
+   while ((myT = segments.getNextElementUntilEnd(myT)))
+   {
+     if(myT->free)
+       sprintf(mBuff, "   Free \t\t ");
+     else
+       sprintf(mBuff, "   Used \t\t ");
 
-  // store returned string into buffer
-  chr = strdup(tempString.c_str());
-  sprintf(mBuff, "%s",chr);
+     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->handle);
+     sprintf(mBuff + strlen(mBuff),"%d \t\t\t", myT->start);
+     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->end);
+     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->size);
+     sprintf(mBuff + strlen(mBuff),"%d \n", myT->owner_tid);
 
-  // write buffer to window
-  usleep(5000);
-  Win->write_window(mBuff);
-  // deallocate memory for chr
-  free(chr);
+     Win->write_window(mBuff);
+   }
+   // deallocate memory for chr
+   free(chr);
 
-  mcb->s->SCHEDULER_SUSPENDED = false;
+   mcb->s->SCHEDULER_SUSPENDED = false;
 }
 
 

@@ -14,7 +14,7 @@ class Mem_Mgr {
  public:
 
   Mem_Mgr();
-  Mem_Mgr(unsigned int size, unsigned char default_init_val);
+  Mem_Mgr(unsigned int size, unsigned char default_init_val );
   ~Mem_Mgr();
   int mem_alloc(unsigned int size,  int tid);
   int mem_free(int handle, int tid);

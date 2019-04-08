@@ -35,7 +35,7 @@ const int CONSOLE_WINDOW = 2;
 void wrapperDump(Scheduler* s, UI* userInf, int level);
 void setMCB(MCB* mcb);
 void endlessLoop(MCB* mcb);
-//void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level);
+void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf);
 void IPCwrapperDump(Scheduler* s, UI* userInf, int level);
 
 
@@ -102,7 +102,7 @@ Parameters    : Scheduler,UI, integer level
 Returns       : void
 Details       : A wrapper function to encapsulate the call to dump
 ------------------------------------------------------------------*/
-void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf, int level)
+void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf)
 {
     //pause program
     s->stop();
@@ -219,6 +219,12 @@ void endlessLoop(MCB* mcb)
              IPCwrapperDump(mcb->s,mcb->userInf,1);
              break;
          }
+         //message Dump(level1)
+          case 'p':
+          {
+              mem_wrapperDump(mcb->s,mcb->mem_mgr,mcb->userInf);
+              break;
+          }
         //clear console screen
         case  'c':
         {
