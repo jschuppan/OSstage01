@@ -176,14 +176,21 @@ Details       : Sets free variable to true, So memory can be used by another
 ------------------------------------------------------------------*/
 int Mem_Mgr::mem_free(int handle, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
+  char buff[255];
 
   if (ms_ptr == NULL) {
-    //cout << "\nmem_free() : Item segment doesn't exist\n";
+    mcb->writeSema->down(tid);
+    sprintf(buff,"\n   mem_free() : Item segment doesn't exist\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();
     return -1;  //error: not found
   }
 
   if (tid != ms_ptr->owner_tid) {
-    //cout << "\nmem_free() : access denied\n";
+    mcb->writeSema->down(tid);
+    sprintf(buff,"\n   mem_free() : access denied\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();
     return -1;  //error: access denied
   }
 

@@ -271,9 +271,22 @@ void endlessLoop(MCB* mcb)
           mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(), 90 , strlen(c), c, 1);
           break;
         }
+        case 'm':
+        {
+          char* c = "This space is mine";
+          mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(), 1, strlen(c), c, 1);
+          mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(0)->getMemHandle(), 1, strlen(c), c, 0);
+
+          break;
+        }
         case 'l':
         {
           mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(),1);
+          break;
+        }
+        case 'o':
+        {
+          mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(0)->getMemHandle(),0);
           break;
         }
         //Resume5 running

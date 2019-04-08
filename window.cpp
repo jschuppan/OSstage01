@@ -103,8 +103,9 @@ void Window :: display_help()
   write_window(1, 75, "y=..Message Dump..");
   write_window(2, 75, "k=. Write Out Of Bounds");
   write_window(3, 75, "m= Write in Bounds");
-  write_window(4, 75, "l= Free Memory");
-  write_window(5, 1, "p= Memory Dump");
+  write_window(4, 75, "l= Free Memory 2");
+  write_window(5, 75, "o= Free Memory 1");
+  write_window(5, 18, "p= Memory Dump");
 
 }
 

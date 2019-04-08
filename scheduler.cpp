@@ -78,10 +78,11 @@ void Scheduler::create_task(Window* threadWin, Window* headerWin, Window* consol
   // wait for termination and check if we ran into issues
   assert(!createResult);
   char buff[256];
+  mcb->messageSema->down(processCount);
   sprintf(buff, " Thread-%d created.\n",threadInfo.getDatumById(processCount)->thread_no);
   threadInfo.getDatumById(processCount)->thread_win->write_window("\n");
   threadInfo.getDatumById(processCount)->head_win->write_window(processCount + 1, 1,buff);
-
+  mcb->messageSema ->up();
 
 
   processCount++;
