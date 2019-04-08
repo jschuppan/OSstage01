@@ -56,8 +56,9 @@ Details       : allocates memory space and returns the handle
 ------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
+  char buff[255];
+  available = 1024;
   if (size > available) {
-    char buff[255];
     mcb->writeSema->down(tid);
     sprintf(buff, "\n  mem_alloc() : not enough memory\n  available size: %d \n  Requested Size %d\n",available,size);
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
@@ -68,52 +69,71 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   // allocate new memort at end
   // traverse segments looking where the last element ends before the
   // free space starts
-  mem_seg* sPtr = segments.getNextElementUntilEnd(NULL);
-
-
-  mem_seg tmpDatum;
-  tmpDatum.handle = next_handle++;
-  tmpDatum.owner_tid = tid;
-  tmpDatum.size = size;
-  tmpDatum.write_cursor = tmpDatum.read_cursor = tmpDatum.start;
-  tmpDatum.free = false;
-
-  // if we have nothing in RAM
-  if (sPtr == NULL)
+  mem_seg* sPtr;
+  sPtr = segments.getNextElement(NULL);
+  if(!sPtr)
   {
-    // allocate first node
-    tmpDatum.start = 0;
-    tmpDatum.end = size - 1;
-    segments.addToEnd(tmpDatum, tmpDatum.handle);
+    mcb->writeSema->down(tid);
+    sprintf(buff, "\n  List is NULL\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();
   }
+  // while(sPtr->size < size)
+  // {
+  //   if(sPtr = segments.getNextElementUntilEnd(NULL))
+  //   {
+  //     mcb->writeSema->down(tid);
+  //     sprintf(buff, "\n  Not Enough Consecutive Memory\n");
+  //     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+  //     mcb->writeSema->up();
+  //     return -1;
+  //   }
+  // }
+
+  //
+  // mem_seg tmpDatum;
+  // tmpDatum.handle = next_handle++;
+  // tmpDatum.owner_tid = tid;
+  // tmpDatum.size = size;
+  // tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
+  // tmpDatum.free = false;
+  //
+  // tmpDatum.start = sPtr->start;
+  // tmpDatum.end = sPtr->start + size;
+  // segments.addToEnd(tmpDatum, tmpDatum.handle);
+  //
+  // sPtr->start = tmpDatum.end + 1;
+  // sPtr->size = sPtr->size - size;
+  // tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
+
 
   // otherwise we need to go to the end after burping to add element
-  else
-  {
-    burp();
-
-    int maxEnd = -1;
-    while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
-    {
-      maxEnd = 0;
-      if (sPtr->end > maxEnd)
-      {
-        maxEnd = sPtr->end;
-      }
-    }
-
-    // we start our node right after the last found element
-    tmpDatum.start = maxEnd + 1;
-    tmpDatum.end = tmpDatum.start + size;
-
-    // do some boundary checking as a safeguard
-    assert(!(tmpDatum.end > (capacity - 1)));
-
-    // if we have no issues push to linked list
-    segments.addToEnd(tmpDatum, tmpDatum.handle);
-
-
-  }
+  // else
+  // {
+  //   burp();
+  //
+  //   int maxEnd = -1;
+  //   while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
+  //   {
+  //     maxEnd = 0;
+  //     if (sPtr->end > maxEnd)
+  //     {
+  //       maxEnd = sPtr->end;
+  //     }
+  //   }
+  //
+  //   // we start our node right after the last found element
+  //   tmpDatum.start = maxEnd + 1;
+  //   tmpDatum.end = tmpDatum.start + size;
+  //
+  //   // do some boundary checking as a safeguard
+  //   assert(!(tmpDatum.end > (capacity - 1)));
+  //
+  //   // if we have no issues push to linked list
+  //   segments.addToEnd(tmpDatum, tmpDatum.handle);
+  //
+  //
+  // }
 
 
   // adjust variables
@@ -121,7 +141,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   used += size;
 
   // return our handle
-  return tmpDatum.handle;
+  return 0;//tmpDatum.handle;
 }
 
 /*-----------------------------------------------------------------
