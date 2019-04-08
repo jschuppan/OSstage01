@@ -34,6 +34,7 @@ class Scheduler {
         Window* console_win;
       public:
         Window* getThreadWin() {return this->thread_win;}
+        int getMemHandle() {return this->mem_handle;}
         Window* getHeadWin() {return this->head_win;}
         Window* getConsoleWin() {return this->console_win;}
         int getThreadNo() { return thread_no; }

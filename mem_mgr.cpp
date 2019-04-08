@@ -321,7 +321,7 @@ Returns       : -1 if access denied, 1 with success
 Details       : Writes to a gien memory space
 ------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
-int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
+int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, char *text, int tid) {
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
   if (ms_ptr == NULL)
@@ -330,30 +330,36 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
     return -1;  //error: not found
   }
 
+  char buff[255];
   if (tid != ms_ptr->owner_tid)
   {
-    std::cout << "\nmem_write() : access denied\n";
-    return -1;  //error: access denied
+    mcb->writeSema->down(tid);
+    sprintf(buff, "\n  Owner permission denied\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();    return -1;  //error: access denied
   }
 
-  if (ms_ptr->write_cursor > ms_ptr->end)
+  if (ms_ptr->write_cursor+text_size+offset >ms_ptr->end)
   {
-    std::cout << "\nmem_write() : segment is full\n";
+    mcb->writeSema->down(tid);
+    sprintf(buff,"\n  Segmentation Fault\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();
     return -1;  //error: segment is full
   }
 
   int i = 0;
-  while (ms_ptr->write_cursor < ms_ptr->end)
+  while (i <= text_size && ms_ptr->write_cursor < ms_ptr->end)
   {
-    memory[ms_ptr->write_cursor] = text[i];
+    memory[ms_ptr->write_cursor+offset] =text[i];
     ms_ptr->write_cursor++;
     i++;
   }
   // make sure message was null terminated, if not return error
-  if (text[i] != '\0')
-  {
-    return -1; // error
-  }
+  // if (text[i] != '\0')
+  // {
+  //   return -1; // error
+  // }
   // reset cursor
   ms_ptr->write_cursor = ms_ptr->start;
 
@@ -482,11 +488,15 @@ void Mem_Mgr::mem_dump(Window* Win)
    chr = strdup(tempString.c_str());
    sprintf(mBuff, "%s",chr);
    Win->write_window(mBuff);
+   int count = 0;
+   char cBuff[1025];
 
    while ((myT = segments.getNextElementUntilEnd(myT)))
    {
      if(myT->free)
+     {
        sprintf(mBuff, "   Free \t\t ");
+     }
      else
        sprintf(mBuff, "   Used \t\t ");
 
@@ -498,6 +508,24 @@ void Mem_Mgr::mem_dump(Window* Win)
 
      Win->write_window(mBuff);
    }
+
+   sprintf(cBuff, "   %c",memory[count]);
+   while(count < 1024)
+   {
+     if(count % 32 == 0)
+          sprintf(cBuff+strlen(cBuff), "\n");
+     else if(count == 0)
+     {
+          continue;
+          count++;
+      }
+     sprintf(cBuff+strlen(cBuff), "   %c",memory[count]);
+     count++;
+   }
+   sprintf(cBuff+strlen(cBuff), "\n");
+
+   Win->write_window(cBuff);
+
    // deallocate memory for chr
    free(chr);
 

@@ -21,7 +21,7 @@ class Mem_Mgr {
   int mem_read(int handle, unsigned char *c, int tid);
   int mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
   int mem_write(int handle, unsigned char c, int tid);
-  int mem_write(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid);
+  int mem_write(int handle, unsigned int offset, unsigned int text_size, char *text, int tid);
   void setMCB(MCB *mcb);
   void mem_dump(Window* Win);
 

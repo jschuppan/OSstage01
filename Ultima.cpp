@@ -25,6 +25,7 @@ class MCB;
 #include "sema.h"
 #include "IPC.h"
 #include "mem_mgr.h"
+#include "string.h"
 
 const int DUMP_SLEEP = 8;
 const int MAX_WINDOWS_THREADS = 6;
@@ -262,6 +263,17 @@ void endlessLoop(MCB* mcb)
         case 'j':
         {
           mcb->s->forceWrite(rand()%5);
+          break;
+        }
+        case 'k':
+        {
+          char* c = "This space is mine";
+          mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(), 90 , strlen(c), c, 1);
+          break;
+        }
+        case 'l':
+        {
+          mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(),1);
           break;
         }
         //Resume5 running
