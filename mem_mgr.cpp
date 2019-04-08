@@ -559,6 +559,7 @@ int Mem_Mgr::burp() {
   mem_seg *shift_ptr = NULL;
   mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
   mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
+  std::cout << "here";
   while (ms_ptr) {
 
     if (prev_ms_ptr->free && !ms_ptr->free) {  //hole followed by data
@@ -568,7 +569,6 @@ int Mem_Mgr::burp() {
       //shift all following nodes and memory back by the size of the hole
       shift_index = prev_ms_ptr->start;
       shift_ptr = ms_ptr;
-
       while (shift_ptr) {
 
 	//if a node is free, don't shift the contents
@@ -596,10 +596,10 @@ int Mem_Mgr::burp() {
   //hole.handle = prev_ms_ptr->handle;
   //hole.owner_tid = -1;
   //hole.start = capacity - 1 - prev_ms_ptr->size;
-  prev_ms_ptr->end = prev_ms_ptr->start + available - 1;
-  prev_ms_ptr->size = available;
-  prev_ms_ptr->read_cursor = 0;
-  prev_ms_ptr->write_cursor = 0;
+  //prev_ms_ptr->end = prev_ms_ptr->start + available - 1;
+  //prev_ms_ptr->size = available;
+  //prev_ms_ptr->read_cursor = 0;
+  //prev_ms_ptr->write_cursor = 0;    
   //hole.free = true;
 
   //mem_coalesce();
