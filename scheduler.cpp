@@ -19,6 +19,7 @@ Purpose       : implementation of scheduler.h
 #include "IPC.h"
 #include "UI.h"
 #include <stdlib.h>
+#include "mem_mgr.h"
 
 //struct MCB;
 //Global Variables
@@ -264,15 +265,16 @@ void* Scheduler::perform_simple_output(void* arguments)
   int i = 0;
   int count = -1;
 
-  // Uncomment when mem_alloc is finished
-  //mem_mgr ->mem_size = 255;
-  //threadData -> mem_handle = mcb.mem_mgr->mem_alloc(threadData->mem_size, i);
 
   // find out who we are
   while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
   }
   int threadNum = i;
+
+  // Uncomment when mem_alloc is finished
+  threadInfo.getDatumById(threadNum)->mem_size = 100;
+  threadInfo.getDatumById(threadNum)-> mem_handle = mcb->mem_mgr->mem_alloc(threadInfo.getDatumById(threadNum)->mem_size, threadNum);
 
   do {
     // run in endless loop until killed by garbage_collect()

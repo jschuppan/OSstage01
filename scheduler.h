@@ -79,6 +79,7 @@ class Scheduler {
     /******************************** START PUBLIC MEMBERS ******************************/
     Scheduler();
     linkedList<TCB> getTCBList() { return this->TCBList; }
+    linkedList<thread_data> getThreadInfo() { return this->threadInfo; }
     void* running(void* ID);
     void create_task(Window* win, Window* headerWin, Window* consoleWin);   // create appropriate data structures and calls coroutine()
     void destroy_task();  // to kill a task (Set its status to DEAD)
@@ -92,7 +93,6 @@ class Scheduler {
     bool SCHEDULER_SUSPENDED;
     bool THREAD_SUSPENDED;
     void forceWrite(int threadID);
-
     friend class Semaphore;
     /******************************** END PUBLIC MEMBERS ********************************/
 

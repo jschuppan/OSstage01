@@ -5,6 +5,7 @@
 #include <string.h>
 #include "scheduler.h"
 #include "IPC.h"
+#include "sema.h"
 #include <unistd.h> //sleep
 
 
@@ -56,7 +57,11 @@ Details       : allocates memory space and returns the handle
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   if (size > available) {
-    std::cout << "\nmem_alloc() : not enough memory\n";
+    char buff[255];
+    mcb->writeSema->down(tid);
+    sprintf(buff, "\n  mem_alloc() : not enough memory\n");
+    mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+    mcb->writeSema->up();
     return -1;  //error: not enough memory
   }
 
@@ -218,7 +223,7 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
   int i = 0;
   while (ms_ptr->read_cursor < ms_ptr->end)
   {
-    //text[i] = message[ms_ptr->read_cursor];
+    text[i] = memory[ms_ptr->read_cursor];
     ms_ptr->read_cursor++;
     i++;
   }
@@ -296,8 +301,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   int i = 0;
   while (ms_ptr->write_cursor < ms_ptr->end)
   {
-
-    //message[ms_ptr->write_cursor] = text[i];
+    memory[ms_ptr->write_cursor] = text[i];
     ms_ptr->write_cursor++;
     i++;
   }
