@@ -553,14 +553,17 @@ Returns       : int
 Details       : Moves the the holes to the end of the memory
 ------------------------------------------------------------------*/
 int Mem_Mgr::burp() {
+  //int total_burped_size = 0;
   int shift_index = 0;
-  mem_seg hole;
+  //mem_seg hole;
   mem_seg *shift_ptr = NULL;
   mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
   mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   while (ms_ptr) {
 
     if (prev_ms_ptr->free && !ms_ptr->free) {  //hole followed by data
+
+      //total_burped_size += prev_ms_ptr->size;
 
       //shift all following nodes and memory back by the size of the hole
       shift_index = prev_ms_ptr->start;
@@ -582,25 +585,24 @@ int Mem_Mgr::burp() {
 	shift_ptr = segments.getNextElementUntilEnd(shift_ptr);
       }
 
-      //remove the hole and add it to the end
-      hole.handle = prev_ms_ptr->handle;
-      hole.owner_tid = -1;
-      hole.start = capacity - 1 - prev_ms_ptr->size;
-      hole.end = capacity - 1;
-      hole.size = prev_ms_ptr->size;
-      hole.read_cursor = 0;
-      hole.write_cursor = 0;
-      hole.free = true;
-
+      //remove the hole
       segments.removeNodeByElement(prev_ms_ptr->handle);
-      segments.addToEnd(hole, hole.handle);
     }
 
     prev_ms_ptr = ms_ptr;
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
 
-  mem_coalesce();
+  //hole.handle = prev_ms_ptr->handle;
+  //hole.owner_tid = -1;
+  //hole.start = capacity - 1 - prev_ms_ptr->size;
+  prev_ms_ptr->end = prev_ms_ptr->start + available - 1;
+  prev_ms_ptr->size = available;
+  prev_ms_ptr->read_cursor = 0;
+  prev_ms_ptr->write_cursor = 0;
+  //hole.free = true;
+
+  //mem_coalesce();
 
   return 1;
 }
