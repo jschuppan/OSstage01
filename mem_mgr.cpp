@@ -59,7 +59,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   if (size > available) {
     char buff[255];
     mcb->writeSema->down(tid);
-    sprintf(buff, "\n  mem_alloc() : not enough memory\n");
+    sprintf(buff, "\n  mem_alloc() : not enough memory\n  available size: %d \n  Requested Size %d\n",available,size);
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
     mcb->writeSema->up();
     return -1;  //error: not enough memory
