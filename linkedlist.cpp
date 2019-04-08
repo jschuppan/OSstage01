@@ -201,15 +201,16 @@ void linkedList<T> :: removeNodeByElement(int element)
     	size--;
     	return;
   }
-
+  node* temp1 = NULL;
   //Loop until temp = last node
   while(temp->next)
   {
       //next element needs deleted
       if(temp->next->id == element)
       {
-        temp->next = temp->next->next;
-        delete temp->next;
+        temp1 = temp->next;
+        temp1 = temp->next->next;
+        delete temp1->next;
 	      size--;
         return;
       }

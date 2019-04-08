@@ -554,52 +554,92 @@ Details       : Moves the the holes to the end of the memory
 ------------------------------------------------------------------*/
 int Mem_Mgr::burp() {
   //int total_burped_size = 0;
-  int shift_index = 0;
+  int shift_start = 0;
   //mem_seg hole;
-  mem_seg *shift_ptr = NULL;
+  mem_seg *shift_ptr = new mem_seg;
   mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
   mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
-  std::cout << "here";
+  //std::cout << "here";
   while (ms_ptr) {
 
-    if (prev_ms_ptr->free && !ms_ptr->free) {  //hole followed by data
+    //free followed by not free
+    if (prev_ms_ptr->free && !ms_ptr->free)
+    {
+      //set temp values to be swaped
+      shift_ptr-> owner_tid = ms_ptr->owner_tid;
+      shift_ptr-> handle = ms_ptr->handle;
+      shift_ptr-> size = ms_ptr->size;
 
-      //total_burped_size += prev_ms_ptr->size;
+      //set next node to previous
+      ms_ptr->free = true;
+      ms_ptr->size = prev_ms_ptr->size;
+      ms_ptr->start = prev_ms_ptr->end +1;
+      ms_ptr->end = ms_ptr-> start + ms_ptr->size;
+      ms_ptr->owner_tid = -1;
+      ms_ptr->read_cursor= ms_ptr->write_cursor = ms_ptr->start;
 
-      //shift all following nodes and memory back by the size of the hole
-      shift_index = prev_ms_ptr->start;
-      shift_ptr = ms_ptr;
-      while (shift_ptr) {
+      //set previous to next
+      prev_ms_ptr->free = false;
+      prev_ms_ptr->owner_tid = shift_ptr->owner_tid;
+      prev_ms_ptr->handle = shift_ptr->handle;
+      prev_ms_ptr->size = shift_ptr->size;
+      prev_ms_ptr->end = prev_ms_ptr->start + prev_ms_ptr->size;
+      prev_ms_ptr->write_cursor = prev_ms_ptr->read_cursor = prev_ms_ptr->start;
 
-	//if a node is free, don't shift the contents
-	if (!shift_ptr->free) {
-	  int start = shift_ptr->start;
-	  int end = shift_ptr->end;
-	  for (int i = start; i <= end; i++) {
-	    memory[ shift_index++ ] = memory[i];
-	  }
-	}
-	shift_ptr->start -= prev_ms_ptr->size;
-	shift_ptr->end -= prev_ms_ptr->size;
 
-	shift_ptr = segments.getNextElementUntilEnd(shift_ptr);
+      // //total_burped_size += prev_ms_ptr->size;
+      //
+      // //shift all following nodes and memory back by the size of the hole
+      // shift_start = prev_ms_ptr->start;
+      // shift_ptr = ms_ptr;
+      // prev_ms_ptr = shift_ptr;
+      // //  while (shift_ptr) {
+      //
+    	// //if a node is free, don't shift the contents
+    	// //if (!shift_ptr->free) {
+      int start = prev_ms_ptr->start;
+      int end = prev_ms_ptr->end;
+      for (int i = start; i <= end; i++) {
+        memory[ shift_start++ ] = memory[i];
       }
-
-      //remove the hole
-      segments.removeNodeByElement(prev_ms_ptr->handle);
-    }
-
+	}
+  //free followed by free
+  // else if(prev_ms_ptr->free && ms_ptr->free)
+  // {
+  //   mem_coalesce();
+  //   //prev_ms_ptr = segments.getNextElementUntilEnd(NULL);
+  //   ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
+  //
+  //   continue;
+  // }
+  //not free followed by free
+  else
+  {
     prev_ms_ptr = ms_ptr;
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
+	//shift_ptr->start -= prev_ms_ptr->size;
+	//shift_ptr->end -= prev_ms_ptr->size;
 
+	// shift_ptr = segments.getNextElementUntilEnd(shift_ptr);
+  //     }
+
+      //remove the hole
+      //segments.removeNodeByElement(prev_ms_ptr->handle);
+
+
+    //prev_ms_ptr = ms_ptr;
+  // ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
+
+}
+mem_coalesce();
   //hole.handle = prev_ms_ptr->handle;
   //hole.owner_tid = -1;
   //hole.start = capacity - 1 - prev_ms_ptr->size;
   //prev_ms_ptr->end = prev_ms_ptr->start + available - 1;
   //prev_ms_ptr->size = available;
   //prev_ms_ptr->read_cursor = 0;
-  //prev_ms_ptr->write_cursor = 0;    
+  //prev_ms_ptr->write_cursor = 0;
   //hole.free = true;
 
   //mem_coalesce();
