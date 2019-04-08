@@ -97,10 +97,15 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   mem_seg* sPtr;
   sPtr = segments.getNextElementUntilEnd(NULL);
   int countPos = 0;
-  while(sPtr->size < size)
+  while(sPtr->size < size || !sPtr->free)
   {
-    if(sPtr = segments.getNextElementUntilEnd(NULL))
+    if(!(sPtr = segments.getNextElementUntilEnd(sPtr)))
     {
+      if(available >= size)
+      {
+          burp();
+          continue;
+      }
       mcb->writeSema->down(tid);
       sprintf(buff, "\n  Not Enough Consecutive Memory\n");
       mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
@@ -120,7 +125,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
 
   tmpDatum.start = sPtr->start;
   tmpDatum.end = sPtr->start + size -1;
-  segments.insertNode(tmpDatum,countPos, tmpDatum.handle);
+  segments.insertNode(tmpDatum, tmpDatum.handle, countPos);
 
   sPtr->start = tmpDatum.end + 1;
   sPtr->size = sPtr->size - size;
@@ -130,6 +135,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   sprintf(buff, "\n  Memory Allocated \n");
   mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
   mcb->writeSema->up();
+
 
   // otherwise we need to go to the end after burping to add element
   // else
