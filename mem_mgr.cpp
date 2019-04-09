@@ -450,26 +450,28 @@ int Mem_Mgr::mem_coalesce() {
   mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
   mem_seg *ms_ptr =NULL;
   char buff[255];
-  mcb->writeSema->down(0);
-  sprintf(buff,"\n  Coalesce()\n");
-  mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-  mcb->writeSema->up();
+  // mcb->writeSema->down(0);
+  // sprintf(buff,"\n  Coalesce()\n");
+  // mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+  // mcb->writeSema->up();
 
-  while(ms_ptr = segments.getNextElementUntilEnd(ms_ptr))
-  {
-    mcb->writeSema->down(0);
-    sprintf(buff,"\n   %d->,%d ",ms_ptr->owner_tid,ms_ptr->size);
-    mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
-  }
+  ms_ptr = NULL;
+  int count =0;
+
+
   ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   while (ms_ptr) {
     if (prev_ms_ptr->free && ms_ptr->free) {  //adjacent free segments
+      mcb->writeSema->down(0);
+      sprintf(buff,"\n   %d->,%d ->%d->%d\n\n",prev_ms_ptr->owner_tid,prev_ms_ptr->size,prev_ms_ptr->handle,prev_ms_ptr->free);
+      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+      mcb->writeSema->up();
 
-        mcb->writeSema->down(0);
-        sprintf(buff,"\n  #1 Size1 %d\n  Size2 %d\n",prev_ms_ptr->size,ms_ptr->size);
-        mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-        mcb->writeSema->up();
+      mcb->writeSema->down(0);
+      sprintf(buff,"\n   %d->,%d ->%d->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle,ms_ptr->free);
+      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+      mcb->writeSema->up();
+
       //fill prev_mem_ptr with '.'
       if (memory[ prev_ms_ptr->start ] != default_mem_fill)
       {
@@ -488,21 +490,33 @@ int Mem_Mgr::mem_coalesce() {
           memory[i] = default_mem_fill;
       }
 
+
       //combine
       ms_ptr->start = prev_ms_ptr->start;
       ms_ptr->size += prev_ms_ptr->size;
+
+      mcb->writeSema->down(0);
+      sprintf(buff,"\n   %d->,%d ->%d->%d\n\n",prev_ms_ptr->owner_tid,prev_ms_ptr->size,prev_ms_ptr->handle,prev_ms_ptr->free);
+      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+      mcb->writeSema->up();
+
+      mcb->writeSema->down(0);
+      sprintf(buff,"\n   %d->,%d ->%d->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle,ms_ptr->free);
+      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+      mcb->writeSema->up();
       segments.removeNodeByElement(prev_ms_ptr->handle);
       ms_ptr->write_cursor = ms_ptr->read_cursor = ms_ptr->start;
 
-      mcb->writeSema->down(0);
-      sprintf(buff,"\n  #2 Size1 %d\n",ms_ptr->size);
-      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
+      // mcb->writeSema->down(0);
+      // sprintf(buff,"\n  #2 Size1 %d\n",ms_ptr->size);
+      // mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+      // mcb->writeSema->up();
     }
 
     prev_ms_ptr = ms_ptr;
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
+  count =0;
 
   return 1;  //success
 }
@@ -585,8 +599,16 @@ int Mem_Mgr::burp() {
   mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
   char buff[255];
   mem_seg *ms_ptr =NULL;
+  mem_seg *temp_ptr =NULL;
   //std::cout << "here";
 
+  // while(ms_ptr = segments.getNextElementUntilEnd(ms_ptr))
+  // {
+  //   mcb->writeSema->down(0);
+  //   sprintf(buff,"\n   %d->,%d ->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle);
+  //   mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
+  //   mcb->writeSema->up();
+  // }
 
   ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
 
@@ -604,73 +626,35 @@ int Mem_Mgr::burp() {
       ms_ptr->free = true;
       ms_ptr->size = prev_ms_ptr->size;
       ms_ptr->owner_tid = -1;
+      ms_ptr->handle = prev_ms_ptr->handle;
 
       //set previous to next
       prev_ms_ptr->free = false;
       prev_ms_ptr->owner_tid = shift_ptr->owner_tid;
       prev_ms_ptr->handle = shift_ptr->handle;
       prev_ms_ptr->size = shift_ptr->size;
-      prev_ms_ptr->end = prev_ms_ptr->start + prev_ms_ptr->size;
+      prev_ms_ptr->end = prev_ms_ptr->start + prev_ms_ptr->size - 1;
       prev_ms_ptr->write_cursor = prev_ms_ptr->read_cursor = prev_ms_ptr->start;
 
-      ms_ptr->start = prev_ms_ptr->end;
+
+      ms_ptr->start = prev_ms_ptr->end + 1;
       ms_ptr->read_cursor= ms_ptr->write_cursor = ms_ptr->start;
-      // mcb->writeSema->down(0);
-      // sprintf(buff,"\n  Size1 %d\n ",ms_ptr->size);
-      // mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      // mcb->writeSema->up();
-      // //total_burped_size += prev_ms_ptr->size;
-      //
-      // //shift all following nodes and memory back by the size of the hole
-      // shift_start = prev_ms_ptr->start;
-      // shift_ptr = ms_ptr;
-      // prev_ms_ptr = shift_ptr;
-      // //  while (shift_ptr) {
-      //
-    	// //if a node is free, don't shift the contents
-    	// //if (!shift_ptr->free) {
+
+
       int start = prev_ms_ptr->start;
       int end = prev_ms_ptr->end;
       for (int i = start; i <= end; i++) {
         memory[ shift_start++ ] = memory[i];
       }
 	}
-  //free followed by free
-  else if(prev_ms_ptr->free && ms_ptr->free)
-  {
-    mem_coalesce();
-    prev_ms_ptr = segments.getNextElementUntilEnd(NULL);
-    ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
-    continue;
-  }
+    prev_ms_ptr = ms_ptr;
+    ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
 
+  }//end while
 
-  prev_ms_ptr = ms_ptr;
-  ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
+  ms_ptr =NULL;
 
-	//shift_ptr->start -= prev_ms_ptr->size;
-	//shift_ptr->end -= prev_ms_ptr->size;
-
-	// shift_ptr = segments.getNextElementUntilEnd(shift_ptr);
-  //     }
-
-      //remove the hole
-      //segments.removeNodeByElement(prev_ms_ptr->handle);
-
-
-    //prev_ms_ptr = ms_ptr;
-  // ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
-
-}
-  //hole.handle = prev_ms_ptr->handle;
-  //hole.owner_tid = -1;
-  //hole.start = capacity - 1 - prev_ms_ptr->size;
-  //prev_ms_ptr->end = prev_ms_ptr->start + available - 1;
-  //prev_ms_ptr->size = available;
-  //prev_ms_ptr->read_cursor = 0;
-  //prev_ms_ptr->write_cursor = 0;
-  //hole.free = true;
-
+  mem_coalesce();
 
   return 1;
 }
