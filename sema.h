@@ -1,5 +1,5 @@
 /*===========================================================================
-Programmers   : Jakob Schuppan, Robert Davis
+Programmers   : Jakob Schuppan, Robert Davis, Yazan Faham
 File          : sema.h
 Date          : Febuary 25, 2019
 Purpose       : implementation of a semaphore to regulate what is
@@ -37,7 +37,7 @@ class Semaphore {
     ezQueue<int> processQueue;
     //std::mutex resMutex;
     pthread_mutex_t resMutex;
-    
+
     int lastPop;
     void* schedRef; //need to remove for mcb
     MCB* mcb;

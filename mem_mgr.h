@@ -1,3 +1,9 @@
+/*===========================================================================
+Programmers   : Jakob Schuppan, Robert Davis, Yazan Faham
+File          : mem_mgr.h
+Date          : April 8, 2019
+Purpose       : Create a memory manger for our system
+============================================================================*/
 #ifndef MEM_MGR_H
 #define MEM_MGR_H
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-Programmers   : Jakob Schuppan, Robert Davis
+Programmers   : Jakob Schuppan, Robert Davis, Yazan Faham
 File          : linkedlist.h
 Date          : Febuary 25, 2019
 Purpose       : Simple implementation of a linked list

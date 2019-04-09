@@ -1,5 +1,5 @@
 /*===========================================================================
-Programmers   : Jakob Schuppan, Robert Davis
+Programmers   : Jakob Schuppan, Robert Davis, Yazan Faham
 File          : scheduler.h
 Date          : Febuary 25, 2019
 Purpose       : implementation of a scheduler for threads
