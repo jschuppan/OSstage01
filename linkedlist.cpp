@@ -202,6 +202,7 @@ void linkedList<T> :: removeNodeByElement(int element)
     	return;
   }
   node* temp1 = NULL;
+  char buff[255];
   //Loop until temp = last node
   while(temp->next)
   {
@@ -338,9 +339,47 @@ void linkedList<T> :: insertNode(T datum, int id, int position)
   }
 }
 
+template<class T>
+void linkedList<T> :: swapNodes(int leftId, int rightId)
+{
+  node* L = head;
+  node* R = NULL;
+
+  if(!head)
+    return;
+
+  if(head->id == leftId)
+  {
+    R = head->next;
+    head = R;
+    L->next = R->next;
+    R->next = L;
+
+    return;
+  }
+
+  node* temp = head;
+  while(temp->next)
+  {
+    if(leftId == temp->next->id)
+    {
+      L = temp->next;
+      break;
+    }
+    temp = temp->next;
+  }
+
+  R = L->next;
+  L->next = R->next;
+  R->next = L;
+  temp->next = R;
+
+
+}
 //Accessors
 template<class T>
 int linkedList<T> :: getSize(){return size;}
+
 
 //Mutators
 template<class T>

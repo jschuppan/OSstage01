@@ -9,7 +9,7 @@
 #include "UI.h"
 #include <unistd.h> //sleep
 
-
+//Defualt Constructor
 Mem_Mgr::Mem_Mgr()
 {
   unsigned int size = 1024;
@@ -22,8 +22,8 @@ Mem_Mgr::Mem_Mgr()
   used = 0;
   next_handle = 0;
 
+  //Create new mem_seg to push to List
   mem_seg ms;
-  // why are we increasing the count here?
   ms.handle = next_handle++;
   ms.owner_tid = -1;
   ms.start = 0;
@@ -33,14 +33,16 @@ Mem_Mgr::Mem_Mgr()
   ms.write_cursor = 0;
   ms.free = true;
 
+  //add ms to list
   segments.addToFront(ms, ms.handle);
 
+  //Initalize MEMORY
   memory = new unsigned char[capacity];
   for (unsigned int i = 0; i < capacity; i++)
     memory[i] = default_mem_fill;
 }
 
-//Constructor and default Constructor
+//Constructor
 Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   char buff[255];
 
@@ -50,8 +52,8 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   used = 0;
   next_handle = 0;
 
+  //Create mem_seg to push to list
   mem_seg ms;
-  // why are we increasing the count here?
   ms.handle = next_handle++;
   ms.owner_tid = -1;
   ms.start = 0;
@@ -61,8 +63,10 @@ Mem_Mgr::Mem_Mgr(unsigned int size, unsigned char default_init_val) {
   ms.write_cursor = 0;
   ms.free = true;
 
+  //push ms to list
   segments.addToFront(ms, ms.handle);
 
+  //Initalize memory
   memory = new unsigned char[capacity];
   for (unsigned int i = 0; i < capacity; i++)
     memory[i] = default_mem_fill;
@@ -80,9 +84,9 @@ Parameters    : int handle, int size, int tid
 Returns       : -1 if not enough memory, returns handle
 Details       : allocates memory space and returns the handle
 ------------------------------------------------------------------*/
-/*********************  needs attention  ***********************/
 int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   char buff[255];
+  //Not enough Memory
   if (size > available) {
     mcb->writeSema->down(tid);
     sprintf(buff, "\n  mem_alloc() : not enough memory\n  available size: %d \n  Requested Size %d\n",available,size);
@@ -91,7 +95,7 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
     return -1;  //error: not enough memory
   }
 
-  // allocate new memort at end
+  // allocate new memory at end
   // traverse segments looking where the last element ends before the
   // free space starts
   mem_seg* sPtr;
@@ -99,25 +103,29 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   int countPos = 0;
   while(sPtr->size < size || !sPtr->free)
   {
+    //exexutes if node is null
     if(!(sPtr = segments.getNextElementUntilEnd(sPtr)))
     {
+      //Node not found but available is > size
       if(available >= size)
       {
           burp();
           sPtr = segments.getNextElementUntilEnd(NULL);
           countPos = 0;
-          continue;
       }
-      mcb->writeSema->down(tid);
-      sprintf(buff, "\n  Not Enough Consecutive Memory\n");
-      mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
-      return -1;
+      else
+      {
+        mcb->writeSema->down(tid);
+        sprintf(buff, "\n  Not Enough Consecutive Memory\n");
+        mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
+        mcb->writeSema->up();
+        return -1;
+      }
     }
     countPos++;
   }
 
-
+  //Create and initalize mem_seg
   mem_seg tmpDatum;
   tmpDatum.handle = next_handle++;
   tmpDatum.owner_tid = tid;
@@ -127,45 +135,19 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
 
   tmpDatum.start = sPtr->start;
   tmpDatum.end = sPtr->start + size -1;
+  //Insert mem_seg
   segments.insertNode(tmpDatum, tmpDatum.handle, countPos);
 
   sPtr->start = tmpDatum.end + 1;
   sPtr->size = sPtr->size - size;
   tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
 
+  //Write to window on success
   mcb->writeSema->down(tid);
   sprintf(buff, "\n  Memory Allocated \n");
   mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
   mcb->writeSema->up();
 
-
-  // otherwise we need to go to the end after burping to add element
-  // else
-  // {
-  //   burp();
-  //
-  //   int maxEnd = -1;
-  //   while ((sPtr = segments.getNextElementUntilEnd(sPtr)))
-  //   {
-  //     maxEnd = 0;
-  //     if (sPtr->end > maxEnd)
-  //     {
-  //       maxEnd = sPtr->end;
-  //     }
-  //   }
-  //
-  //   // we start our node right after the last found element
-  //   tmpDatum.start = maxEnd + 1;
-  //   tmpDatum.end = tmpDatum.start + size;
-  //
-  //   // do some boundary checking as a safeguard
-  //   assert(!(tmpDatum.end > (capacity - 1)));
-  //
-  //   // if we have no issues push to linked list
-  //   segments.addToEnd(tmpDatum, tmpDatum.handle);
-  //
-  //
-  // }
 
 
   // adjust variables
@@ -183,9 +165,11 @@ Returns       : -1 if no access, 1 if success
 Details       : Sets free variable to true, So memory can be used by another
 ------------------------------------------------------------------*/
 int Mem_Mgr::mem_free(int handle, int tid) {
+  //Get mem_seg at give handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
   char buff[255];
 
+  //If mem_seg doesnt exist
   if (ms_ptr == NULL) {
     mcb->writeSema->down(tid);
     sprintf(buff,"\n   mem_free() : Item segment doesn't exist\n");
@@ -194,6 +178,7 @@ int Mem_Mgr::mem_free(int handle, int tid) {
     return -1;  //error: not found
   }
 
+  //If tid Does not have permission
   if (tid != ms_ptr->owner_tid) {
     mcb->writeSema->down(tid);
     sprintf(buff,"\n   mem_free() : access denied\n");
@@ -202,6 +187,7 @@ int Mem_Mgr::mem_free(int handle, int tid) {
     return -1;  //error: access denied
   }
 
+  //Else Free up the memory
   unsigned int start = ms_ptr->start;
   unsigned int end = ms_ptr->end;
   for (unsigned int i = start; i <= end; i++)
@@ -227,21 +213,26 @@ Parameters    : int handle, char c, int tid
 Returns       : -1 if no access, 1 if success
 Details       : Reads from a given memory space
 ------------------------------------------------------------------*/
-int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid) {
+int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid)
+{
+  //get mem_seg by handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
+  //mem_seg does not exist
   if (ms_ptr == NULL)
   {
     std::cout << "\nmem_read() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
+  //tid does not have permission
   if (tid != ms_ptr->owner_tid)
   {
     std::cout << "\nmem_read() : access denied\n";
     return -1;  //error: access denied
   }
 
+  //Else read the Data
   *c = memory[ ms_ptr->read_cursor ];
 
   ms_ptr->read_cursor ++;
@@ -263,18 +254,22 @@ Details       : reads from a given memory space
 ------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
+  //get mem_seg by handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
+  //mem_seg does not exist
   if (ms_ptr == NULL) {
     std::cout << "\nmem_read() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
+  //tid does not have permission
   if (tid != ms_ptr->owner_tid || offset > ms_ptr->end) {
     std::cout << "\nmem_read() : access denied\n";
     return -1;  //error: access denied
   }
 
+  //else read from memory
   // set read cursor
   ms_ptr->read_cursor = ms_ptr->start;
 
@@ -302,26 +297,31 @@ Returns       : -1 if no access, 1 if success
 Details       : Writes to a given memory space
 ------------------------------------------------------------------*/
 int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
+  //get mem_seg by handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
+  //mem_seg does not exist
   if (ms_ptr == NULL)
   {
     std::cout << "\nmem_write() : Item segment doesn't exist\n";
     return -1;  //error: not found
   }
 
+  //tid does not perssion
   if (tid != ms_ptr->owner_tid)
   {
     std::cout << "\nmem_write() : access denied\n";
     return -1;  //error: access denied
   }
 
+  //if writecursor is at end of memory
   if (ms_ptr->write_cursor > ms_ptr->end)
   {
     std::cout << "\nmem_write() : segment is full\n";
     return -1;  //error: segment is full
   }
 
+//just read
   memory[ ms_ptr->write_cursor ] = c;
 
   ms_ptr->write_cursor++;
@@ -336,9 +336,12 @@ Returns       : -1 if access denied, 1 with success
 Details       : Writes to a gien memory space
 ------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
-int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, char *text, int tid) {
+int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, char *text, int tid)
+{
+  //get mem_seg
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
+  //mem_seg does not exist
   if (ms_ptr == NULL)
   {
     std::cout << "\nmem_write() : Item segment doesn't exist\n";
@@ -346,6 +349,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   }
 
   char buff[255];
+  //tid does not have permission
   if (tid != ms_ptr->owner_tid)
   {
     mcb->writeSema->down(tid);
@@ -354,6 +358,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
     mcb->writeSema->up();    return -1;  //error: access denied
   }
 
+  //if not enough space to write string
   if (ms_ptr->write_cursor+text_size+offset >ms_ptr->end)
   {
     mcb->writeSema->down(tid);
@@ -363,6 +368,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
     return -1;  //error: segment is full
   }
 
+  //just write
   int i = 0;
   while (i <= text_size && ms_ptr->write_cursor < ms_ptr->end)
   {
@@ -370,12 +376,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
     ms_ptr->write_cursor++;
     i++;
   }
-  // make sure message was null terminated, if not return error
-  // if (text[i] != '\0')
-  // {
-  //   return -1; // error
-  // }
-  // reset cursor
+
   ms_ptr->write_cursor = ms_ptr->start;
 
 
@@ -404,7 +405,12 @@ int Mem_Mgr::mem_left()
   return available;
 }
 
-
+/*-----------------------------------------------------------------
+Function      : mem_largest();
+Parameters    :
+Returns       : returns largest  memory block
+Details       :
+------------------------------------------------------------------*/
 int Mem_Mgr::mem_largest() {
   unsigned int largest = 0;
 
@@ -412,7 +418,6 @@ int Mem_Mgr::mem_largest() {
   while (ms_ptr = segments.getNextElementUntilEnd(ms_ptr)) {
     if (ms_ptr->free && ms_ptr->size > largest)
       largest = ms_ptr->size;
-
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
 
@@ -446,31 +451,15 @@ Parameters    :
 Returns       : returns 1 on success
 Details       : combines holes in the memory
 ------------------------------------------------------------------*/
-int Mem_Mgr::mem_coalesce() {
-  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
-  mem_seg *ms_ptr =NULL;
+int Mem_Mgr::mem_coalesce()
+{
+  //get first element
+  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   char buff[255];
-  // mcb->writeSema->down(0);
-  // sprintf(buff,"\n  Coalesce()\n");
-  // mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-  // mcb->writeSema->up();
 
-  ms_ptr = NULL;
-  int count =0;
-
-
-  ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   while (ms_ptr) {
     if (prev_ms_ptr->free && ms_ptr->free) {  //adjacent free segments
-      mcb->writeSema->down(0);
-      sprintf(buff,"\n   %d->,%d ->%d->%d\n\n",prev_ms_ptr->owner_tid,prev_ms_ptr->size,prev_ms_ptr->handle,prev_ms_ptr->free);
-      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
-
-      mcb->writeSema->down(0);
-      sprintf(buff,"\n   %d->,%d ->%d->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle,ms_ptr->free);
-      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
 
       //fill prev_mem_ptr with '.'
       if (memory[ prev_ms_ptr->start ] != default_mem_fill)
@@ -495,28 +484,16 @@ int Mem_Mgr::mem_coalesce() {
       ms_ptr->start = prev_ms_ptr->start;
       ms_ptr->size += prev_ms_ptr->size;
 
-      mcb->writeSema->down(0);
-      sprintf(buff,"\n   %d->,%d ->%d->%d\n\n",prev_ms_ptr->owner_tid,prev_ms_ptr->size,prev_ms_ptr->handle,prev_ms_ptr->free);
-      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
-
-      mcb->writeSema->down(0);
-      sprintf(buff,"\n   %d->,%d ->%d->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle,ms_ptr->free);
-      mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      mcb->writeSema->up();
+      //remove prev node
       segments.removeNodeByElement(prev_ms_ptr->handle);
       ms_ptr->write_cursor = ms_ptr->read_cursor = ms_ptr->start;
 
-      // mcb->writeSema->down(0);
-      // sprintf(buff,"\n  #2 Size1 %d\n",ms_ptr->size);
-      // mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-      // mcb->writeSema->up();
     }
 
+    //Iterate through list
     prev_ms_ptr = ms_ptr;
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
   }
-  count =0;
 
   return 1;  //success
 }
@@ -534,6 +511,8 @@ void Mem_Mgr::mem_dump(Window* Win)
    char mBuff[16384];
    std::string tempString;
    char* chr;
+
+   //Suspend scheduler
    mcb->s->SCHEDULER_SUSPENDED = true;
 
    tempString = "\n\n   Status \t Memory Handle \t Starting Location \t Ending Location \t Size \t task-ID\n";
@@ -543,6 +522,7 @@ void Mem_Mgr::mem_dump(Window* Win)
    int count = 0;
    char cBuff[1025];
 
+   //Display table for memory
    while ((myT = segments.getNextElementUntilEnd(myT)))
    {
      if(myT->free)
@@ -562,7 +542,9 @@ void Mem_Mgr::mem_dump(Window* Win)
    }
 
    sprintf(cBuff, "   %c",memory[count]);
-   while(count < 1024)
+
+   //Output memory segment
+   while(count < capacity)
    {
      if(count % 32 == 0)
           sprintf(cBuff+strlen(cBuff), "\n");
@@ -576,6 +558,7 @@ void Mem_Mgr::mem_dump(Window* Win)
    }
    sprintf(cBuff+strlen(cBuff), "\n");
 
+   //write to window
    Win->write_window(cBuff);
 
    // deallocate memory for chr
@@ -592,69 +575,43 @@ Returns       : int
 Details       : Moves the the holes to the end of the memory
 ------------------------------------------------------------------*/
 int Mem_Mgr::burp() {
-  //int total_burped_size = 0;
+
   int shift_start = 0;
-  //mem_seg hole;
   mem_seg *shift_ptr = new mem_seg;
-  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);  //get first element
+  //get first element
+  mem_seg *prev_ms_ptr = segments.getNextElementUntilEnd(NULL);
+  mem_seg *ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
   char buff[255];
-  mem_seg *ms_ptr =NULL;
-  mem_seg *temp_ptr =NULL;
-  //std::cout << "here";
-
-  // while(ms_ptr = segments.getNextElementUntilEnd(ms_ptr))
-  // {
-  //   mcb->writeSema->down(0);
-  //   sprintf(buff,"\n   %d->,%d ->%d",ms_ptr->owner_tid,ms_ptr->size,ms_ptr->handle);
-  //   mcb->s->getThreadInfo().getDatumById(0)->getThreadWin()->write_window(buff);
-  //   mcb->writeSema->up();
-  // }
-
-  ms_ptr = segments.getNextElementUntilEnd(prev_ms_ptr);
 
   while (ms_ptr) {
-  //
-  //   //free followed by not free
+     //free followed by not free
     if (prev_ms_ptr->free && !ms_ptr->free)
     {
-      //set temp values to be swaped
-      shift_ptr-> owner_tid = ms_ptr->owner_tid;
-      shift_ptr-> handle = ms_ptr->handle;
-      shift_ptr-> size = ms_ptr->size;
 
-      //set next node to previous
-      ms_ptr->free = true;
-      ms_ptr->size = prev_ms_ptr->size;
-      ms_ptr->owner_tid = -1;
-      ms_ptr->handle = prev_ms_ptr->handle;
-
-      //set previous to next
-      prev_ms_ptr->free = false;
-      prev_ms_ptr->owner_tid = shift_ptr->owner_tid;
-      prev_ms_ptr->handle = shift_ptr->handle;
-      prev_ms_ptr->size = shift_ptr->size;
-      prev_ms_ptr->end = prev_ms_ptr->start + prev_ms_ptr->size - 1;
-      prev_ms_ptr->write_cursor = prev_ms_ptr->read_cursor = prev_ms_ptr->start;
-
-
-      ms_ptr->start = prev_ms_ptr->end + 1;
-      ms_ptr->read_cursor= ms_ptr->write_cursor = ms_ptr->start;
-
-
-      int start = prev_ms_ptr->start;
-      int end = prev_ms_ptr->end;
+      //Swap data in memory
+      shift_start = prev_ms_ptr->start;
+      int start = ms_ptr->start;
+      int end = ms_ptr->end;
       for (int i = start; i <= end; i++) {
         memory[ shift_start++ ] = memory[i];
       }
+
+      //Swap nodes
+      ms_ptr->start = prev_ms_ptr->start;
+      ms_ptr->end = ms_ptr->start+ms_ptr->size -1;
+      prev_ms_ptr->start = ms_ptr->end +1;
+      prev_ms_ptr->end = prev_ms_ptr->start+ prev_ms_ptr->size -1;
+
+      segments.swapNodes(prev_ms_ptr->handle,ms_ptr->handle);
+
 	}
+
+    //iterate through list
     prev_ms_ptr = ms_ptr;
     ms_ptr = segments.getNextElementUntilEnd(ms_ptr);
 
   }//end while
 
-  ms_ptr =NULL;
-
   mem_coalesce();
-
   return 1;
 }
