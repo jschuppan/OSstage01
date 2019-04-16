@@ -340,14 +340,15 @@ void linkedList<T> :: insertNode(T datum, int id, int position)
 }
 
 template<class T>
-void linkedList<T> :: swapNodes(int leftId, int rightId)
+void linkedList<T> :: swapNodes(int leftId)
 {
   node* L = head;
   node* R = NULL;
 
+  //list is empty
   if(!head)
     return;
-
+    //first node is to be swaped
   if(head->id == leftId)
   {
     R = head->next;
@@ -358,6 +359,7 @@ void linkedList<T> :: swapNodes(int leftId, int rightId)
     return;
   }
 
+  //loop untill left Id is found
   node* temp = head;
   while(temp->next)
   {

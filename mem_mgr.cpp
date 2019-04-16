@@ -602,7 +602,7 @@ int Mem_Mgr::burp() {
       prev_ms_ptr->start = ms_ptr->end +1;
       prev_ms_ptr->end = prev_ms_ptr->start+ prev_ms_ptr->size -1;
 
-      segments.swapNodes(prev_ms_ptr->handle,ms_ptr->handle);
+      segments.swapNodes(prev_ms_ptr->handle);
 
 	}
 

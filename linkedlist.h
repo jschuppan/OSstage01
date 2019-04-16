@@ -27,7 +27,7 @@ class linkedList
     public:
     /******************************* START PUBLIC MEMBERS *******************/
     linkedList();
-    void swapNodes(int leftId, int rightId);
+    void swapNodes(int leftId);
     void addToEnd(T datum, int id);
     void addToFront(T datum, int id);
     bool isEmpty();
