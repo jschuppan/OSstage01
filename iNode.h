@@ -9,6 +9,8 @@ Purpose       : Implementation of an iNode
 
 #include <ctime>
 #include <string>
+#include <fstream>
+
 
 class iNode {
     std::string fileName;

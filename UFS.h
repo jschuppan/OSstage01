@@ -8,6 +8,7 @@ Purpose       : Implementation of our file system
 #define UFS_H
 
 #include <string>
+#include <fstream>
 
 class UFS {
     std::string fsName;
@@ -16,13 +17,13 @@ class UFS {
     int nextFileHandle;
     char initChar;
 
-    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar);
+    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, fstream &fileSystem);
     void format();
 
     int openFile(int threadID, int fileHandle, std::string fileName, char mode);
     int closeFile(int threadID, int fileID);
 
-    
+
 };
 
 #endif
