@@ -8,9 +8,10 @@ Purpose       : Implementation of an iNode
 #define INODE_H
 
 #include <ctime>
+#include <string>
 
 class iNode {
-    char fileName[8];
+    std::string fileName;
     int ownerTaskID;
     int startingBlock;
     int size;
