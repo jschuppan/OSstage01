@@ -4,9 +4,12 @@ File          : iNode.h
 Date          : April 16, 2019
 Purpose       : Implementation of our file system
 ============================================================================*/
+
+#include <fstream>
 #include "UFS.h"
 
-UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar) {
+
+UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, std::fstream &fileSystem) {
     this->fsName = fsName;
     this->numberOfBlocks = numberOfBlocks;
     this->fsBlockSize = fsBlockSize;

@@ -17,7 +17,7 @@ class UFS {
     int nextFileHandle;
     char initChar;
 
-    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, fstream &fileSystem);
+    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, std::fstream &fileSystem);
     void format();
 
     int openFile(int threadID, int fileHandle, std::string fileName, char mode);
