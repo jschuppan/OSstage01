@@ -17,6 +17,8 @@ class UFS {
         int ownerTaskID;
         int startingBlock;
         int size;
+        int sequence;
+        int nextIndex;
 
         char permission;
         unsigned int blocks[4];
@@ -24,7 +26,7 @@ class UFS {
         time_t modifiedOn;
     };*/
 
-    iNode *inodes;
+    iNode *inodes;  // dynamic array
     std::string fsName;
     std::string metaFileName;
     int fsBlockSize;
@@ -32,6 +34,7 @@ class UFS {
     int nextFileHandle;
     char initChar;
 
+    int available, used;
 
     public:
 
@@ -54,7 +57,7 @@ class UFS {
     int readChar(int threadID, std::string fileName, char &c);
     int writeChar(int threadID, std::string fileName, char c);
 
-    int createFile(int threadID, std::string fileName, char permission);
+    int createFile(int threadID, std::string fileName, int fileSize, char permission);
     int deleteFile(int threadID, std::string fileName);
 
     int changePermission(int threadID, std::string fileName, char newPermission);

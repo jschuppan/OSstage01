@@ -15,16 +15,17 @@ Purpose       : Implementation of an iNode
 class iNode {
     public:
 
-    std::string fileName;
+    char fileName[8];
     int ownerTaskID;
     int startingBlock;
     int size;
+    int sequence;
+    int nextIndex;
 
     char permission;
     unsigned int blocks[4];
     time_t createdOn;
-    time_t modifiedOn;  
-
+    time_t modifiedOn;
 };
 
 #endif
