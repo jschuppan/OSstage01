@@ -23,6 +23,8 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
 
     this->available = 0;
     this->used = 0;
+    this->nextFileID = 0;
+    this->nextFileHandle = 0;
 
     // create iNode corresponding to UFS here
         // iNode crINODE();
@@ -72,6 +74,7 @@ void UFS::format() {
         inodes[i].startingBlock = fsBlockSize * i;
         inodes[i].size = fsBlockSize;
         inodes[i].sequence = 0;
+        inodes[i].handle = -1;
         inodes[i].nextIndex = -1;
         inodes[i].permission = 0b0000;
         inodes[i].blocks = 0;
@@ -107,10 +110,10 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
     for (int i = 0; i < numberOfBlocks; i++) {
         
         // if file exists
-        if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0 ) {
+        if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0) {
             
             // owner wants to open
-            if (inodes[i].ownerTaskID == threadID) {
+            if (inodes[i].ownerTaskID == threadID || fileHandle == inodes[i].handle) {
 
                 // asking for read without read permission
                 if ((mode & READ) && !(inodes[i].permission & OWNER_READ)) {
@@ -137,7 +140,13 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
                 }
             }
             //success (unique int file_id?)
-            return 0;
+            openFiles tempNode;
+            tempNode.T_ID = threadID;
+            tempNode.filename = fileName;
+            tempNode.fileID = nextFileID;
+            tempNode.status = mode;
+            openFileList.addToFront(tempNode, nextFileID);
+            return nextFileID++;
         }
     }
     // file doesn't exist
@@ -188,6 +197,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
     	std::fstream metaFile(metaFileName.c_str());
     if ( fileSize <=0)
 		return 0;
+    //Requested Block is less that 128
 	else if (fileSize < fsBlockSize && available > 0) 
 	{
 		for (int i = 0; i < numberOfBlocks; i++) 
@@ -203,10 +213,11 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
 				available--;
 				used++;
-		        return 1;
+		        return nextFileHandle++;
 		    }
 		}
 	}
+    //Requested Block is greater than 128 and enough space is available
 	else if(available >= fileSize / 128.0)
 	{
 		iNode* temp;
@@ -244,13 +255,14 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 					inodes[i].fileName[k] = fileName[k];
 				if(count >= fileSize / 128.0)
 				{
-					return 1;
+					return nextFileHandle++;
 				}
 				count++;
 			}
 		}
 	}
-	return 0;
+    //Not enough space
+	return -1;
 
 }
 
@@ -294,6 +306,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     inodes[ current ].nextIndex = -1;
                     inodes[ current ].permission = 0b0000;
                     inodes[ current ].blocks = 0;
+                    inodes[ current ].handle = -1;
                     inodes[ current ].createdOn = time(NULL);
                     inodes[ current ].modifiedOn = time(NULL);
 

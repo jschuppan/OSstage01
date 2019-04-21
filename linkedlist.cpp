@@ -16,6 +16,7 @@ class Window;
 #include "linkedlist.h"
 #include "IPC.h"
 #include "mem_mgr.h"
+#include "UFS.cpp"
 
 
 //defualt constructor
@@ -394,3 +395,4 @@ template class linkedList<Window>;
 template class linkedList<Scheduler::TCB>;
 template class linkedList<ezQueue<IPC::Message_Type> >;
 template class linkedList<Mem_Mgr::mem_seg>;
+template class linkedList<UFS::openFiles>;
