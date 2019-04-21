@@ -221,7 +221,6 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		{	
 		    if (inodes[i].ownerTaskID == -1 && count == 1) 
 			{
-				cout<<"IF number1"<<endl;
 				//store previous iNode to store nextIndex
 				temp = &inodes[i];
 		       	inodes[i].ownerTaskID = ownerID;
@@ -237,7 +236,6 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 			//Second or more iNode
 			else if(inodes[i].ownerTaskID == -1)
 			{
-				cout<<"IF number2"<<endl;
 				temp->nextIndex = i;
 				temp = &inodes[i];
 				inodes[i].ownerTaskID = ownerID;
@@ -340,7 +338,7 @@ Returns       :
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
-
+  
 }
 
 
