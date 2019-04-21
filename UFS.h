@@ -12,21 +12,8 @@ Purpose       : Implementation of our file system
 #include "iNode.h"
 
 class UFS {
-    /*struct iNode {
-        std::string fileName;
-        int ownerTaskID;
-        int startingBlock;
-        int size;
-        int sequence;
-        int nextIndex;
 
-        char permission;
-        unsigned int blocks[4];
-        time_t createdOn;
-        time_t modifiedOn;
-    };*/
-
-    iNode *inodes;  // dynamic array
+    iNode inodes[16]; 
     std::string fsName;
     std::string metaFileName;
     int fsBlockSize;
