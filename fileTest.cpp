@@ -1,14 +1,17 @@
-#include<iostream>
-#include<cstdlib>
-#include<fstream>
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
 #include <ctime>
 #include <string>
 #include <stdio.h>
 #include <cstring>
+#include <iomanip>
 //#include <bits/stdc++.h> //Needed for memset
 
 using namespace std;
 void format();
+void dump();
+void dir();
 int createFile(int threadID, char* fileName, int fileSize, char permission);
 void testOutput();
 string charToBin(unsigned char c);
@@ -80,16 +83,18 @@ int main()
 	char* fileName = "sdf";
 	int fileSize = 1500;
 	char permission =0b0100;
-	testOutput();
-	cout<<"-----------------------------------------------------------"<<endl;
+	//testOutput();
+	//cout<<"-----------------------------------------------------------"<<endl;
 	if(createFile(ownerID, fileName, fileSize, permission))
 		cout<<"FileCreated"<<endl;
 	else
 		cout<<"File Failed tp Create"<<endl;
 
 	cout<<"size = " <<fileSize / 128.0<<endl;
+	dump();
+	dir();
 
-	testOutput();
+	//testOutput();
 }
 
 void format() {
@@ -228,4 +233,81 @@ string charToBin(unsigned char c) {
   binArr[8] = '\0';
   string result(binArr);
   return result;
+}
+
+void dump() {
+	std::string fRow;
+    std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
+
+	if (dataFile.is_open())
+    {
+      while (getline (dataFile, fRow))
+      {
+        std::cout << fRow << std::endl;
+      }
+    dataFile.close();
+    }
+}
+
+void dir() {
+    const char colFill        = ' ';
+    const std::string colSep  = " | ";
+	const int  colNameSm      = 5;
+    const int  colNameMd      = 8;
+	const int  colNameLg      = 14;
+	const int  colNameXLg     = 17;
+
+	std::time_t cDate, mDate;
+	std::time_t initTime;
+  	struct tm * timeStruct;
+	//char* cDateOut;
+	//char* mDateOut;
+
+    //const int  colContent  = 8;
+
+	// setting up the table
+    std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Handle" << colSep;
+    std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
+	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks used" << colSep;
+	std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
+	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
+	std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
+	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Permission" << colSep;
+	std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner ID" << colSep;
+	std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
+	std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Modified Time" << std::endl;
+
+
+    for (int i = 0; i < numberOfBlocks; i++) {
+		// time conversions
+		char cDateBuff [100];
+		char mDateBuff [100];
+        timeStruct = localtime (&inodes[i].createdOn);
+        strftime (cDateBuff, 100 ,"%x %X", timeStruct);
+		timeStruct = localtime (&inodes[i].modifiedOn);
+        strftime (mDateBuff, 100 ,"%x %X", timeStruct);
+
+
+		/* 
+		cDate     =  std::time(&inodes[i].createdOn);
+		cDateOut  =  std::asctime(std::localtime(&cDate));
+		mDate     =  std::time(&inodes[i].modifiedOn);
+		mDateOut  =  std::asctime(std::localtime(&mDate));
+		*/
+
+        // only list actual files
+        if (inodes[i].ownerTaskID != -1) {
+			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
+			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  i << colSep;
+			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
+			std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
+			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "unknown" << colSep;
+			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  charToBin(inodes[i].permission) << colSep;
+			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+        }
+    }
 }
