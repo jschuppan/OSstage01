@@ -339,12 +339,13 @@ Returns       :
 Details       : 
 ------------------------------------------------------------------*/
 void UFS::dir() {
-const char colFill        = ' ';
+    const char colFill        = ' ';
     const std::string colSep  = " | ";
 	const int  colNameSm      = 5;
     const int  colNameMd      = 8;
 	const int  colNameLg      = 14;
 	const int  colNameXLg     = 17;
+	char permBuff[5];
 
 	std::time_t cDate, mDate;
 	std::time_t initTime;
@@ -369,12 +370,38 @@ const char colFill        = ' ';
 
     for (int i = 0; i < numberOfBlocks; i++) {
 		// time conversions
-		char cDateBuff [100];
-		char mDateBuff [100];
+		char cDateBuff[100];
+		char mDateBuff[100];
+
+		// figure out time
         timeStruct = localtime (&inodes[i].createdOn);
         strftime (cDateBuff, 100 ,"%x %X", timeStruct);
 		timeStruct = localtime (&inodes[i].modifiedOn);
         strftime (mDateBuff, 100 ,"%x %X", timeStruct);
+
+		// figure out file permissions
+		if (inodes[i].permission & 0b1000)
+			permBuff[0] = 'r';
+		else
+			permBuff[0] = '-';
+
+		if (inodes[i].permission & 0b0100)
+			permBuff[1] = 'w';
+		else
+			permBuff[1] = '-';
+
+		if (inodes[i].permission & 0b0010)
+			permBuff[2] = 'r';
+		else
+			permBuff[2] = '-';
+
+		if (inodes[i].permission & 0b0001)
+			permBuff[3] = 'w';
+		else
+			permBuff[3] = '-';
+
+		permBuff[4] = '\0';
+
 
 
 		/* 
@@ -393,7 +420,7 @@ const char colFill        = ' ';
 			std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
 			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
 			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "unknown" << colSep;
-			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  charToBin(inodes[i].permission) << colSep;
+			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
 			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
 			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
 			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
@@ -409,7 +436,7 @@ Returns       :
 Details       : 
 ------------------------------------------------------------------*/
 void UFS::dir(int threadID) {
-
+    // next index
 }
 
 
