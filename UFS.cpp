@@ -37,10 +37,12 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
         format();  // format file system with initChar
     }
     else {  // file exists
-        for (int i = 0; i < numberOfBlocks; i++) {
+        
+        // read iNode from metaFile
+        metaFile.read((char *) inodes, sizeof(inodes));
+        metaFile.close();
 
-            // read iNode from metaFile (tested this method and it seems good)
-            metaFile.read((char *) &(inodes[i]), sizeof(iNode));
+        for (int i = 0; i < numberOfBlocks; i++) {
 
             if (inodes[i].ownerTaskID == -1) {
                 (this->available)++;
@@ -49,7 +51,6 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
                 (this->used)++;
             }
         }
-        metaFile.close();
     }
 }
 
@@ -62,7 +63,6 @@ Details       : initializes the iNodes, metaFile and dataFile with default value
 ------------------------------------------------------------------*/
 void UFS::format() {
     // initialize and write to meta file
-    std::ofstream metaFile(metaFileName.c_str());
     for (int i = 0; i < numberOfBlocks; i++) {
 
         // initialize
@@ -76,10 +76,11 @@ void UFS::format() {
         memset(inodes[i].blocks, 0, sizeof( inodes[i].blocks ));
         inodes[i].createdOn = time(NULL);
         inodes[i].modifiedOn = time(NULL);
-
-        // write to metaFile
-        metaFile.write((char *) &(inodes[i]), sizeof(iNode));
     }
+
+    // write to metaFile
+    std::ofstream metaFile(metaFileName.c_str());
+    metaFile.write((char *) inodes, sizeof(inodes));
     metaFile.close();
 
     available = numberOfBlocks;
