@@ -15,7 +15,7 @@ string charToBin(unsigned char c);
 
 class iNode {
     public:
-
+//ddss
     char fileName[8];
     int ownerTaskID;
     int startingBlock;
