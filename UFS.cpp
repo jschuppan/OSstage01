@@ -40,11 +40,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
         for (int i = 0; i < numberOfBlocks; i++) {
 
             // read iNode from metaFile (tested this method and it seems good)
-            char *buffer = (char *) &(inodes[i]);
-            int inodeSize = sizeof(iNode);
-            for (int j = 0; j < inodeSize; j++) {
-                metaFile.get( buffer[j] );
-            }
+            metaFile.read((char *) &(inodes[i]), sizeof(iNode));
 
             if (inodes[i].ownerTaskID == -1) {
                 (this->available)++;
@@ -82,11 +78,7 @@ void UFS::format() {
         inodes[i].modifiedOn = time(NULL);
 
         // write to metaFile
-        char *buffer = (char *) &(inodes[i]);
-        int inodeSize = sizeof(iNode);
-        for (int j = 0; j < inodeSize; j++) {
-            metaFile.put( buffer[j] );
-        }
+        metaFile.write((char *) &(inodes[i]), sizeof(iNode));
     }
     metaFile.close();
 
@@ -271,11 +263,11 @@ int UFS::deleteFile(int threadID, std::string fileName) {
     for (int i = 0; i < numberOfBlocks; i++) {
         
         // file exists
-        if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0 ) {
+        if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0
+             && inodes[i].ownerTaskID == threadID ) {
             
             // has permission
-            if (inodes[i].ownerTaskID == threadID
-                && (inodes[i].permission & OWNER_WRITE)) {
+            if (inodes[i].permission & OWNER_WRITE) {
                     
                 std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
                 std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
@@ -294,23 +286,17 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
                     inodes[ current ].ownerTaskID = -1;
-                    inodes[ current ].startingBlock = fsBlockSize * i;
-                    inodes[ current ].size = fsBlockSize;
                     inodes[ current ].sequence = 0;
                     inodes[ current ].nextIndex = -1;
-
                     inodes[ current ].permission = 0b0000;
                     memset(inodes[ current ].blocks, 0, sizeof( inodes[ current ].blocks ));
                     inodes[ current ].createdOn = time(NULL);
                     inodes[ current ].modifiedOn = time(NULL);
 
                     // write to metaFile
-                    char *buffer = (char *) &(inodes[ current ]);
                     int inodeSize = sizeof(iNode);
                     metaFile.seekp( current * inodeSize );
-                    for (int j = 0; j < inodeSize; j++) {
-                        metaFile.put( buffer[j] );
-                    }
+                    metaFile.write((char *) &(inodes[ current ]), inodeSize);
 
                     current = inodes[ current ].nextIndex;
                 }
