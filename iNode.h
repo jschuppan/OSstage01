@@ -23,7 +23,7 @@ class iNode {
     int nextIndex;
 
     char permission;
-    unsigned int blocks[4];
+    unsigned short int blocks;
     //time_t createdOn;
     //time_t modifiedOn;
 };
