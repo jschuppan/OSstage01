@@ -268,7 +268,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
              && inodes[i].ownerTaskID == threadID ) {
             
             // has permission
-            if (inodes[i].permission & OWNER_WRITE) {
+            if (inodes[i].permission & 0b0100) {
                     
                 std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
                 std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
@@ -276,7 +276,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 // for all inodes corresponding to this file
                 // reset dataFile block and reset inode
                 int current = i;
-                int nextIndex = 0;
+				int nextIndex = 0;
                 while (current != -1) {
 
                     // reset dataFile block
@@ -285,9 +285,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                         dataFile.put('$');
                     }
 
-                    // keep track of next index before resetting
-                    nextIndex = inodes[ current ].nextIndex;
-
+					nextIndex = inodes[ current ].nextIndex;
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
                     inodes[ current ].ownerTaskID = -1;
