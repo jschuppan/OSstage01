@@ -276,6 +276,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 // for all inodes corresponding to this file
                 // reset dataFile block and reset inode
                 int current = i;
+                int nextIndex = 0;
                 while (current != -1) {
 
                     // reset dataFile block
@@ -283,6 +284,9 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     for (int j = 0; j < inodes[ current ].size; j++) {
                         dataFile.put('$');
                     }
+
+                    // keep track of next index before resetting
+                    nextIndex = inodes[ current ].nextIndex;
 
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
@@ -299,7 +303,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     metaFile.seekp( current * inodeSize );
                     metaFile.write((char *) &(inodes[ current ]), inodeSize);
 
-                    current = inodes[ current ].nextIndex;
+                    current = nextIndex;
                 }
 
                 dataFile.close();
