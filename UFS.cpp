@@ -73,7 +73,7 @@ void UFS::format() {
         inodes[i].sequence = 0;
         inodes[i].nextIndex = -1;
         inodes[i].permission = 0b0000;
-        memset(inodes[i].blocks, 0, sizeof( inodes[i].blocks ));
+        inodes[i].blocks = 0;
         inodes[i].createdOn = time(NULL);
         inodes[i].modifiedOn = time(NULL);
     }
@@ -292,7 +292,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     inodes[ current ].sequence = 0;
                     inodes[ current ].nextIndex = -1;
                     inodes[ current ].permission = 0b0000;
-                    memset(inodes[ current ].blocks, 0, sizeof( inodes[ current ].blocks ));
+                    inodes[ current ].blocks = 0;
                     inodes[ current ].createdOn = time(NULL);
                     inodes[ current ].modifiedOn = time(NULL);
 
