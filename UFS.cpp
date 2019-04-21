@@ -44,6 +44,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
 
         for (int i = 0; i < numberOfBlocks; i++) {
 
+            inodes[i].blocks = B_ALLOC[i];
             if (inodes[i].ownerTaskID == -1) {
                 (this->available)++;
             }
@@ -363,4 +364,22 @@ Details       :
 ------------------------------------------------------------------*/
 void UFS::dump() {
 
+}
+
+std::string UFS::intToBin(unsigned short int val)
+{
+   unsigned short int mask = 1 << (sizeof(short int) * 8 - 1);
+   char c[17];
+   for(int i = 0; i < sizeof(short int) * 8; i++)
+   {
+      if( (val & mask) == 0 )
+         c[i] =  '0' ;
+      else
+         c[i] = '1' ;
+
+      mask  >>= 1;
+   }
+	c[16] = '\0';
+	string result(c);
+	return result;
 }

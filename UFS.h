@@ -68,6 +68,7 @@ class UFS {
     int changePermission(int threadID, std::string fileName, char newPermission);
 
     void dir();
+    std::string intToBin(unsigned short int val);
     void dir(int threadID);
     void dump();
 };
