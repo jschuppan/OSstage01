@@ -191,12 +191,75 @@ Returns       :
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
-    for (int i = 0; i < numberOfBlocks; i++) {
-        if (true) {
-            // function stub
-            return 0;
-        }
-    }
+    	std::fstream metaFile(metaFileName.c_str());
+    if ( fileSize <=0)
+		return 0;
+	else if (fileSize < fsBlockSize && available > 0) 
+	{
+		for (int i = 0; i < numberOfBlocks; i++) 
+		{	
+		    if (inodes[i].ownerTaskID == -1) 
+			{
+		       	inodes[i].ownerTaskID = ownerID;
+			   	inodes[i].permission = permission;
+				for(int k=0; k<8; k++)
+					inodes[i].fileName[k] = fileName[k];
+				//ADD SEMAPHORE HERE
+				metaFile.seekp(sizeof(iNode) * i);
+				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
+				available--;
+				used++;
+		        return 1;
+		    }
+		}
+	}
+	else if(available >= fileSize / 128.0)
+	{
+		iNode* temp;
+		int count = 1;
+		for (int i = 0; i < numberOfBlocks; i++) 
+		{	
+		    if (inodes[i].ownerTaskID == -1 && count == 1) 
+			{
+				cout<<"IF number1"<<endl;
+				//store previous iNode to store nextIndex
+				temp = &inodes[i];
+		       	inodes[i].ownerTaskID = ownerID;
+			   	inodes[i].permission = permission;
+				for(int k=0; k<8; k++)
+					inodes[i].fileName[k] = fileName[k];
+				count++;
+				available--;
+				used++;
+				metaFile.seekp(sizeof(iNode) * i);
+				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
+		    }
+			//Second or more iNode
+			else if(inodes[i].ownerTaskID == -1)
+			{
+				cout<<"IF number2"<<endl;
+				temp->nextIndex = i;
+				temp = &inodes[i];
+				inodes[i].ownerTaskID = ownerID;
+			   	inodes[i].permission = permission;
+				inodes[i].sequence = count -1;
+				//ADD SEMAPHORE HERE
+				metaFile.seekp(sizeof(iNode) * i);
+				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
+				available--;
+				used++;
+				for(int k=0; k<8; k++)
+					inodes[i].fileName[k] = fileName[k];
+				if(count >= fileSize / 128.0)
+				{
+					return 1;
+				}
+				count++;
+			}
+		}
+	}
+	return 0;
+
 }
 
 
