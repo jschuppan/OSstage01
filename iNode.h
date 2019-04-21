@@ -24,8 +24,8 @@ class iNode {
 
     char permission;
     unsigned int blocks[4];
-    time_t createdOn;
-    time_t modifiedOn;
+    //time_t createdOn;
+    //time_t modifiedOn;
 };
 
 #endif

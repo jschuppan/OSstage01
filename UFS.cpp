@@ -10,6 +10,7 @@ Purpose       : Implementation of our file system
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
+#include <stdio.h>
 
 
 // not sure what to do with std::fstream &fileSystem
@@ -44,23 +45,6 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar,
             for (int j = 0; j < inodeSize; j++) {
                 metaFile.get( buffer[j] );
             }
-
-            /*
-            getline(metaFile, inodes[i].fileName);
-            metaFile >> inodes[i].ownerTaskID;
-            metaFile >> inodes[i].startingBlock;
-            metaFile >> inodes[i].size;
-            metaFile >> inodes[i].sequence;
-            metaFile >> inodes[i].nextIndex;
-
-            metaFile >> inodes[i].permission;
-            for (int j = 0; j < 4; j++) {
-                metaFile >> inodes[i].blocks[j];
-            }
-            metaFile >> inodes[i].createdOn;
-            metaFile >> inodes[i].modifiedOn;
-            metaFile.ignore(1);  // ignore new line
-            */
 
             if (inodes[i].ownerTaskID == -1) {
                 (this->available)++;
