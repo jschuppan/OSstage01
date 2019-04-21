@@ -35,6 +35,24 @@ class UFS {
     static const char READ  = 0b10,
                       WRITE = 0b01;
 
+    // constant array corresponding to iNode bitmap
+    static const unsigned short int B_ALLOC[16] = { 0b1000 0000 0000 0000,
+                                                    0b0100 0000 0000 0000,
+                                                    0b0010 0000 0000 0000,
+                                                    0b0001 0000 0000 0000,
+                                                    0b0000 1000 0000 0000,
+                                                    0b0000 0100 0000 0000,
+                                                    0b0000 0010 0000 0000,
+                                                    0b0000 0001 0000 0000,
+                                                    0b0000 0000 1000 0000,
+                                                    0b0000 0000 0100 0000,
+                                                    0b0000 0000 0010 0000,
+                                                    0b0000 0000 0001 0000,
+                                                    0b0000 0000 0000 1000,
+                                                    0b0000 0000 0000 0100,
+                                                    0b0000 0000 0000 0010,
+                                                    0b0000 0000 0000 0001 };
+
     UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, std::fstream &fileSystem);
     void format();
 
