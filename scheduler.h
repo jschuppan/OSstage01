@@ -29,11 +29,11 @@ class Scheduler {
         int thread_no;
         int mem_handle;
         int mem_size;
-        linkedList<int> fileHandle;
         Window* thread_win;
         Window* head_win;
         Window* console_win;
       public:
+        linkedList<int> fileHandle;
         Window* getThreadWin() {return this->thread_win;}
         int getMemHandle() {return this->mem_handle;}
         Window* getHeadWin() {return this->head_win;}
