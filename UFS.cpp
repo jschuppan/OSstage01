@@ -180,8 +180,25 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-int UFS::closeFile(int threadID, int fileID) {
-    
+int UFS::closeFile(int threadID, int fileID) 
+{
+	openfiles tempOpenFile = openFileList.getDatumByID(fileID);
+	if(!tempOpenFile)
+	{
+		//Print error file not found
+		return -1;
+	}
+	else
+	{
+		if(threadID == tempOpenFile.T_ID)
+		{
+			openFileList.removeNodeByElement(fileID);
+			return 1;
+		}
+	}
+	//ERROR ID didnt match
+	return -1;
+	
 }
 
 
