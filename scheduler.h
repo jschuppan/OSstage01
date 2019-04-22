@@ -29,6 +29,7 @@ class Scheduler {
         int thread_no;
         int mem_handle;
         int mem_size;
+        linkedList<int> fileHandle;
         Window* thread_win;
         Window* head_win;
         Window* console_win;
