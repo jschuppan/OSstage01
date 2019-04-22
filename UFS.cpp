@@ -387,7 +387,7 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-void UFS::dir() {
+void UFS::dir(Window* Win) {
     const char colFill        = ' ';
     const std::string colSep  = " | ";
 	const int  colNameSm      = 5;
@@ -484,7 +484,7 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-void UFS::dir(int threadID) {
+void UFS::dir(Window* Win, int threadID) {
     // next index
 }
 
