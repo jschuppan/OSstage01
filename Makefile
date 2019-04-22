@@ -28,6 +28,9 @@ IPC.o: IPC.cpp
 
 mem_mgr.o: mem_mgr.cpp
 	$(CC) $(FLAGS) mem_mgr.cpp
+
+UFS.o: UFS.cpp
+	$(CC) $(FLAGS) UFS.cpp
 	
 clean:
 	rm -f $(OBJS) $(OUT) *.txt *.gch *~

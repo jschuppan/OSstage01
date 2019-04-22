@@ -15,6 +15,7 @@ class Semaphore;
 class UI;
 class IPC;
 class Mem_Mgr;
+class UFS;
 
 
 struct MCB
@@ -26,6 +27,7 @@ struct MCB
     Semaphore* messageSema;
     UI* userInf;
     Mem_Mgr* mem_mgr;
+    UFS* ufs;
     MCB();
 };
 

@@ -6,6 +6,7 @@
 #include "UI.h"
 #include "mem_mgr.h"
 #include "sema.h"
+#include "UFS.h"
 
 //Constructor
 MCB::MCB()
@@ -16,4 +17,5 @@ MCB::MCB()
   messageSema = new Semaphore("message_access",1);
   userInf = new UI();
   mem_mgr = new Mem_Mgr();
+  ufs = new UFS("UltimaFS", 16, 128, '^');
 }

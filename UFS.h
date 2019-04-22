@@ -14,7 +14,8 @@ Purpose       : Implementation of our file system
 
 class UFS {
 
-    iNode inodes[16]; 
+    iNode* inodes; 
+    MCB* mcb;
     std::string fsName;
     std::string metaFileName;
     int fsBlockSize;
@@ -32,6 +33,10 @@ class UFS {
         std::string filename;
         int fileID;
         char status;
+        bool operator==(const openFiles& rhs)
+        {
+          return (fileID == rhs.fileID);
+        }
     };
 
     linkedList<openFiles> openFileList;
@@ -47,25 +52,8 @@ class UFS {
     static const char READ  = 0b10,
                       WRITE = 0b01;
 
-    // constant array corresponding to iNode bitmap
-    static const unsigned short int B_ALLOC[16] = { 0b1000000000000000,
-                                                    0b0100000000000000,
-                                                    0b0010000000000000,
-                                                    0b0001000000000000,
-                                                    0b0000100000000000,
-                                                    0b0000010000000000,
-                                                    0b0000001000000000,
-                                                    0b0000000100000000,
-                                                    0b0000000010000000,
-                                                    0b0000000001000000,
-                                                    0b0000000000100000,
-                                                    0b0000000000010000,
-                                                    0b0000000000001000,
-                                                    0b0000000000000100,
-                                                    0b0000000000000010,
-                                                    0b0000000000000001 };
 
-    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, std::fstream &fileSystem);
+    UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar);
     void format();
 
     int openFile(int threadID, int fileHandle, std::string fileName, char mode);
@@ -83,6 +71,7 @@ class UFS {
     std::string intToBin(unsigned short int val);
     void dir(int threadID);
     void dump();
+    void setMCB(MCB* mcb);
 };
 
 #endif

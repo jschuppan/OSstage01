@@ -5,18 +5,37 @@ Date          : April 16, 2019
 Purpose       : Implementation of our file system
 ============================================================================*/
 
-#include <fstream>
 #include "UFS.h"
+#include "iNode.h"
+#include <fstream>
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
 #include <stdio.h>
+#include <iomanip>
+
+// constant array corresponding to iNode bitmap
+static constexpr unsigned short int B_ALLOC[16] = { 0b1000000000000000,
+                                                0b0100000000000000,
+                                                0b0010000000000000,
+                                                0b0001000000000000,
+                                                0b0000100000000000,
+                                                0b0000010000000000,
+                                                0b0000001000000000,
+                                                0b0000000100000000,
+                                                0b0000000010000000,
+                                                0b0000000001000000,
+                                                0b0000000000100000,
+                                                0b0000000000010000,
+                                                0b0000000000001000,
+                                                0b0000000000000100,
+                                                0b0000000000000010,
+                                                0b0000000000000001 };
 
 
-// not sure what to do with std::fstream &fileSystem
-UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar, std::fstream &fileSystem) {
+UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar) {
     this->fsName = fsName + ".txt";  // ex: ultima.txt
-    this->metaFileName = "meta" + fsName;  // ex: metaultima.txt
+    this->metaFileName = "meta" + fsName + ".txt";  // ex: metaultima.txt
     this->numberOfBlocks = numberOfBlocks;
     this->fsBlockSize = fsBlockSize;
     this->initChar = initChar;
@@ -204,7 +223,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		{	
 		    if (inodes[i].ownerTaskID == -1) 
 			{
-		       	inodes[i].ownerTaskID = ownerID;
+		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
 				for(int k=0; k<8; k++)
 					inodes[i].fileName[k] = fileName[k];
@@ -228,7 +247,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 			{
 				//store previous iNode to store nextIndex
 				temp = &inodes[i];
-		       	inodes[i].ownerTaskID = ownerID;
+		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
 				for(int k=0; k<8; k++)
 					inodes[i].fileName[k] = fileName[k];
@@ -243,7 +262,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 			{
 				temp->nextIndex = i;
 				temp = &inodes[i];
-				inodes[i].ownerTaskID = ownerID;
+				inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
 				inodes[i].sequence = count -1;
 				//ADD SEMAPHORE HERE
@@ -489,6 +508,17 @@ std::string UFS::intToBin(unsigned short int val)
       mask  >>= 1;
    }
 	c[16] = '\0';
-	string result(c);
+	std::string result(c);
 	return result;
+}
+
+/*-----------------------------------------------------------------
+Function      : stMCB
+Parameters    : MCB*
+Returns       :
+Details       : Sets the MCB pointer within the class
+------------------------------------------------------------------*/
+void UFS::setMCB(MCB* mcb)
+{
+  this->mcb = mcb;
 }
