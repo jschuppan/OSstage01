@@ -427,7 +427,7 @@ void UFS::dir() {
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
 			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
-			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  i << colSep;
+			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
 			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
 			std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;

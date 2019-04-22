@@ -10,6 +10,7 @@ Purpose       : Implementation of our file system
 #include <string>
 #include <fstream>
 #include "iNode.h"
+#include "linkedlist.h"
 
 class UFS {
 
