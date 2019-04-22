@@ -15,6 +15,7 @@ Purpose       : Implementation of our file system
 #include <string.h>
 #include <stdio.h>
 #include <iomanip>
+#include <sstream>
 
 // constant array corresponding to iNode bitmap
 static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
@@ -544,11 +545,15 @@ void UFS::dir(Window* Win) {
 	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Perm." << colSep;
 	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner#" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
-	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. TimeYOO" << std::endl;
     
     outString = sOutput.str();
     chr = strdup(outString.c_str());
-    sprintf(outBuff, "            test %s", chr);
+    sprintf(outBuff, "  %s", chr);
+    Win->write_window(outBuff);
+    sprintf(outBuff, "");
+
+
 
     for (int i = 0; i < numberOfBlocks; i++) {
 		// time conversions
@@ -610,9 +615,9 @@ void UFS::dir(Window* Win) {
 
         outString = sOutput.str();
         chr = strdup(outString.c_str());
-        sprintf(outBuff  + strlen(outBuff), "%s", chr);
+        sprintf(outBuff  + strlen(outBuff), "    %s", chr);
     }
-    Win->write_window(outBuff);
+    //Win->write_window(outBuff);
     free(chr);
 
     mcb->s->SCHEDULER_SUSPENDED = false;
