@@ -28,11 +28,15 @@ class MCB;
 #include "string.h"
 #include "UFS.h"
 
+static const char alphabet[26] = {'a','b','c','d','e','f','g','h','i',
+                    'j','k','l','m','n','o','p','q','r',
+                    's','t','u','v','w','x','y','z'};
 const int DUMP_SLEEP = 8;
 const int MAX_WINDOWS_THREADS = 6;
 const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
+int fileOpen1 =0;
 
 void wrapperDump(Scheduler* s, UI* userInf, int level);
 void setMCB(MCB* mcb);
@@ -171,7 +175,7 @@ void filewrapperDumpDir(UFS* ufs, UI* userInf)
     //create new window to dump to
     Win->createMaxSizeWindow();
 
-    ufs->dir(Win);
+    //ufs->dir(Win);
     //display dump window for DUMP_SLEEP seconds
     sleep(DUMP_SLEEP);
     Win->deleteWindow();
@@ -188,7 +192,7 @@ void filewrapperDumpDir(UFS* ufs, UI* userInf, int threadID)
     //create new window to dump to
     Win->createMaxSizeWindow();
 
-    ufs->dir(Win,threadID);
+    //ufs->dir(Win,threadID);
     //display dump window for DUMP_SLEEP seconds
     sleep(DUMP_SLEEP);
     Win->deleteWindow();
@@ -395,6 +399,18 @@ void endlessLoop(MCB* mcb)
         case 'P':
         {
           filewrapperDumpDir(mcb->ufs,mcb->userInf, rand()%3);
+          break;
+        }
+        case 'g':
+        {
+         
+          mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],0);
+          break;
+        }
+        case 'G':
+        {
+          int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
+          fileOpen1 =mcb->ufs->openFile(0,handle,"Big_Daddy" , 0b01);
           break;
         }
         

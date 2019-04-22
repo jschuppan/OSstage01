@@ -59,8 +59,8 @@ class UFS {
     int openFile(int threadID, int fileHandle, std::string fileName, char mode);
     int closeFile(int threadID, int fileID);
 
-    int readChar(int threadID, std::string fileName, char &c);
-    int writeChar(int threadID, std::string fileName, char c);
+    int readChar(int threadID, int fileID, char &c, int offset);
+    int writeChar(int threadID, int fileID, char c, int offset);
 
     int createFile(int threadID, std::string fileName, int fileSize, char permission);
     int deleteFile(int threadID, std::string fileName);

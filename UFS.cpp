@@ -182,7 +182,7 @@ Details       :
 ------------------------------------------------------------------*/
 int UFS::closeFile(int threadID, int fileID) 
 {
-	openfiles tempOpenFile = openFileList.getDatumByID(fileID);
+    openFiles *tempOpenFile = openFileList.getDatumById(fileID);
 	if(!tempOpenFile)
 	{
 		//Print error file not found
@@ -190,7 +190,7 @@ int UFS::closeFile(int threadID, int fileID)
 	}
 	else
 	{
-		if(threadID == tempOpenFile.T_ID)
+		if(threadID == tempOpenFile->T_ID)
 		{
 			openFileList.removeNodeByElement(fileID);
 			return 1;
@@ -208,7 +208,7 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-int UFS::readChar(int threadID, std::string fileName, char &c) {
+int UFS::readChar(int threadID, int fileID, char &c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
     
     // file is NOT open
@@ -232,7 +232,7 @@ int UFS::readChar(int threadID, std::string fileName, char &c) {
     for (int i = 0; i < numberOfBlocks; i++) {
 
         // found the file
-        if ( strcmp(ptr->filename, inodes[i].fileName) == 0 ) {
+        if ( strcmp(ptr->filename.c_str(), inodes[i].fileName) == 0 ) {
 
             // go to the appropriate block
             int current = i;
@@ -250,7 +250,7 @@ int UFS::readChar(int threadID, std::string fileName, char &c) {
             offset %= fsBlockSize;
 
             // write to appropriate location
-            std::ifstream dataFile(fsName);
+            std::ifstream dataFile(fsName.c_str());
             dataFile.seekg( offset + inodes[ current ].startingBlock );
             dataFile.get(c);
             dataFile.close();
@@ -268,7 +268,7 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-int UFS::writeChar(int threadID, std::string fileName, char c) {
+int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
     
     // file is NOT open
@@ -292,7 +292,7 @@ int UFS::writeChar(int threadID, std::string fileName, char c) {
     for (int i = 0; i < numberOfBlocks; i++) {
 
         // found the file
-        if ( strcmp(ptr->filename, inodes[i].fileName) == 0 ) {
+        if ( strcmp(ptr->filename.c_str(), inodes[i].fileName) == 0 ) {
 
             // go to the appropriate block
             int current = i;
@@ -310,7 +310,7 @@ int UFS::writeChar(int threadID, std::string fileName, char c) {
             offset %= fsBlockSize;
 
             // write to appropriate location
-            std::fstream dataFile(fsName, std::ios::in | std::ios::out);
+            std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
             dataFile.seekp( offset + inodes[ current ].startingBlock );
             dataFile.put(c);
             dataFile.close();
@@ -473,7 +473,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
 /*-----------------------------------------------------------------
 Function      : changePermission()
 Parameters    : 
-Returns       : ???????????????????????
+Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
