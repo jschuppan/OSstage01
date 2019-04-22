@@ -133,17 +133,19 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
 
         // if file exists
         if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0) {
+          writeToThreadWindow(threadID, "  TEST\n");
 
             // owner wants to open
             if (inodes[i].ownerTaskID == threadID || fileHandle == inodes[i].handle) {
-
                 // asking for read without read permission
                 if ((mode & READ) && !(inodes[i].permission & OWNER_READ)) {
+                    writeToThreadWindow(threadID, "  Invalid Read Permission\n");
                     return -1;
                 }
 
                 // asking for write without write permission
                 if ((mode & WRITE) && !(inodes[i].permission & OWNER_WRITE)) {
+                    writeToThreadWindow(threadID, "  Invalid Write Permission\n");
                     return -1;
                 }
             }
@@ -153,11 +155,13 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
 
                 // asking for read without read permission
                 if ((mode & READ) && !(inodes[i].permission & OTHER_READ)) {
+                    writeToThreadWindow(threadID, "  Invalid Read Permission\n");
                     return -1;
                 }
 
                 // asking for write without write permission
                 if ((mode & WRITE) && !(inodes[i].permission & OTHER_WRITE)) {
+                    writeToThreadWindow(threadID, "  Invalid Write Permission\n");
                     return -1;
                 }
             }
@@ -169,10 +173,12 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.status = mode;
             tempNode.ownerID = inodes[i].ownerTaskID;
             openFileList.addToFront(tempNode, nextFileID);
+            writeToThreadWindow(threadID, "  Success Open\n");
             return nextFileID++;
         }
     }
     // file doesn't exist
+    writeToThreadWindow(threadID, "  File Does Not Exist\n");
     return -1;
 }
 
@@ -276,16 +282,19 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
 
     // file is NOT open
     if (!ptr) {
+          writeToThreadWindow(threadID, "  File Does Not Exist\n");
         return -1;
     }
 
     // task didn't open file
     if ( ptr->T_ID != threadID ) {
+        writeToThreadWindow(threadID, "  Do Not Have Correct Permissions\n");
         return -1;
     }
 
     // file is not open for write
     if ( ! (ptr->status & WRITE) ) {
+        writeToThreadWindow(threadID, "  File Not Open For Write\n");
         return -1;
     }
 
@@ -306,6 +315,7 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
 
             // out of boundaries
             if (skips > 0) {
+                writeToThreadWindow(threadID, "  Error Writing Out Of Bounds\n");
                 return -1;
             }
 
@@ -318,6 +328,7 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
             dataFile.put(c);
             dataFile.close();
 
+            writeToThreadWindow(threadID, "  Successful Write\n");
             return 1;
         }
     }
