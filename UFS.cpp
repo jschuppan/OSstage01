@@ -209,9 +209,58 @@ Returns       :
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::readChar(int threadID, std::string fileName, char &c) {
+    openFiles *ptr = openFileList.getDatumById(fileID);
+    
+    // file is NOT open
+    if (!ptr) {
+        return -1;
+    }
 
+    // task didn't open file
+    if ( ptr->T_ID != threadID ) {
+        return -1;
+    }
+
+    // file is not open for read
+    if ( ! (ptr->status & READ) ) {
+        return -1;
+    }
+
+    // calculate how many blocks to traverse before starting to read
+    int skips = offset / fsBlockSize;
+
+    for (int i = 0; i < numberOfBlocks; i++) {
+
+        // found the file
+        if ( strcmp(ptr->filename, inodes[i].fileName) == 0 ) {
+
+            // go to the appropriate block
+            int current = i;
+            while (current != -1 && skips > 0) {
+                skips--;
+                current = inodes[ current ].nextIndex;
+            }
+
+            // out of boundaries
+            if (skips > 0) {
+                return -1;
+            }
+
+            // make offset local to that block
+            offset %= fsBlockSize;
+
+            // write to appropriate location
+            std::ifstream dataFile(fsName);
+            dataFile.seekg( offset + inodes[ current ].startingBlock );
+            dataFile.get(c);
+            dataFile.close();
+
+            return 1;
+        }
+    }
+    // shouldn't reach this return because file should be found
+    return -99;
 }
-
 
 /*-----------------------------------------------------------------
 Function      : writeChar()
