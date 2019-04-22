@@ -15,7 +15,7 @@ Purpose       : Implementation of our file system
 #include <iomanip>
 
 // constant array corresponding to iNode bitmap
-static constexpr unsigned short int B_ALLOC[16] = { 0b1000000000000000,
+static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
                                                 0b0100000000000000,
                                                 0b0010000000000000,
                                                 0b0001000000000000,

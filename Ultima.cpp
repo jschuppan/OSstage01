@@ -26,6 +26,7 @@ class MCB;
 #include "IPC.h"
 #include "mem_mgr.h"
 #include "string.h"
+#include "UFS.h"
 
 const int DUMP_SLEEP = 8;
 const int MAX_WINDOWS_THREADS = 6;
@@ -326,6 +327,10 @@ void endlessLoop(MCB* mcb)
         {
           int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",300,0b1100);
           mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
+        }
+        case 'R':
+        {
+          mcb->s->stop();
         }
       }
     }
