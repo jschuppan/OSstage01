@@ -36,7 +36,9 @@ const int MAX_WINDOWS_THREADS = 6;
 const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
-int fileOpen1 =0;
+int fileOpen1 = 0;
+int fileSize1 = 0;
+char c;
 
 void wrapperDump(Scheduler* s, UI* userInf, int level);
 void setMCB(MCB* mcb);
@@ -382,38 +384,68 @@ void endlessLoop(MCB* mcb)
         }
         case 'y':
         {
-          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",200,0b1100);
+          //Test UFS file create
+          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",fileSize1,0b1100);
           mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
           break;
         }
         case 'Y':
         {
+          //Test UFS Dump
           filewrapperDump(mcb->ufs,mcb->userInf);
           break;
         }
         case 'p':
         {
+          //Test UFS Dir dump
           filewrapperDumpDir(mcb->ufs,mcb->userInf);
           break;
         }
         case 'P':
         {
+          //Test UFS  Dir dump
           filewrapperDumpDir(mcb->ufs,mcb->userInf, rand()%3);
           break;
         }
         case 'g':
         {
-         
-          mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],0);
+         //Test UFS Write out of bounds
+          mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],700);
           break;
         }
         case 'G':
         {
+         //Test UFS Write in bounds
+          mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],rand() % fileSize1 );
+          break;
+        }
+        case 'e':
+        {
+          //Test UFS OpenFile for Write
           int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
           fileOpen1 =mcb->ufs->openFile(0,handle,"Big_Daddy" , 0b01);
           break;
         }
-        
+        case 'E':
+        {
+          //Test UFS OpenFile for Read
+          int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
+          fileOpen1 =mcb->ufs->openFile(0,handle,"Big_Daddy" , 0b10);
+          break;
+        }
+        case 'u':
+        {
+         //Test UFS Read out of bounds
+          mcb->ufs->readChar(0,fileOpen1, c,700);
+          break;
+        }
+        case 'U':
+        {
+         //Test UFS Read in bounds
+          mcb->ufs->writeChar(0,fileOpen1,c,rand() % fileSize1 );
+          break;
+        }
+
       }
     }
   }

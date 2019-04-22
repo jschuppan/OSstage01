@@ -14,7 +14,7 @@ Purpose       : Implementation of our file system
 
 class UFS {
 
-    iNode* inodes; 
+    iNode* inodes;
     MCB* mcb;
     std::string fsName;
     std::string metaFileName;
@@ -30,6 +30,7 @@ class UFS {
     {
         //T_ID is the thread that opened file
         int T_ID;
+        int ownerID;
         std::string filename;
         int fileID;
         char status;

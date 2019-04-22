@@ -62,7 +62,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
         format();  // format file system with initChar
     }
     else {  // file exists
-        
+
         // read iNode from metaFile
         metaFile.read((char *) inodes, sizeof(inodes));
         metaFile.close();
@@ -82,8 +82,8 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
 
 /*-----------------------------------------------------------------
 Function      : format();
-Parameters    : 
-Returns       : 
+Parameters    :
+Returns       :
 Details       : initializes the iNodes, metaFile and dataFile with default values
 ------------------------------------------------------------------*/
 void UFS::format() {
@@ -124,16 +124,16 @@ void UFS::format() {
 
 /*-----------------------------------------------------------------
 Function      : openFile()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode) {
     for (int i = 0; i < numberOfBlocks; i++) {
-        
+
         // if file exists
         if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0) {
-            
+
             // owner wants to open
             if (inodes[i].ownerTaskID == threadID || fileHandle == inodes[i].handle) {
 
@@ -147,7 +147,7 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
                     return -1;
                 }
             }
-        
+
             // other wants to open
             else {
 
@@ -167,6 +167,7 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.filename = fileName;
             tempNode.fileID = nextFileID;
             tempNode.status = mode;
+            tempNode.ownerID = inodes[i].ownerTaskID;
             openFileList.addToFront(tempNode, nextFileID);
             return nextFileID++;
         }
@@ -178,11 +179,11 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
 
 /*-----------------------------------------------------------------
 Function      : closeFile()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
-int UFS::closeFile(int threadID, int fileID) 
+int UFS::closeFile(int threadID, int fileID)
 {
     openFiles *tempOpenFile = openFileList.getDatumById(fileID);
 	if(!tempOpenFile)
@@ -200,19 +201,19 @@ int UFS::closeFile(int threadID, int fileID)
 	}
 	//ERROR ID didnt match
 	return -1;
-	
+
 }
 
 
 /*-----------------------------------------------------------------
 Function      : readChar()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::readChar(int threadID, int fileID, char &c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
-    
+
     // file is NOT open
     if (!ptr) {
         return -1;
@@ -266,13 +267,13 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
 
 /*-----------------------------------------------------------------
 Function      : writeChar()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
-    
+
     // file is NOT open
     if (!ptr) {
         return -1;
@@ -327,9 +328,9 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
 
 /*-----------------------------------------------------------------
 Function      : createFile()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
     	std::fstream metaFile(metaFileName.c_str());
@@ -339,11 +340,11 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		return -1;
     }
     //Requested Block is less that 128
-	else if (fileSize < fsBlockSize && available > 0) 
+	else if (fileSize < fsBlockSize && available > 0)
 	{
-		for (int i = 0; i < numberOfBlocks; i++) 
-		{	
-		    if (inodes[i].ownerTaskID == -1) 
+		for (int i = 0; i < numberOfBlocks; i++)
+		{
+		    if (inodes[i].ownerTaskID == -1)
 			{
 		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
@@ -365,9 +366,9 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 	{
 		iNode* temp;
 		int count = 1;
-		for (int i = 0; i < numberOfBlocks; i++) 
-		{	
-		    if (inodes[i].ownerTaskID == -1 && count == 1) 
+		for (int i = 0; i < numberOfBlocks; i++)
+		{
+		    if (inodes[i].ownerTaskID == -1 && count == 1)
 			{
 				//store previous iNode to store nextIndex
 				temp = &inodes[i];
@@ -416,20 +417,20 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 
 /*-----------------------------------------------------------------
 Function      : deleteFile()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::deleteFile(int threadID, std::string fileName) {
     for (int i = 0; i < numberOfBlocks; i++) {
-        
+
         // file exists
         if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0
              && inodes[i].ownerTaskID == threadID ) {
-            
+
             // has permission
             if (inodes[i].permission & 0b0100) {
-                    
+
                 std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
                 std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
 
@@ -483,17 +484,17 @@ int UFS::deleteFile(int threadID, std::string fileName) {
 
 /*-----------------------------------------------------------------
 Function      : changePermission()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
 
     for (int i = 0; i < numberOfBlocks; i++) {
-        
+
         if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0
              && inodes[i].ownerTaskID == threadID ) {
-            
+
             int current = i;
             while (current != -1) {
                 inodes[ current ].permission = newPermission;
@@ -510,9 +511,9 @@ int UFS::changePermission(int threadID, std::string fileName, char newPermission
 
 /*-----------------------------------------------------------------
 Function      : dir()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 void UFS::dir(Window* Win) {
     const char colFill        = ' ';
@@ -530,11 +531,28 @@ void UFS::dir(Window* Win) {
     unsigned short int cmbBlock; // combined block
     int j;
 
-	std::time_t cDate, mDate;
-	std::time_t initTime;
+	  std::time_t cDate, mDate;
+	  std::time_t initTime;
   	struct tm * timeStruct;
 
-
+    //Loop through linked list
+    openFiles* Ofile = NULL:
+    int k =0;
+    char tempStatus = 'c';
+    while(Ofile = openFiles.getNextElementUntilEnd(Ofile))
+    {
+      if(Ofile->ownerID == inodes[k].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[k].fileName) == 0)
+      {
+        if(Ofile->status == READ)
+            tempStatus = 'r';
+        else if(Ofile->status == WRITE)
+        {
+          //Highest priority status stop looking
+          tempStatus = 'w';
+          break;
+        }
+      }
+    }
     mcb->s->SCHEDULER_SUSPENDED = true;
 
 
@@ -549,7 +567,7 @@ void UFS::dir(Window* Win) {
 	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner#" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
-    
+
     outString = sOutput.str();
     chr = strdup(outString.c_str());
 
@@ -568,10 +586,10 @@ void UFS::dir(Window* Win) {
 		char mDateBuff[100];
 
 		// figure out time
-        timeStruct = localtime (&inodes[i].createdOn);
-        strftime (cDateBuff, 100 ,"%x %X", timeStruct);
+    timeStruct = localtime (&inodes[i].createdOn);
+    strftime (cDateBuff, 100 ,"%x %X", timeStruct);
 		timeStruct = localtime (&inodes[i].modifiedOn);
-        strftime (mDateBuff, 100 ,"%x %X", timeStruct);
+    strftime (mDateBuff, 100 ,"%x %X", timeStruct);
 
 		// figure out file permissions
 		if (inodes[i].permission & 0b1000)
@@ -598,19 +616,19 @@ void UFS::dir(Window* Win) {
 
 
         // only list actual files
-        if (inodes[i].ownerTaskID != -1) 
+        if (inodes[i].ownerTaskID != -1)
         {
 
             cmbBlock = inodes[i].blocks;
             j = i;
 
-            while (inodes[j].nextIndex != -1) 
+            while (inodes[j].nextIndex != -1)
             {
                 j = inodes[j].nextIndex;
                 cmbBlock =  cmbBlock | inodes[j].blocks;
             }
 
-            if (inodes[i].sequence == 0) 
+            if (inodes[i].sequence == 0)
             {
                 sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
@@ -643,9 +661,9 @@ void UFS::dir(Window* Win) {
 
 /*-----------------------------------------------------------------
 Function      : dir()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 void UFS::dir(Window* Win, int threadID) {
     // next index
@@ -654,13 +672,13 @@ void UFS::dir(Window* Win, int threadID) {
 
 /*-----------------------------------------------------------------
 Function      : dump()
-Parameters    : 
-Returns       : 
-Details       : 
+Parameters    :
+Returns       :
+Details       :
 ------------------------------------------------------------------*/
 void UFS::dump(Window* Win) {
   char mBuff[16384];
-  std::string tempString; 
+  std::string tempString;
   char* chr;
 
   //Suspend scheduler
