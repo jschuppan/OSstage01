@@ -361,7 +361,23 @@ Returns       : ???????????????????????
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
-  
+
+    for (int i = 0; i < numberOfBlocks; i++) {
+        
+        if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0
+             && inodes[i].ownerTaskID == threadID ) {
+            
+            int current = i;
+            while (current != -1) {
+                inodes[ current ].permission = newPermission;
+
+                current = inodes[ current ].nextIndex;
+            }
+            return 1;
+        }
+    }
+
+    return -1;
 }
 
 
