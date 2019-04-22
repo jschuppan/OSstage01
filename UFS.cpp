@@ -69,7 +69,6 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
 
         for (int i = 0; i < numberOfBlocks; i++) {
 
-            inodes[i].blocks = B_ALLOC[i];
             if (inodes[i].ownerTaskID == -1) {
                 (this->available)++;
             }
@@ -100,7 +99,7 @@ void UFS::format() {
         inodes[i].handle = -1;
         inodes[i].nextIndex = -1;
         inodes[i].permission = 0b0000;
-        inodes[i].blocks = 0;
+        inodes[i].blocks = B_ALLOC[i];
         inodes[i].createdOn = time(NULL);
         inodes[i].modifiedOn = time(NULL);
     }
@@ -528,21 +527,19 @@ void UFS::dir(Window* Win) {
     std::stringstream sOutput;
     char* chr;
     std::ofstream yoo;
-    yoo.open("iHatesEverything.txt");
+    unsigned short int cmbBlock; // combined block
+    int j;
 
 	std::time_t cDate, mDate;
 	std::time_t initTime;
   	struct tm * timeStruct;
-	//char* cDateOut;
-	//char* mDateOut;
 
-    //const int  colContent  = 8;
 
     mcb->s->SCHEDULER_SUSPENDED = true;
 
 
 	// setting up the table
-    sOutput << "    " << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
+    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
     sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
 	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks#" << colSep;
 	sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
@@ -551,18 +548,17 @@ void UFS::dir(Window* Win) {
 	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Perm." << colSep;
 	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner#" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
-	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. TimeYOO" << std::endl;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
     
     outString = sOutput.str();
     chr = strdup(outString.c_str());
-    //yoo << chr;
-    sprintf(outBuff, "  \n%s", chr);
+
+    sprintf(outBuff, "  \n  %s", chr);
     Win->write_window(outBuff);
     sprintf(outBuff, "");
     sOutput.str("");
     sOutput.clear();
 
-    yoo.close();
 
 
 
@@ -602,23 +598,36 @@ void UFS::dir(Window* Win) {
 
 
         // only list actual files
-        if (inodes[i].ownerTaskID != -1) {
-			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
-			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
-			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
-			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
-			sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
-			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
-			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "unknown" << colSep;
-			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
-			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
-			sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
-			sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+        if (inodes[i].ownerTaskID != -1) 
+        {
+
+            cmbBlock = inodes[i].blocks;
+            j = i;
+
+            while (inodes[j].nextIndex != -1) 
+            {
+                j = inodes[j].nextIndex;
+                cmbBlock =  cmbBlock | inodes[j].blocks;
+            }
+
+            if (inodes[i].sequence == 0) 
+            {
+                sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
+			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
+			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  openFileList << colSep;
+			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+            }
         }
 
         outString = sOutput.str();
         chr = strdup(outString.c_str());
-        sprintf(outBuff, "    %s", chr);
+        sprintf(outBuff, "  %s ", chr);
         Win->write_window(outBuff);
         sOutput.str("");
         sOutput.clear();
