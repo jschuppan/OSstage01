@@ -70,7 +70,7 @@ class UFS {
     void dir();
     std::string intToBin(unsigned short int val);
     void dir(int threadID);
-    void dump();
+    void dump(Window* Win);
     void setMCB(MCB* mcb);
 };
 

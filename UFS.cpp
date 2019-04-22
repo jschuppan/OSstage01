@@ -7,6 +7,7 @@ Purpose       : Implementation of our file system
 
 #include "UFS.h"
 #include "iNode.h"
+#include "window.h"
 #include <fstream>
 #include <cstdio>
 #include <unistd.h>
@@ -356,7 +357,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
 /*-----------------------------------------------------------------
 Function      : changePermission()
 Parameters    : 
-Returns       : 
+Returns       : ???????????????????????
 Details       : 
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
@@ -478,20 +479,34 @@ Parameters    :
 Returns       : 
 Details       : 
 ------------------------------------------------------------------*/
-void UFS::dump() {
-	std::string fRow;
-    std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
+void UFS::dump(Window* Win) {
+  char mBuff[16384];
+  std::string tempString; 
+  char* chr;
 
-    // make sure file was successfully opened
-	if (dataFile.is_open())
+  //Suspend scheduler
+  mcb->s->SCHEDULER_SUSPENDED = true;
+
+
+  std::string fRow;
+  std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
+
+  // make sure file was successfully opened
+  if (dataFile.is_open())
+  {
+    // get one line at a time until EOF
+    while (getline (dataFile, fRow))
     {
-      // get one line at a time until EOF
-      while (getline (dataFile, fRow))
-      {
-        std::cout << fRow << std::endl;
-      }
-    dataFile.close();
+      sprintf(mBuff + strlen(mBuff),"%s \t\t", fRow);
     }
+  dataFile.close();
+  }
+
+  // write to window
+  Win->write_window(mBuff);
+
+  //Resume scheduler
+  mcb->s->SCHEDULER_SUSPENDED = true;
 }
 
 std::string UFS::intToBin(unsigned short int val)

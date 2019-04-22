@@ -550,6 +550,8 @@ void Mem_Mgr::mem_dump(Window* Win)
           sprintf(cBuff+strlen(cBuff), "\n");
      else if(count == 0)
      {
+          // WHYYYYYYYY???????????????????????
+          // fix me
           continue;
           count++;
       }
