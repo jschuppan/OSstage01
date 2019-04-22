@@ -32,7 +32,7 @@ class UFS {
         std::string filename;
         int fileID;
         char status;
-    }
+    };
 
     linkedList<openFiles> openFileList;
     public:

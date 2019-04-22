@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <iomanip>
+#include "linkedlist.h"
 //#include <bits/stdc++.h> //Needed for memset
 
 using namespace std;
@@ -25,6 +26,7 @@ class iNode {
     int size;
     int sequence;
     int nextIndex;
+	int handle;
 
     char permission;
     unsigned int blocks[4];
@@ -32,6 +34,7 @@ class iNode {
     time_t modifiedOn;
 };
 
+linkedList<openFiles> openFileList;
 
 int numberOfBlocks = 16;
 iNode inodes[16];
@@ -325,6 +328,7 @@ void dir() {
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
 			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
+
 			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  i << colSep;
 			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
 			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
