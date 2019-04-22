@@ -356,7 +356,8 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				available--;
 				used++;
                 writeToThreadWindow(threadID, "  File Created\n");
-		        return nextFileHandle++;
+                inodes[i].handle = ++nextFileHandle;
+		        return inodes[i].handle;
 		    }
 		}
 	}
@@ -373,6 +374,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				temp = &inodes[i];
 		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
+                inodes[i].handle = ++nextFileHandle;
 				for(int k=0; k<8; k++)
 					inodes[i].fileName[k] = fileName[k];
 				count++;
@@ -389,6 +391,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
 				inodes[i].sequence = count -1;
+                inodes[i].handle = nextFileHandle;
 				//ADD SEMAPHORE HERE
 				metaFile.seekp(sizeof(iNode) * i);
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
@@ -399,7 +402,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				if(count >= fileSize / 128.0)
 				{
                     writeToThreadWindow(threadID, "  File Created\n");
-					return nextFileHandle++;
+		            return inodes[i].handle;
 				}
 				count++;
 			}
@@ -597,14 +600,6 @@ void UFS::dir(Window* Win) {
 
 		permBuff[4] = '\0';
 
-
-
-		/* 
-		cDate     =  std::time(&inodes[i].createdOn);
-		cDateOut  =  std::asctime(std::localtime(&cDate));
-		mDate     =  std::time(&inodes[i].modifiedOn);
-		mDateOut  =  std::asctime(std::localtime(&mDate));
-		*/
 
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
