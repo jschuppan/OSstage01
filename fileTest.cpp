@@ -34,6 +34,15 @@ class iNode {
     time_t modifiedOn;
 };
 
+struct openFiles
+{
+	//T_ID is the thread that opened file
+	int T_ID;
+	std::string filename;
+	int fileID;
+	char status;
+};
+
 linkedList<openFiles> openFileList;
 
 int numberOfBlocks = 16;
