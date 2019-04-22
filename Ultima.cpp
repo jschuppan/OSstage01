@@ -197,31 +197,31 @@ void endlessLoop(MCB* mcb)
              break;
          }
         //Dump(level2)
-        case 'd':
+        case 'S':
         {
              wrapperDump(mcb->s, mcb->userInf,2);
              break;
         }
         //Dump(level3)
-        case 'f':
+        case 'd':
         {
              wrapperDump(mcb->s, mcb->userInf,3);
              break;
         }
        //Dump(level4)
-        case 'g':
+        case 'D':
         {
             wrapperDump(mcb->s,mcb->userInf,4);
             break;
         }
         //message Dump(level1)
-         case 'y':
+         case 'm':
          {
              IPCwrapperDump(mcb->s,mcb->userInf,1);
              break;
          }
-         //message Dump(level1)
-          case 'p':
+         //message Dump(level2)
+          case 'M':
           {
               mem_wrapperDump(mcb->s,mcb->mem_mgr,mcb->userInf);
               break;
@@ -260,7 +260,7 @@ void endlessLoop(MCB* mcb)
                 mcb->s->getTCBList().getDatumById((int)ch-'0')->setState(3);
           break;
         }
-        case 'j':
+        case 'f':
         {
           mcb->s->forceWrite(rand()%5);
           break;
@@ -271,7 +271,7 @@ void endlessLoop(MCB* mcb)
           mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(), 90 , strlen(c), c, 1);
           break;
         }
-        case 'm':
+        case 'K':
         {
           char* c = "This space is mine";
           mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(), 1, strlen(c), c, 1);
@@ -279,13 +279,13 @@ void endlessLoop(MCB* mcb)
 
           break;
         }
-        case 'b':
+        case 'z':
         {
           mcb->s->getThreadInfo().getDatumById(0)->mem_size = 300;
           mcb->s->getThreadInfo().getDatumById(0)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(0)->mem_size, 0);
           break;
         }
-        case 'v':
+        case 'Z':
         {
           mcb->s->getThreadInfo().getDatumById(1)->mem_size = 300;
           mcb->s->getThreadInfo().getDatumById(1)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(1)->mem_size, 1);
@@ -297,7 +297,7 @@ void endlessLoop(MCB* mcb)
           mcb->s->getThreadInfo().getDatumById(2)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(2)->mem_size, 2);
           break;
         }
-        case 'z':
+        case 'X':
         {
           mcb->s->getThreadInfo().getDatumById(0)->mem_size = 400;
           mcb->s->getThreadInfo().getDatumById(0)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(0)->mem_size, 0);
@@ -308,7 +308,7 @@ void endlessLoop(MCB* mcb)
           mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(1)->getMemHandle(),1);
           break;
         }
-        case 'o':
+        case 'L':
         {
           mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(0)->getMemHandle(),0);
           break;
@@ -316,7 +316,16 @@ void endlessLoop(MCB* mcb)
         //Resume5 running
         case 'r':
         {
-              mcb->s->resume();
+          mcb->s->resume();
+        }
+        case 'R':
+        {
+          mcb->s->stop();
+        }
+        case 'y':
+        {
+          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",300,0b1100);
+          mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
         }
       }
     }
@@ -329,4 +338,5 @@ void setMCB(MCB* mcb)
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
   mcb->mem_mgr->setMCB(mcb);
+  mcb->ufs->setMCB(mcb);
 }

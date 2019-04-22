@@ -21,7 +21,6 @@ Purpose       : implementation of scheduler.h
 #include <stdlib.h>
 #include "mem_mgr.h"
 
-//struct MCB;
 //Global Variables
 const int RUNNING = 0;
 const int READY = 1;
