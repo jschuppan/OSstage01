@@ -37,7 +37,7 @@ const int HEADER_WIN = 0;
 const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
 int fileOpen1 = 0;
-int fileSize1 = 0;
+int fileSize1 = 200;
 char c;
 
 void wrapperDump(Scheduler* s, UI* userInf, int level);
@@ -214,6 +214,7 @@ void endlessLoop(MCB* mcb)
   char ch;
   std::clock_t garbageTimerStart = std::clock();
   double timeElapsed;
+  int tempFileHandle;
 //loop until q is pressed
   while(ch != 'q')
   {
@@ -385,7 +386,7 @@ void endlessLoop(MCB* mcb)
         case 'y':
         {
           //Test UFS file create
-          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",fileSize1,0b1100);
+          tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",fileSize1,0b1100);
           mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
           break;
         }
@@ -430,7 +431,7 @@ void endlessLoop(MCB* mcb)
         {
           //Test UFS OpenFile for Read
           int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
-          fileOpen1 =mcb->ufs->openFile(0,handle,"Big_Daddy" , 0b10);
+          fileOpen1 =mcb->ufs->openFile(0, tempFileHandle, "Big_Daddy" , 0b10);
           break;
         }
         case 'u':

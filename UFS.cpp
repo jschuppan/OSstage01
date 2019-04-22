@@ -530,16 +530,17 @@ void UFS::dir(Window* Win) {
     std::ofstream yoo;
     unsigned short int cmbBlock; // combined block
     int j;
+    int fileSize;
 
 	  std::time_t cDate, mDate;
 	  std::time_t initTime;
   	struct tm * timeStruct;
 
     //Loop through linked list
-    openFiles* Ofile = NULL:
+    openFiles* Ofile = NULL;
     int k =0;
     char tempStatus = 'c';
-    while(Ofile = openFiles.getNextElementUntilEnd(Ofile))
+    while(Ofile = openFileList.getNextElementUntilEnd(Ofile))
     {
       if(Ofile->ownerID == inodes[k].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[k].fileName) == 0)
       {
@@ -552,6 +553,7 @@ void UFS::dir(Window* Win) {
           break;
         }
       }
+      k++;
     }
     mcb->s->SCHEDULER_SUSPENDED = true;
 
@@ -586,10 +588,10 @@ void UFS::dir(Window* Win) {
 		char mDateBuff[100];
 
 		// figure out time
-    timeStruct = localtime (&inodes[i].createdOn);
-    strftime (cDateBuff, 100 ,"%x %X", timeStruct);
+        timeStruct = localtime (&inodes[i].createdOn);
+        strftime (cDateBuff, 100 ,"%x %X", timeStruct);
 		timeStruct = localtime (&inodes[i].modifiedOn);
-    strftime (mDateBuff, 100 ,"%x %X", timeStruct);
+        strftime (mDateBuff, 100 ,"%x %X", timeStruct);
 
 		// figure out file permissions
 		if (inodes[i].permission & 0b1000)
@@ -620,12 +622,14 @@ void UFS::dir(Window* Win) {
         {
 
             cmbBlock = inodes[i].blocks;
+            fileSize = inodes[i].size;
             j = i;
 
             while (inodes[j].nextIndex != -1)
             {
                 j = inodes[j].nextIndex;
                 cmbBlock =  cmbBlock | inodes[j].blocks;
+                fileSize += inodes[j].size;
             }
 
             if (inodes[i].sequence == 0)
@@ -633,9 +637,9 @@ void UFS::dir(Window* Win) {
                 sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
 			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
-			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
+			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
 			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  openFileList << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
 			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
 			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
 			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
