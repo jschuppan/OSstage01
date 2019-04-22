@@ -12,6 +12,7 @@ Purpose       : Implementation of our file system
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
+#include <string.h>
 #include <stdio.h>
 #include <iomanip>
 
@@ -511,6 +512,9 @@ void UFS::dir(Window* Win) {
 	const int  colNameLg      = 14;
 	const int  colNameXLg     = 17;
 	char permBuff[5];
+    char outBuff[16384];
+    std::string outString;
+    std::stringstream sOutput;
 
 	std::time_t cDate, mDate;
 	std::time_t initTime;
@@ -521,22 +525,23 @@ void UFS::dir(Window* Win) {
     //const int  colContent  = 8;
 
 	// setting up the table
-    std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Handle" << colSep;
-    std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
-	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks used" << colSep;
-	std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
-	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
-	std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
-	std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Permission" << colSep;
-	std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner ID" << colSep;
-	std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
-	std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Modified Time" << std::endl;
+    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Handle" << colSep;
+    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks used" << colSep;
+	sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
+	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Permission" << colSep;
+	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner ID" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Modified Time" << std::endl;
 
 
     for (int i = 0; i < numberOfBlocks; i++) {
 		// time conversions
 		char cDateBuff[100];
 		char mDateBuff[100];
+        char* chr;
 
 		// figure out time
         timeStruct = localtime (&inodes[i].createdOn);
@@ -579,17 +584,22 @@ void UFS::dir(Window* Win) {
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
 			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
-			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
-			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
-			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
-			std::cout << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
-			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
-			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "unknown" << colSep;
-			std::cout << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
-			std::cout << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
-			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
-			std::cout << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
+			sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
+			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "unknown" << colSep;
+			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
+			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+			sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+			sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
         }
+
+        outString = sOutput.str();
+        chr = strdup(outString.c_str());
+        sprintf(outBuff, "%s",chr);
+        Win->write_window(outBuff);
     }
 }
 
@@ -621,6 +631,7 @@ void UFS::dump(Window* Win) {
 
 
   std::string fRow;
+  char* tmpChar;
   std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
 
   // make sure file was successfully opened
@@ -629,7 +640,8 @@ void UFS::dump(Window* Win) {
     // get one line at a time until EOF
     while (getline (dataFile, fRow))
     {
-      //sprintf(mBuff + strlen(mBuff),"%s \t\t", fRow);
+      tmpChar = strdup(fRow.c_str());
+      sprintf(mBuff + strlen(mBuff),"%s \t\t", tmpChar);
     }
   dataFile.close();
   }
