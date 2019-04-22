@@ -175,12 +175,12 @@ void filewrapperDumpDir(UFS* ufs, UI* userInf)
     //create new window to dump to
     Win->createMaxSizeWindow();
 
-    //ufs->dir(Win);
+    ufs->dir(Win);
     //display dump window for DUMP_SLEEP seconds
     sleep(DUMP_SLEEP);
     Win->deleteWindow();
     userInf->update();
-    //Win->clearScreen();
+    Win->clearScreen();
 
 }
 

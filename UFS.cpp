@@ -507,14 +507,15 @@ Details       :
 void UFS::dir(Window* Win) {
     const char colFill        = ' ';
     const std::string colSep  = " | ";
-	const int  colNameSm      = 5;
-    const int  colNameMd      = 8;
-	const int  colNameLg      = 14;
-	const int  colNameXLg     = 17;
+	const int  colNameSm      = 4;
+    const int  colNameMd      = 7;
+	const int  colNameLg      = 12;
+	const int  colNameXLg     = 16;
 	char permBuff[5];
-    char outBuff[16384];
+    char outBuff[65536];
     std::string outString;
     std::stringstream sOutput;
+    char* chr;
 
 	std::time_t cDate, mDate;
 	std::time_t initTime;
@@ -524,24 +525,29 @@ void UFS::dir(Window* Win) {
 
     //const int  colContent  = 8;
 
+    mcb->s->SCHEDULER_SUSPENDED = true;
+
+
 	// setting up the table
-    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Handle" << colSep;
+    sOutput << "    " << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
     sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
-	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks used" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks#" << colSep;
 	sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
 	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
 	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
-	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Permission" << colSep;
-	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner ID" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Perm." << colSep;
+	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner#" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
-	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Modified Time" << std::endl;
-
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
+    
+    outString = sOutput.str();
+    chr = strdup(outString.c_str());
+    sprintf(outBuff, "            test %s", chr);
 
     for (int i = 0; i < numberOfBlocks; i++) {
 		// time conversions
 		char cDateBuff[100];
 		char mDateBuff[100];
-        char* chr;
 
 		// figure out time
         timeStruct = localtime (&inodes[i].createdOn);
@@ -584,7 +590,7 @@ void UFS::dir(Window* Win) {
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
 			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
-			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+			sOutput << "    "  << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
 			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
 			sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
@@ -598,9 +604,14 @@ void UFS::dir(Window* Win) {
 
         outString = sOutput.str();
         chr = strdup(outString.c_str());
-        sprintf(outBuff, "%s",chr);
-        Win->write_window(outBuff);
+        sprintf(outBuff  + strlen(outBuff), "%s", chr);
     }
+    Win->write_window(outBuff);
+    free(chr);
+
+    mcb->s->SCHEDULER_SUSPENDED = false;
+
+
 }
 
 
