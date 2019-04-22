@@ -16,6 +16,7 @@ Purpose       : Implementation of our file system
 #include <stdio.h>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 
 // constant array corresponding to iNode bitmap
 static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
@@ -523,6 +524,8 @@ void UFS::dir(Window* Win) {
     std::string outString;
     std::stringstream sOutput;
     char* chr;
+    std::ofstream yoo;
+    yoo.open("iHatesEverything.txt");
 
 	std::time_t cDate, mDate;
 	std::time_t initTime;
@@ -549,9 +552,14 @@ void UFS::dir(Window* Win) {
     
     outString = sOutput.str();
     chr = strdup(outString.c_str());
-    sprintf(outBuff, "  %s", chr);
+    //yoo << chr;
+    sprintf(outBuff, "  \n%s", chr);
     Win->write_window(outBuff);
     sprintf(outBuff, "");
+    sOutput.str("");
+    sOutput.clear();
+
+    yoo.close();
 
 
 
@@ -601,7 +609,7 @@ void UFS::dir(Window* Win) {
         // only list actual files
         if (inodes[i].ownerTaskID != -1) {
 			// USE I FOR HANDLE TEMPORARILY ONLY !!!!!!!!!
-			sOutput << "    "  << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
 			sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "xxxx" << colSep;
 			sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  inodes[i].size << colSep;
@@ -615,9 +623,12 @@ void UFS::dir(Window* Win) {
 
         outString = sOutput.str();
         chr = strdup(outString.c_str());
-        sprintf(outBuff  + strlen(outBuff), "    %s", chr);
+        sprintf(outBuff, "    %s", chr);
+        Win->write_window(outBuff);
+        sOutput.str("");
+        sOutput.clear();
+
     }
-    //Win->write_window(outBuff);
     free(chr);
 
     mcb->s->SCHEDULER_SUSPENDED = false;
