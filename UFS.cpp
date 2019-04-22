@@ -513,7 +513,7 @@ void UFS::dump(Window* Win) {
     // get one line at a time until EOF
     while (getline (dataFile, fRow))
     {
-      sprintf(mBuff + strlen(mBuff),"%s \t\t", fRow);
+      //sprintf(mBuff + strlen(mBuff),"%s \t\t", fRow);
     }
   dataFile.close();
   }

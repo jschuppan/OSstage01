@@ -39,7 +39,9 @@ void setMCB(MCB* mcb);
 void endlessLoop(MCB* mcb);
 void mem_wrapperDump(Scheduler* s, Mem_Mgr* m, UI* userInf);
 void IPCwrapperDump(Scheduler* s, UI* userInf, int level);
-
+void filewrapperDump(UFS* ufs, UI* userInf);
+void filewrapperDumpDir(UFS* ufs, UI* userInf);
+void filewrapperDumpDir(UFS* ufs, UI* userInf,int threadID);
 
 
 
@@ -144,7 +146,56 @@ void IPCwrapperDump(Scheduler* s, UI* userInf, int level)
 
 }
 
+void filewrapperDump(UFS* ufs, UI* userInf)
+{
+    sleep(1);
+    //suserInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
 
+    ufs->dump(Win);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
+    userInf->update();
+    //Win->clearScreen();
+
+}
+
+void filewrapperDumpDir(UFS* ufs, UI* userInf)
+{
+    sleep(1);
+    //suserInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
+
+    ufs->dir(Win);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
+    userInf->update();
+    //Win->clearScreen();
+
+}
+
+void filewrapperDumpDir(UFS* ufs, UI* userInf, int threadID)
+{
+    sleep(1);
+    //suserInf->clearConsoleScreen();
+    Window * Win = new Window();
+    //create new window to dump to
+    Win->createMaxSizeWindow();
+
+    ufs->dir(Win,threadID);
+    //display dump window for DUMP_SLEEP seconds
+    sleep(DUMP_SLEEP);
+    Win->deleteWindow();
+    userInf->update();
+    //Win->clearScreen();
+
+}
 /*-----------------------------------------------------------------
 Function      : endlessLoop()
 Parameters    :
@@ -318,16 +369,35 @@ void endlessLoop(MCB* mcb)
         case 'r':
         {
           mcb->s->resume();
+          break;
         }
         case 'R':
         {
           mcb->s->stop();
+          break;
         }
         case 'y':
         {
           int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",300,0b1100);
           mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
+          break;
         }
+        case 'Y':
+        {
+          filewrapperDump(mcb->ufs,mcb->userInf);
+          break;
+        }
+        case 'p':
+        {
+          filewrapperDumpDir(mcb->ufs,mcb->userInf);
+          break;
+        }
+        case 'P':
+        {
+          filewrapperDumpDir(mcb->ufs,mcb->userInf, rand()%3);
+          break;
+        }
+        
       }
     }
   }
