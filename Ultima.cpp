@@ -382,7 +382,7 @@ void endlessLoop(MCB* mcb)
         }
         case 'y':
         {
-          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",300,0b1100);
+          int tempFileHandle = mcb->ufs->createFile(0,"Big_Daddy",200,0b1100);
           mcb->s->getThreadInfo().getDatumById(0)->fileHandle.addToFront(tempFileHandle,tempFileHandle);
           break;
         }

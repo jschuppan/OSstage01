@@ -39,6 +39,7 @@ class UFS {
         }
     };
 
+    void writeToThreadWindow(int, char*);
     linkedList<openFiles> openFileList;
     public:
 

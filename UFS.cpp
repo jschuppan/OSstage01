@@ -332,8 +332,11 @@ Details       :
 ------------------------------------------------------------------*/
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
     	std::fstream metaFile(metaFileName.c_str());
-    if ( fileSize <=0)
-		return 0;
+    if ( fileSize <=0 || fileSize >= 4*fsBlockSize)
+    {
+        writeToThreadWindow(threadID, "  Invalid File Size\n");
+		return -1;
+    }
     //Requested Block is less that 128
 	else if (fileSize < fsBlockSize && available > 0) 
 	{
@@ -350,6 +353,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
 				available--;
 				used++;
+                writeToThreadWindow(threadID, "  File Created\n");
 		        return nextFileHandle++;
 		    }
 		}
@@ -392,6 +396,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 					inodes[i].fileName[k] = fileName[k];
 				if(count >= fileSize / 128.0)
 				{
+                    writeToThreadWindow(threadID, "  File Created\n");
 					return nextFileHandle++;
 				}
 				count++;
@@ -399,6 +404,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		}
 	}
     //Not enough space
+    writeToThreadWindow(threadID, "  Not Enough Free Space\n");
 	return -1;
 
 }
@@ -691,4 +697,9 @@ Details       : Sets the MCB pointer within the class
 void UFS::setMCB(MCB* mcb)
 {
   this->mcb = mcb;
+}
+
+void UFS::writeToThreadWindow(int threadID, char* text)
+{
+    mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
 }
