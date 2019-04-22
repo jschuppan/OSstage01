@@ -20,9 +20,20 @@ class UFS {
     int numberOfBlocks;
     int nextFileHandle;
     char initChar;
+    int nextFileID;
 
     int available, used;
 
+    struct openFiles
+    {
+        //T_ID is the thread that opened file
+        int T_ID;
+        std::string filename;
+        int fileID;
+        char status;
+    }
+
+    linkedList<openFiles> openFileList;
     public:
 
     // permission constants to be passed to createFile()

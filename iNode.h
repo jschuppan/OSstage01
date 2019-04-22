@@ -21,6 +21,7 @@ class iNode {
     int size;
     int sequence;
     int nextIndex;
+    int handle;
 
     char permission;
     unsigned short int blocks;
