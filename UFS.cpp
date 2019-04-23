@@ -67,7 +67,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
         dataFile.close();
 
         // read iNode from metaFile
-        metaFile.read((char *) inodes, sizeof(inodes));
+        metaFile.read((char *) inodes, sizeof(iNode) * numberOfBlocks);
         metaFile.close();
 
         for (int i = 0; i < numberOfBlocks; i++) {
@@ -109,7 +109,7 @@ void UFS::format() {
 
     // write to metaFile
     std::ofstream metaFile(metaFileName.c_str());
-    metaFile.write((char *) inodes, sizeof(inodes));
+    metaFile.write((char *) inodes, sizeof(iNode) * numberOfBlocks);
     metaFile.close();
 
     available = numberOfBlocks;
@@ -382,7 +382,7 @@ Details       : Creates a file for the given ThreadID, with fileName
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
     mcb->metaFileSema->down(threadID);
 
-    std::fstream metaFile(metaFileName.c_str());
+    std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
     if ( fileSize <=0 || fileSize >= 4*fsBlockSize)
     {
         writeToThreadWindow(threadID, "  Invalid File Size\n");
@@ -407,6 +407,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
   			  {
   		       	inodes[i].ownerTaskID = threadID;
   			   	  inodes[i].permission = permission;
+              inodes[i].handle = ++nextFileHandle;
   				    strcpy(inodes[i].fileName, fileName.c_str());
               //for(int k=0; k<8; k++)
   				     //	inodes[i].fileName[k] = fileName[k];
@@ -416,7 +417,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
   				    available--;
   			      used++;
               writeToThreadWindow(threadID, "  File Created\n");
-              inodes[i].handle = ++nextFileHandle;
+              metaFile.close();
               //release sema before return
               mcb->metaFileSema->up();
 
@@ -459,15 +460,15 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 			   	inodes[i].permission = permission;
 				inodes[i].sequence = count -1;
                 inodes[i].handle = nextFileHandle;
-				//ADD SEMAPHORE HERE
+				strcpy(inodes[i].fileName, fileName.c_str());
 				metaFile.seekp(sizeof(iNode) * i);
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
 				available--;
 				used++;
-				strcpy(inodes[i].fileName, fileName.c_str());
 				if(count >= fileSize / 128.0)
 				{
                 writeToThreadWindow(threadID, "  File Created\n");
+                metaFile.close();
                 //release sema before return
                 mcb->metaFileSema->up();
 
@@ -479,6 +480,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 	}
     //Not enough space
     //release sema before return
+    metaFile.close();
     mcb->metaFileSema->up();
 
     writeToThreadWindow(threadID, "  Not Enough Free Space\n");
