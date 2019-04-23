@@ -424,8 +424,7 @@ void endlessLoop(MCB* mcb)
         case 'e':
         {
           //Test UFS OpenFile for Write
-          int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
-          fileOpen1 =mcb->ufs->openFile(0,handle,fileName1 , 0b01);
+          fileOpen1 =mcb->ufs->openFile(0,tempFileHandle,fileName1 , 0b01);
           break;
         }
         case 'E':
@@ -437,17 +436,28 @@ void endlessLoop(MCB* mcb)
         }
         case 'u':
         {
-         //Test UFS Read out of bounds
+          //Test UFS Read out of bounds
           mcb->ufs->readChar(0,fileOpen1, c,700);
           break;
         }
         case 'U':
         {
-         //Test UFS Read in bounds
+          //Test UFS Read in bounds
           mcb->ufs->writeChar(0,fileOpen1,c,rand() % fileSize1 );
           break;
         }
-
+        case 'i':
+        {
+          //Test UFS Delete File
+          mcb->ufs->deleteFile(0,fileOpen1);
+          break;
+        }
+        case 'I':
+        {
+          //Test UFS Delete File
+          mcb->ufs->deleteFile(0,"boo");
+          break;
+        }
       }
     }
   }
