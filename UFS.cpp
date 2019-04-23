@@ -788,9 +788,9 @@ void UFS::dir(Window* Win, int threadID) {
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
 	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
 
+    //convert stringstream and write to window
     outString = sOutput.str();
     chr = strdup(outString.c_str());
-
     sprintf(outBuff, "  \n  %s", chr);
     Win->write_window(outBuff);
     sprintf(outBuff, "");
@@ -841,13 +841,17 @@ void UFS::dir(Window* Win, int threadID) {
             fileSize = inodes[i].size;
             j = i;
 
+            // combine the nodes corresponding to one file
             while (inodes[j].nextIndex != -1)
             {
                 j = inodes[j].nextIndex;
+                // OR the blocks
                 cmbBlock =  cmbBlock | inodes[j].blocks;
+                // add size of nodes together
                 fileSize += inodes[j].size;
             }
 
+            // only show the first node for a file
             if (inodes[i].sequence == 0)
             {
                     while((Ofile = openFileList.getNextElementUntilEnd(Ofile)))
@@ -879,6 +883,7 @@ void UFS::dir(Window* Win, int threadID) {
             }
         }
 
+        // print all files
         outString = sOutput.str();
         chr = strdup(outString.c_str());
         sprintf(outBuff, " %s", chr);
