@@ -172,9 +172,9 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.fileID = nextFileID;
             tempNode.status = mode;
             tempNode.ownerID = inodes[i].ownerTaskID;
-            openFileList.addToFront(tempNode, nextFileID);
+            openFileList.addToFront(tempNode, ++nextFileID);
             writeToThreadWindow(threadID, "  Success Open\n");
-            return nextFileID++;
+            return nextFileID;
         }
     }
     // file doesn't exist
@@ -631,19 +631,19 @@ void UFS::dir(Window* Win) {
 
             if (inodes[i].sequence == 0)
             {
-                    while((Ofile = openFileList.getNextElement(Ofile)))
+                    while((Ofile = openFileList.getNextElementUntilEnd(Ofile)))
                     {
-                        // if(Ofile->ownerID == inodes[i].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[i].fileName) == 0)
-                        // {
-                        //     // if(Ofile->status == READ)
-                        //     //     tempStatus = 'r';
-                        //     // else if(Ofile->status == WRITE)
-                        //     // {
-                        //     //     //Highest priority status stop looking
-                        //     //     tempStatus = 'w';
-                        //     //     break;
-                        //     // }
-                        // }
+                        if(Ofile->ownerID == inodes[i].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[i].fileName) == 0)
+                        {
+                            if(Ofile->status == READ)
+                                tempStatus = 'r';
+                            else if(Ofile->status == WRITE)
+                            {
+                                //Highest priority status stop looking
+                                tempStatus = 'w';
+                                break;
+                            }
+                        }
                     }
 
                 sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
