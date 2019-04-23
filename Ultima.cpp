@@ -38,7 +38,7 @@ const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
 int fileOpen1 = 0;
 int fileSize1 = 200;
-std::string fileName1 = "TestFile";
+std::string fileName1 = "tf";
 char c;
 
 void wrapperDump(Scheduler* s, UI* userInf, int level);

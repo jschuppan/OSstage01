@@ -359,8 +359,9 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 			{
 		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
-				for(int k=0; k<8; k++)
-					inodes[i].fileName[k] = fileName[k];
+				strcpy(inodes[i].fileName, fileName.c_str());
+                //for(int k=0; k<8; k++)
+				//	inodes[i].fileName[k] = fileName[k];
 				//ADD SEMAPHORE HERE
 				metaFile.seekp(sizeof(iNode) * i);
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
@@ -386,8 +387,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		       	inodes[i].ownerTaskID = threadID;
 			   	inodes[i].permission = permission;
                 inodes[i].handle = ++nextFileHandle;
-				for(int k=0; k<8; k++)
-					inodes[i].fileName[k] = fileName[k];
+				strcpy(inodes[i].fileName, fileName.c_str());
 				count++;
 				available--;
 				used++;
@@ -408,8 +408,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
 				available--;
 				used++;
-				for(int k=0; k<8; k++)
-					inodes[i].fileName[k] = fileName[k];
+				strcpy(inodes[i].fileName, fileName.c_str());
 				if(count >= fileSize / 128.0)
 				{
                     writeToThreadWindow(threadID, "  File Created\n");
@@ -549,30 +548,17 @@ void UFS::dir(Window* Win) {
 
     //Loop through linked list
     openFiles* Ofile = NULL;
-    int k =0;
+    int k = 0;
     char tempStatus = 'c';
-    while(Ofile = openFileList.getNextElementUntilEnd(Ofile))
-    {
-      if(Ofile->ownerID == inodes[k].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[k].fileName) == 0)
-      {
-        if(Ofile->status == READ)
-            tempStatus = 'r';
-        else if(Ofile->status == WRITE)
-        {
-          //Highest priority status stop looking
-          tempStatus = 'w';
-          break;
-        }
-      }
-      k++;
-    }
+
     mcb->s->SCHEDULER_SUSPENDED = true;
+
 
 
 	// setting up the table
     sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
     sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
-	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Blocks#" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Blocks#" << colSep;
 	sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
 	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
 	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
@@ -627,7 +613,7 @@ void UFS::dir(Window* Win) {
 
 		permBuff[4] = '\0';
 
-
+        // sOutput << " ";
         // only list actual files
         if (inodes[i].ownerTaskID != -1)
         {
@@ -645,9 +631,24 @@ void UFS::dir(Window* Win) {
 
             if (inodes[i].sequence == 0)
             {
+                    while((Ofile = openFileList.getNextElement(Ofile)))
+                    {
+                        // if(Ofile->ownerID == inodes[i].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[i].fileName) == 0)
+                        // {
+                        //     // if(Ofile->status == READ)
+                        //     //     tempStatus = 'r';
+                        //     // else if(Ofile->status == WRITE)
+                        //     // {
+                        //     //     //Highest priority status stop looking
+                        //     //     tempStatus = 'w';
+                        //     //     break;
+                        //     // }
+                        // }
+                    }
+
                 sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
 			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
-			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
 			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
 			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
 			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
@@ -660,7 +661,7 @@ void UFS::dir(Window* Win) {
 
         outString = sOutput.str();
         chr = strdup(outString.c_str());
-        sprintf(outBuff, "  %s ", chr);
+        sprintf(outBuff, " %s", chr);
         Win->write_window(outBuff);
         sOutput.str("");
         sOutput.clear();
@@ -669,8 +670,6 @@ void UFS::dir(Window* Win) {
     free(chr);
 
     mcb->s->SCHEDULER_SUSPENDED = false;
-
-
 }
 
 
