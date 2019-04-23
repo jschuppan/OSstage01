@@ -7,9 +7,6 @@ Purpose       : Implementation of our file system
 #ifndef UFS_H
 #define UFS_H
 
-//k
-
-
 #include <string>
 #include <fstream>
 #include "iNode.h"
@@ -45,6 +42,7 @@ class UFS {
 
     void writeToThreadWindow(int, char*);
     linkedList<openFiles> openFileList;
+
     public:
 
     // permission constants to be passed to createFile()

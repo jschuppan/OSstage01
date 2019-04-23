@@ -496,6 +496,9 @@ void setMCB(MCB* mcb)
   mcb->ipc->setMCB(mcb);
   mcb->writeSema->setMCB(mcb);
   mcb->messageSema->setMCB(mcb);
+  mcb->metaFileSema->setMCB(mcb);
+  mcb->dataFileSema->setMCB(mcb);
+  mcb->UFSLinkSema->setMCB(mcb);
   mcb->mem_mgr->setMCB(mcb);
   mcb->ufs->setMCB(mcb);
 }

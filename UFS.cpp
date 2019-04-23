@@ -5,10 +5,6 @@ Date          : April 16, 2019
 Purpose       : Implementation of our file system
 ============================================================================*/
 
-
-//k
-
-
 #include "UFS.h"
 #include "iNode.h"
 #include "window.h"
@@ -90,7 +86,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
 /*-----------------------------------------------------------------
 Function      : format();
 Parameters    :
-Returns       :
+Returns       : void
 Details       : initializes the iNodes, metaFile and dataFile with default values
 ------------------------------------------------------------------*/
 void UFS::format() {
@@ -131,9 +127,9 @@ void UFS::format() {
 
 /*-----------------------------------------------------------------
 Function      : openFile()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, int fileHandle, std::string fileName, char mode
+Returns       : int FileID
+Details       : Opens an existing file and returns FileID
 ------------------------------------------------------------------*/
 int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode) {
     for (int i = 0; i < numberOfBlocks; i++) {
@@ -178,8 +174,10 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.fileID = nextFileID;
             tempNode.status = mode;
             tempNode.ownerID = inodes[i].ownerTaskID;
+            //protect linked list
+            mcb->UFSLinkSema->down(threadID);
             openFileList.addToFront(tempNode, ++nextFileID);
-
+            mcb->UFSLinkSema->up();
 
             writeToThreadWindow(threadID, "  Success Open\n");
 
@@ -194,13 +192,16 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
 
 /*-----------------------------------------------------------------
 Function      : closeFile()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, int fileID
+Returns       : -1 on fail, 1 on success
+Details       : closes an existing file
 ------------------------------------------------------------------*/
 int UFS::closeFile(int threadID, int fileID)
 {
+  //Protect Linked List
+  mcb->UFSLinkSema->down(threadID);
   openFiles *tempOpenFile = openFileList.getDatumById(fileID);
+  
 
 	if(!tempOpenFile)
 	{
@@ -212,12 +213,17 @@ int UFS::closeFile(int threadID, int fileID)
 	{
 		if(threadID == tempOpenFile->T_ID)
 		{
+            
 			openFileList.removeNodeByElement(fileID);
+            //free sema
+            mcb->UFSLinkSema->up();
 			return 1;
 		}
 	}
 	//ERROR ID didnt match
     writeToThreadWindow(threadID, "  Task did not open file\n");
+    //free sema
+    mcb->UFSLinkSema->down(threadID);
 	return -1;
 
 }
@@ -225,23 +231,29 @@ int UFS::closeFile(int threadID, int fileID)
 
 /*-----------------------------------------------------------------
 Function      : readChar()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, int fileID, char &c,int offset
+Returns       : -1 on fail, 1 on success
+Details       : Reads char and saves to reference
 ------------------------------------------------------------------*/
 int UFS::readChar(int threadID, int fileID, char &c,int offset) {
+    //protect sema
+    mcb->UFSLinkSema->down(threadID);
     openFiles *ptr = openFileList.getDatumById(fileID);
 
 
     // file is NOT open or task didn't open file
     if (!ptr || ptr->T_ID != threadID) {
         writeToThreadWindow(threadID, "  File not open\n");
+        //free sema
+        mcb->UFSLinkSema->up();
         return -1;
     }
 
     // file is not open for read
     if ( ! (ptr->status & READ) ) {
         writeToThreadWindow(threadID, "  File not open for read\n");
+        //free sema
+        mcb->UFSLinkSema->up();
         return -1;
     }
 
@@ -270,30 +282,33 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
             offset %= fsBlockSize;
 
             // write to appropriate location
-            //mcb->dataFileSema->down(threadID);
+            mcb->dataFileSema->down(threadID);
             std::ifstream dataFile(fsName.c_str());
             dataFile.seekg( offset + inodes[ current ].startingBlock );
             dataFile.get(c);
             dataFile.close();
-            //mcb->dataFileSema->up();
+            mcb->dataFileSema->up();
 
             char buffer[100] = { 0 };
             sprintf(buffer, "  Read %c\n", c);
             writeToThreadWindow(threadID, buffer);
-
+            //free sema
+            mcb->UFSLinkSema->up();
             return 1;
         }
     }
     // shouldn't reach this return because file should be found
     writeToThreadWindow(threadID, "  readChar() bad error\n");
+    //free sema
+    mcb->UFSLinkSema->up();
     return -99;
 }
 
 /*-----------------------------------------------------------------
 Function      : writeChar()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, int fileID, char c,int offset
+Returns       : -1 on fail, 1 on success
+Details       : writes one char to an open file
 ------------------------------------------------------------------*/
 int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
@@ -342,12 +357,12 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
             offset %= fsBlockSize;
 
             // write to appropriate location
-            //mcb->dataFileSema->down(threadID);
+            mcb->dataFileSema->down(threadID);
             std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
             dataFile.seekp( offset + inodes[ current ].startingBlock );
             dataFile.put(c);
             dataFile.close();
-            //mcb->dataFileSema->up();
+            mcb->dataFileSema->up();
 
             writeToThreadWindow(threadID, "  Successful Write\n");
             return 1;
@@ -360,12 +375,12 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
 
 /*-----------------------------------------------------------------
 Function      : createFile()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, std::string fileName, int fileSize, char permission
+Returns       : -1 on fail, HandleID on success
+Details       : Creates a file for the given ThreadID, with fileName
 ------------------------------------------------------------------*/
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
-    //mcb->metaFileSema->down(threadID);
+    mcb->metaFileSema->down(threadID);
 
     std::fstream metaFile(metaFileName.c_str());
     if ( fileSize <=0 || fileSize >= 4*fsBlockSize)
@@ -403,7 +418,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
               writeToThreadWindow(threadID, "  File Created\n");
               inodes[i].handle = ++nextFileHandle;
               //release sema before return
-            //  mcb->metaFileSema->up();
+              mcb->metaFileSema->up();
 
   		        return inodes[i].handle;
   		    }
@@ -454,7 +469,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				{
                 writeToThreadWindow(threadID, "  File Created\n");
                 //release sema before return
-              //  mcb->metaFileSema->up();
+                mcb->metaFileSema->up();
 
 		            return inodes[i].handle;
 				}
@@ -464,7 +479,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 	}
     //Not enough space
     //release sema before return
-    //mcb->metaFileSema->up();
+    mcb->metaFileSema->up();
 
     writeToThreadWindow(threadID, "  Not Enough Free Space\n");
 	  return -1;
@@ -474,9 +489,9 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 
 /*-----------------------------------------------------------------
 Function      : deleteFile()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, std::string fileName
+Returns       : -1 on fail, 1 on success
+Details       : deletes an existing file 
 ------------------------------------------------------------------*/
 int UFS::deleteFile(int threadID, std::string fileName) {
     for (int i = 0; i < numberOfBlocks; i++) {
@@ -489,8 +504,8 @@ int UFS::deleteFile(int threadID, std::string fileName) {
             if (inodes[i].permission & 0b0100) {
 
                 //Protect files
-                //mcb->dataFileSema->down(threadID);
-                //mcb->metaFileSema->down(threadID);
+                mcb->dataFileSema->down(threadID);
+                mcb->metaFileSema->down(threadID);
 
                 std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
                 std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
@@ -531,8 +546,8 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 dataFile.close();
                 metaFile.close();
                 //Release semas
-                //mcb->dataFileSema->up();
-                //mcb->metaFileSema->up();
+                mcb->dataFileSema->up();
+                mcb->metaFileSema->up();
                 writeToThreadWindow(threadID, "  File deleted\n");
                 available++;
                 used--;
@@ -553,9 +568,9 @@ int UFS::deleteFile(int threadID, std::string fileName) {
 
 /*-----------------------------------------------------------------
 Function      : changePermission()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : int threadID, std::string fileName, char newPermission
+Returns       : -1 on fail, 1 on success
+Details       : Changes the file permission
 ------------------------------------------------------------------*/
 int UFS::changePermission(int threadID, std::string fileName, char newPermission) {
 
@@ -583,9 +598,9 @@ int UFS::changePermission(int threadID, std::string fileName, char newPermission
 
 /*-----------------------------------------------------------------
 Function      : dir()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : Window* Win
+Returns       : void
+Details       : displays a directory for all users
 ------------------------------------------------------------------*/
 void UFS::dir(Window* Win) {
     const char colFill        = ' ';
@@ -731,9 +746,9 @@ void UFS::dir(Window* Win) {
 
 /*-----------------------------------------------------------------
 Function      : dir()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : Window* Win, int threadID
+Returns       : void
+Details       : displays Directory for given threadID
 ------------------------------------------------------------------*/
 void UFS::dir(Window* Win, int threadID) {
     const char colFill        = ' ';
@@ -879,9 +894,9 @@ void UFS::dir(Window* Win, int threadID) {
 
 /*-----------------------------------------------------------------
 Function      : dump()
-Parameters    :
-Returns       :
-Details       :
+Parameters    : Window* Win
+Returns       : void
+Details       : displays dataFile to window
 ------------------------------------------------------------------*/
 void UFS::dump(Window* Win) {
   char mBuff[16384];
@@ -946,10 +961,17 @@ void UFS::setMCB(MCB* mcb)
   this->mcb = mcb;
 }
 
+
+/*-----------------------------------------------------------------
+Function      : writeToThreadWindow
+Parameters    : int threadID, char* text
+Returns       :
+Details       : A Wrapper function to write to the thread windows
+------------------------------------------------------------------*/
 void UFS::writeToThreadWindow(int threadID, char* text)
 {
-    //mcb->writeSema->down(threadID);
+    mcb->writeSema->down(threadID);
     mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
-    //mcb->writeSema->up();
+    mcb->writeSema->up();
 
 }
