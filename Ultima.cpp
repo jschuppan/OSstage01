@@ -450,7 +450,7 @@ void endlessLoop(MCB* mcb)
         case 'i':
         {
           //Test UFS Delete File
-          mcb->ufs->deleteFile(0,fileOpen1);
+          mcb->ufs->deleteFile(0,fileName1);
           break;
         }
         case 'I':

@@ -22,6 +22,23 @@ Purpose       : Implementation of our file system
 #include <sstream>
 #include <fstream>
 
+// constant array corresponding to iNode bitmap
+static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
+                                            0b0100000000000000,
+                                            0b0010000000000000,
+                                            0b0001000000000000,
+                                            0b0000100000000000,
+                                            0b0000010000000000,
+                                            0b0000001000000000,
+                                            0b0000000100000000,
+                                            0b0000000010000000,
+                                            0b0000000001000000,
+                                            0b0000000000100000,
+                                            0b0000000000010000,
+                                            0b0000000000001000,
+                                            0b0000000000000100,
+                                            0b0000000000000010,
+                                            0b0000000000000001 };
 
 UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar) {
     this->fsName = fsName + ".txt";  // ex: ultima.txt
@@ -43,9 +60,6 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
     std::ifstream dataFile(fsName.c_str());
 
     if (metaFile.fail() || dataFile.fail()) {  // one or more files don't exist
-
-        mcb->s->getThreadInfo().getDatumById(threadID)->getConsoleWin()->write_window(
-            "  Couldn't open meta or data file.\n  Initializing with default values.\n");
 
         metaFile.close();
         dataFile.close();
