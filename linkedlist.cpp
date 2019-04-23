@@ -277,8 +277,13 @@ T* linkedList<T> ::  getNextElementUntilEnd(T* ndv)
 
   node* temp = head;
   //one element in List
-  if(head->datum == *ndv)
-    return &head->next->datum;
+  if(head->datum == *ndv) {
+    
+    if (head->next)
+      return &head->next->datum;
+    else
+      return NULL;
+  }
 
   //loop until temp = last node
   while(temp->next)
