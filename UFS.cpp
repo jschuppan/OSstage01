@@ -555,13 +555,11 @@ void UFS::dir(Window* Win) {
     std::string outString;
     std::stringstream sOutput;
     char* chr;
-    std::ofstream yoo;
     unsigned short int cmbBlock; // combined block
     int j;
     int fileSize;
-
-	  std::time_t cDate, mDate;
-	  std::time_t initTime;
+	std::time_t cDate, mDate;
+	std::time_t initTime;
   	struct tm * timeStruct;
 
     //Loop through linked list
@@ -570,8 +568,6 @@ void UFS::dir(Window* Win) {
     char tempStatus = 'c';
 
     mcb->s->SCHEDULER_SUSPENDED = true;
-
-
 
 	// setting up the table
     sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
@@ -593,8 +589,6 @@ void UFS::dir(Window* Win) {
     sprintf(outBuff, "");
     sOutput.str("");
     sOutput.clear();
-
-
 
 
     for (int i = 0; i < numberOfBlocks; i++) {
@@ -686,7 +680,6 @@ void UFS::dir(Window* Win) {
 
     }
     free(chr);
-
     mcb->s->SCHEDULER_SUSPENDED = false;
 }
 
@@ -698,7 +691,143 @@ Returns       :
 Details       :
 ------------------------------------------------------------------*/
 void UFS::dir(Window* Win, int threadID) {
-    // next index
+    const char colFill        = ' ';
+    const std::string colSep  = " | ";
+	const int  colNameSm      = 4;
+    const int  colNameMd      = 7;
+	const int  colNameLg      = 12;
+	const int  colNameXLg     = 16;
+	char permBuff[5];
+    char outBuff[65536];
+    std::string outString;
+    std::stringstream sOutput;
+    char* chr;
+    unsigned short int cmbBlock; // combined block
+    int j;
+    int fileSize;
+	std::time_t cDate, mDate;
+	std::time_t initTime;
+  	struct tm * timeStruct;
+
+    //Loop through linked list
+    openFiles* Ofile = NULL;
+    int k = 0;
+    char tempStatus = 'c';
+
+    mcb->s->SCHEDULER_SUSPENDED = true;
+
+	// setting up the table
+    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Hndle" << colSep;
+    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Name" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Blocks#" << colSep;
+	sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  "Size" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Starting block" << colSep;
+	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Status" << colSep;
+	sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  "Perm." << colSep;
+	sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  "Owner#" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Create Time" << colSep;
+	sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  "Mod. Time" << std::endl;
+
+    outString = sOutput.str();
+    chr = strdup(outString.c_str());
+
+    sprintf(outBuff, "  \n  %s", chr);
+    Win->write_window(outBuff);
+    sprintf(outBuff, "");
+    sOutput.str("");
+    sOutput.clear();
+
+
+    for (int i = 0; i < numberOfBlocks; i++) {
+		// time conversions
+		char cDateBuff[100];
+		char mDateBuff[100];
+
+		// figure out time
+        timeStruct = localtime (&inodes[i].createdOn);
+        strftime (cDateBuff, 100 ,"%x %X", timeStruct);
+		timeStruct = localtime (&inodes[i].modifiedOn);
+        strftime (mDateBuff, 100 ,"%x %X", timeStruct);
+
+		// figure out file permissions
+		if (inodes[i].permission & 0b1000)
+			permBuff[0] = 'r';
+		else
+			permBuff[0] = '-';
+
+		if (inodes[i].permission & 0b0100)
+			permBuff[1] = 'w';
+		else
+			permBuff[1] = '-';
+
+		if (inodes[i].permission & 0b0010)
+			permBuff[2] = 'r';
+		else
+			permBuff[2] = '-';
+
+		if (inodes[i].permission & 0b0001)
+			permBuff[3] = 'w';
+		else
+			permBuff[3] = '-';
+
+		permBuff[4] = '\0';
+
+        // sOutput << " ";
+        // only list actual files and iNodes belonging to the thread we are looking for
+        if (inodes[i].ownerTaskID != -1  && inodes[i].ownerTaskID == threadID)
+        {
+
+            cmbBlock = inodes[i].blocks;
+            fileSize = inodes[i].size;
+            j = i;
+
+            while (inodes[j].nextIndex != -1)
+            {
+                j = inodes[j].nextIndex;
+                cmbBlock =  cmbBlock | inodes[j].blocks;
+                fileSize += inodes[j].size;
+            }
+
+            if (inodes[i].sequence == 0)
+            {
+                    while((Ofile = openFileList.getNextElementUntilEnd(Ofile)))
+                    {
+                        if(Ofile->ownerID == inodes[i].ownerTaskID && strcmp(Ofile->filename.c_str(),inodes[i].fileName) == 0)
+                        {
+                            if(Ofile->status == READ)
+                                tempStatus = 'r';
+                            else if(Ofile->status == WRITE)
+                            {
+                                //Highest priority status stop looking
+                                tempStatus = 'w';
+                                break;
+                            }
+                        }
+                    }
+
+                sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
+			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
+			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
+			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
+			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+            }
+        }
+
+        outString = sOutput.str();
+        chr = strdup(outString.c_str());
+        sprintf(outBuff, " %s", chr);
+        Win->write_window(outBuff);
+        sOutput.str("");
+        sOutput.clear();
+
+    }
+    free(chr);
+    mcb->s->SCHEDULER_SUSPENDED = false;
 }
 
 
@@ -725,6 +854,7 @@ void UFS::dump(Window* Win) {
   if (dataFile.is_open())
   {
     // get one line at a time until EOF
+    sprintf(mBuff, "");
     while (getline (dataFile, fRow))
     {
       tmpChar = strdup(fRow.c_str());

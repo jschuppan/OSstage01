@@ -167,7 +167,7 @@ void filewrapperDump(UFS* ufs, UI* userInf)
     sleep(DUMP_SLEEP);
     Win->deleteWindow();
     userInf->update();
-    //Win->clearScreen();
+    Win->clearScreen();
 
 }
 
@@ -191,17 +191,17 @@ void filewrapperDumpDir(UFS* ufs, UI* userInf)
 void filewrapperDumpDir(UFS* ufs, UI* userInf, int threadID)
 {
     sleep(1);
-    //suserInf->clearConsoleScreen();
+    userInf->clearConsoleScreen();
     Window * Win = new Window();
     //create new window to dump to
     Win->createMaxSizeWindow();
 
-    //ufs->dir(Win,threadID);
+    ufs->dir(Win,threadID);
     //display dump window for DUMP_SLEEP seconds
     sleep(DUMP_SLEEP);
     Win->deleteWindow();
     userInf->update();
-    //Win->clearScreen();
+    Win->clearScreen();
 
 }
 /*-----------------------------------------------------------------
@@ -407,7 +407,7 @@ void endlessLoop(MCB* mcb)
         case 'P':
         {
           //Test UFS  Dir dump
-          filewrapperDumpDir(mcb->ufs,mcb->userInf, rand()%3);
+          filewrapperDumpDir(mcb->ufs,mcb->userInf, 0);
           break;
         }
         case 'g':
