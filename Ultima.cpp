@@ -39,7 +39,15 @@ const int RUNNING_WINDOW = 1;
 const int CONSOLE_WINDOW = 2;
 int fileOpen1 = 0;
 int fileSize1 = 200;
+int fileSize2 = 500;
+
 std::string fileName1 = "tf";
+std::string fileName2 = "tfw";
+std::string fileName3 = "tfe";
+std::string fileName4 = "tfa";
+std::string fileName5 = "tfy";
+
+
 char c;
 
 void wrapperDump(Scheduler* s, UI* userInf, int level);
@@ -431,7 +439,6 @@ void endlessLoop(MCB* mcb)
         case 'E':
         {
           //Test UFS OpenFile for Read
-          int handle = *mcb->s->getThreadInfo().getDatumById(0)->fileHandle.getNextElement(NULL);
           fileOpen1 =mcb->ufs->openFile(0, tempFileHandle, fileName1 , 0b10);
           break;
         }
@@ -444,7 +451,7 @@ void endlessLoop(MCB* mcb)
         case 'U':
         {
           //Test UFS Read in bounds
-          mcb->ufs->writeChar(0,fileOpen1,c,rand() % fileSize1 );
+          mcb->ufs->readChar(0,fileOpen1,c,rand() % fileSize1 );
           break;
         }
         case 'i':
@@ -457,6 +464,26 @@ void endlessLoop(MCB* mcb)
         {
           //Test UFS Delete File
           mcb->ufs->deleteFile(0,"boo");
+          break;
+        }
+        case 'n':
+        {
+          //Test UFS Multiple file create
+          tempFileHandle = mcb->ufs->createFile(1,fileName2,fileSize2,0b1100);
+          tempFileHandle = mcb->ufs->createFile(1,fileName3,fileSize2,0b1111);
+          tempFileHandle = mcb->ufs->createFile(1,fileName4,fileSize2,0b1101);
+          tempFileHandle = mcb->ufs->createFile(1,fileName5,fileSize2,0b1110);
+
+          break;
+        }
+        case 'N':
+        {
+          //Test UFS Multiple file create
+          mcb->ufs->deleteFile(1,fileName2);
+          mcb->ufs->deleteFile(1,fileName3);
+          mcb->ufs->deleteFile(1,fileName4);
+          mcb->ufs->deleteFile(1,fileName5);
+
           break;
         }
       }

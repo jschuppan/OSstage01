@@ -21,6 +21,7 @@ Purpose       : Implementation of our file system
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include "sema.h"
 
 // constant array corresponding to iNode bitmap
 static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
@@ -178,7 +179,10 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.status = mode;
             tempNode.ownerID = inodes[i].ownerTaskID;
             openFileList.addToFront(tempNode, ++nextFileID);
+
+
             writeToThreadWindow(threadID, "  Success Open\n");
+
             return nextFileID;
         }
     }
@@ -196,7 +200,8 @@ Details       :
 ------------------------------------------------------------------*/
 int UFS::closeFile(int threadID, int fileID)
 {
-    openFiles *tempOpenFile = openFileList.getDatumById(fileID);
+  openFiles *tempOpenFile = openFileList.getDatumById(fileID);
+
 	if(!tempOpenFile)
 	{
 		//Print error file not found
@@ -226,6 +231,7 @@ Details       :
 ------------------------------------------------------------------*/
 int UFS::readChar(int threadID, int fileID, char &c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
+
 
     // file is NOT open or task didn't open file
     if (!ptr || ptr->T_ID != threadID) {
@@ -264,10 +270,12 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
             offset %= fsBlockSize;
 
             // write to appropriate location
+            //mcb->dataFileSema->down(threadID);
             std::ifstream dataFile(fsName.c_str());
             dataFile.seekg( offset + inodes[ current ].startingBlock );
             dataFile.get(c);
             dataFile.close();
+            //mcb->dataFileSema->up();
 
             char buffer[100] = { 0 };
             sprintf(buffer, "  Read %c\n", c);
@@ -289,6 +297,7 @@ Details       :
 ------------------------------------------------------------------*/
 int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
+
 
     // file is NOT open
     if (!ptr) {
@@ -333,10 +342,12 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
             offset %= fsBlockSize;
 
             // write to appropriate location
+            //mcb->dataFileSema->down(threadID);
             std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
             dataFile.seekp( offset + inodes[ current ].startingBlock );
             dataFile.put(c);
             dataFile.close();
+            //mcb->dataFileSema->up();
 
             writeToThreadWindow(threadID, "  Successful Write\n");
             return 1;
@@ -354,34 +365,49 @@ Returns       :
 Details       :
 ------------------------------------------------------------------*/
 int UFS::createFile(int threadID, std::string fileName, int fileSize, char permission) {
-    	std::fstream metaFile(metaFileName.c_str());
+    //mcb->metaFileSema->down(threadID);
+
+    std::fstream metaFile(metaFileName.c_str());
     if ( fileSize <=0 || fileSize >= 4*fsBlockSize)
     {
         writeToThreadWindow(threadID, "  Invalid File Size\n");
-		return -1;
+		    return -1;
+    }
+    else if(strlen(fileName.c_str()) > 7)
+    {
+      writeToThreadWindow(threadID, "  Invalid Filename Size\n");
+      return -1;
     }
     //Requested Block is less that 128
-	else if (fileSize < fsBlockSize && available > 0)
-	{
-		for (int i = 0; i < numberOfBlocks; i++)
-		{
-		    if (inodes[i].ownerTaskID == -1)
-			{
-		       	inodes[i].ownerTaskID = threadID;
-			   	inodes[i].permission = permission;
-				strcpy(inodes[i].fileName, fileName.c_str());
-                //for(int k=0; k<8; k++)
-				//	inodes[i].fileName[k] = fileName[k];
-				//ADD SEMAPHORE HERE
-				metaFile.seekp(sizeof(iNode) * i);
-				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
-				available--;
-				used++;
-                writeToThreadWindow(threadID, "  File Created\n");
-                inodes[i].handle = ++nextFileHandle;
-		        return inodes[i].handle;
-		    }
-		}
+	  else if (fileSize < fsBlockSize && available > 0)
+	  {
+  		for (int i = 0; i < numberOfBlocks; i++)
+  		{
+          if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
+          {
+            writeToThreadWindow(threadID, "  File Already Exists\n");
+            return -1;
+          }
+  		    if (inodes[i].ownerTaskID == -1)
+  			  {
+  		       	inodes[i].ownerTaskID = threadID;
+  			   	  inodes[i].permission = permission;
+  				    strcpy(inodes[i].fileName, fileName.c_str());
+              //for(int k=0; k<8; k++)
+  				     //	inodes[i].fileName[k] = fileName[k];
+  				    //ADD SEMAPHORE HERE
+  				    metaFile.seekp(sizeof(iNode) * i);
+  				    metaFile.write((char *) &(inodes[i]), sizeof(iNode));
+  				    available--;
+  			      used++;
+              writeToThreadWindow(threadID, "  File Created\n");
+              inodes[i].handle = ++nextFileHandle;
+              //release sema before return
+            //  mcb->metaFileSema->up();
+
+  		        return inodes[i].handle;
+  		    }
+  		}
 	}
     //Requested Block is greater than 128 and enough space is available
 	else if(available >= fileSize / 128.0)
@@ -390,7 +416,12 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		int count = 1;
 		for (int i = 0; i < numberOfBlocks; i++)
 		{
-		    if (inodes[i].ownerTaskID == -1 && count == 1)
+      if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
+      {
+        writeToThreadWindow(threadID, "  File Already Exists\n");
+        return -1;
+      }
+		  if (inodes[i].ownerTaskID == -1 && count == 1)
 			{
 				//store previous iNode to store nextIndex
 				temp = &inodes[i];
@@ -421,7 +452,10 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 				strcpy(inodes[i].fileName, fileName.c_str());
 				if(count >= fileSize / 128.0)
 				{
-                    writeToThreadWindow(threadID, "  File Created\n");
+                writeToThreadWindow(threadID, "  File Created\n");
+                //release sema before return
+              //  mcb->metaFileSema->up();
+
 		            return inodes[i].handle;
 				}
 				count++;
@@ -429,8 +463,11 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 		}
 	}
     //Not enough space
+    //release sema before return
+    //mcb->metaFileSema->up();
+
     writeToThreadWindow(threadID, "  Not Enough Free Space\n");
-	return -1;
+	  return -1;
 
 }
 
@@ -451,13 +488,17 @@ int UFS::deleteFile(int threadID, std::string fileName) {
             // has permission
             if (inodes[i].permission & 0b0100) {
 
+                //Protect files
+                //mcb->dataFileSema->down(threadID);
+                //mcb->metaFileSema->down(threadID);
+
                 std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
                 std::fstream metaFile(metaFileName.c_str(), std::ios::in | std::ios::out);
 
                 // for all inodes corresponding to this file
                 // reset dataFile block and reset inode
                 int current = i;
-				int nextIndex = 0;
+				        int nextIndex = 0;
                 while (current != -1) {
 
                     // reset dataFile block
@@ -466,7 +507,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                         dataFile.put('$');
                     }
 
-					nextIndex = inodes[ current ].nextIndex;
+					          nextIndex = inodes[ current ].nextIndex;
 
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
@@ -474,7 +515,6 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     inodes[ current ].sequence = 0;
                     inodes[ current ].nextIndex = -1;
                     inodes[ current ].permission = 0b0000;
-                    inodes[ current ].blocks = 0;
                     inodes[ current ].handle = -1;
                     inodes[ current ].createdOn = time(NULL);
                     inodes[ current ].modifiedOn = time(NULL);
@@ -490,8 +530,12 @@ int UFS::deleteFile(int threadID, std::string fileName) {
 
                 dataFile.close();
                 metaFile.close();
-
+                //Release semas
+                //mcb->dataFileSema->up();
+                //mcb->metaFileSema->up();
                 writeToThreadWindow(threadID, "  File deleted\n");
+                available++;
+                used--;
                 return 0;  // success
             }
 
@@ -658,16 +702,17 @@ void UFS::dir(Window* Win) {
                         }
                     }
 
-                sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
-			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
-			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
-			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+
+              sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
+    			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
+    			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
+    			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
             }
         }
 
@@ -805,16 +850,17 @@ void UFS::dir(Window* Win, int threadID) {
                         }
                     }
 
-                sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
-			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
-			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
-			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
-			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
-			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
+
+              sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].handle << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].fileName << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  intToBin(cmbBlock) << colSep;
+    			    sOutput << std::left << std::setw(colNameSm) << std::setfill(colFill) <<  fileSize << colSep;
+    			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  inodes[i].startingBlock << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  tempStatus << colSep;
+    			    sOutput << std::left << std::setw(colNameLg) << std::setfill(colFill) <<  permBuff << colSep;
+    			    sOutput << std::left << std::setw(colNameMd) << std::setfill(colFill) <<  inodes[i].ownerTaskID << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  cDateBuff << colSep;
+    			    sOutput << std::left << std::setw(colNameXLg) << std::setfill(colFill) <<  mDateBuff << std::endl;
             }
         }
 
@@ -848,6 +894,7 @@ void UFS::dump(Window* Win) {
 
   std::string fRow;
   char* tmpChar;
+
   std::fstream dataFile(fsName.c_str(), std::ios::in | std::ios::out);
 
   // make sure file was successfully opened
@@ -901,5 +948,8 @@ void UFS::setMCB(MCB* mcb)
 
 void UFS::writeToThreadWindow(int threadID, char* text)
 {
+    //mcb->writeSema->down(threadID);
     mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
+    //mcb->writeSema->up();
+
 }

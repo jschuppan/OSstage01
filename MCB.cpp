@@ -15,6 +15,10 @@ MCB::MCB()
   ipc = new IPC();
   writeSema = new Semaphore("write_window",1);
   messageSema = new Semaphore("message_access",1);
+  metaFileSema = new Semaphore("metaFile",1);
+  dataFileSema = new Semaphore("dataFile",1);
+  UFSLinkSema = new Semaphore("UFS_linkedList",1);
+
   userInf = new UI();
   mem_mgr = new Mem_Mgr();
   ufs = new UFS("UltimaFS", 16, 128, '^');

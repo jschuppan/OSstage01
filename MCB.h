@@ -25,6 +25,9 @@ struct MCB
     IPC* ipc;
     Semaphore* writeSema;
     Semaphore* messageSema;
+    Semaphore* metaFileSema;
+    Semaphore* dataFileSema;
+    Semaphore* UFSLinkSema;
     UI* userInf;
     Mem_Mgr* mem_mgr;
     UFS* ufs;
