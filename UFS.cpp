@@ -18,24 +18,6 @@ Purpose       : Implementation of our file system
 #include <sstream>
 #include <fstream>
 
-// constant array corresponding to iNode bitmap
-static unsigned short int B_ALLOC[16] = { 0b1000000000000000,
-                                                0b0100000000000000,
-                                                0b0010000000000000,
-                                                0b0001000000000000,
-                                                0b0000100000000000,
-                                                0b0000010000000000,
-                                                0b0000001000000000,
-                                                0b0000000100000000,
-                                                0b0000000010000000,
-                                                0b0000000001000000,
-                                                0b0000000000100000,
-                                                0b0000000000010000,
-                                                0b0000000000001000,
-                                                0b0000000000000100,
-                                                0b0000000000000010,
-                                                0b0000000000000001 };
-
 
 UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar) {
     this->fsName = fsName + ".txt";  // ex: ultima.txt
@@ -57,11 +39,17 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
     std::ifstream dataFile(fsName.c_str());
 
     if (metaFile.fail() || dataFile.fail()) {  // one or more files don't exist
-        printf("\nCouldn't open meta or data file, initializing with default values.\n");
+
+        mcb->s->getThreadInfo().getDatumById(threadID)->getConsoleWin()->write_window(
+            "  Couldn't open meta or data file.\n  Initializing with default values.\n");
+
         metaFile.close();
+        dataFile.close();
         format();  // format file system with initChar
     }
     else {  // file exists
+
+        dataFile.close();
 
         // read iNode from metaFile
         metaFile.read((char *) inodes, sizeof(inodes));
@@ -133,7 +121,6 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
 
         // if file exists
         if ( strcmp(inodes[i].fileName, fileName.c_str()) == 0) {
-          writeToThreadWindow(threadID, "  TEST\n");
 
             // owner wants to open
             if (inodes[i].ownerTaskID == threadID || fileHandle == inodes[i].handle) {
@@ -195,6 +182,7 @@ int UFS::closeFile(int threadID, int fileID)
 	if(!tempOpenFile)
 	{
 		//Print error file not found
+        writeToThreadWindow(threadID, "  File not open\n");
 		return -1;
 	}
 	else
@@ -206,6 +194,7 @@ int UFS::closeFile(int threadID, int fileID)
 		}
 	}
 	//ERROR ID didnt match
+    writeToThreadWindow(threadID, "  Task did not open file\n");
 	return -1;
 
 }
@@ -220,18 +209,15 @@ Details       :
 int UFS::readChar(int threadID, int fileID, char &c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
 
-    // file is NOT open
-    if (!ptr) {
-        return -1;
-    }
-
-    // task didn't open file
-    if ( ptr->T_ID != threadID ) {
+    // file is NOT open or task didn't open file
+    if (!ptr || ptr->T_ID != threadID) {
+        writeToThreadWindow(threadID, "  File not open\n");
         return -1;
     }
 
     // file is not open for read
     if ( ! (ptr->status & READ) ) {
+        writeToThreadWindow(threadID, "  File not open for read\n");
         return -1;
     }
 
@@ -252,6 +238,7 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
 
             // out of boundaries
             if (skips > 0) {
+                writeToThreadWindow(threadID, "  readChar() out of bounds\n");
                 return -1;
             }
 
@@ -264,10 +251,15 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
             dataFile.get(c);
             dataFile.close();
 
+            char buffer[100] = { 0 };
+            sprintf(buffer, "  Read %c\n", c);
+            writeToThreadWindow(threadID, buffer);
+
             return 1;
         }
     }
     // shouldn't reach this return because file should be found
+    writeToThreadWindow(threadID, "  readChar() bad error\n");
     return -99;
 }
 
@@ -457,6 +449,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     }
 
 					nextIndex = inodes[ current ].nextIndex;
+
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
                     inodes[ current ].ownerTaskID = -1;
@@ -467,6 +460,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     inodes[ current ].handle = -1;
                     inodes[ current ].createdOn = time(NULL);
                     inodes[ current ].modifiedOn = time(NULL);
+
 
                     // write to metaFile
                     int inodeSize = sizeof(iNode);
@@ -479,15 +473,18 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 dataFile.close();
                 metaFile.close();
 
+                writeToThreadWindow(threadID, "  File deleted\n");
                 return 0;  // success
             }
 
             // doesn't have permission
             else {
+                writeToThreadWindow(threadID, "  Permission denied\n");
                 return -1;
             }
         }
     }
+    writeToThreadWindow(threadID, "  File not found\n");
     return -1;
 }
 
@@ -511,10 +508,13 @@ int UFS::changePermission(int threadID, std::string fileName, char newPermission
 
                 current = inodes[ current ].nextIndex;
             }
+
+            writeToThreadWindow(threadID, "  Changed permission\n");
             return 1;
         }
     }
 
+    writeToThreadWindow(threadID, "  Failed to change permission\n");
     return -1;
 }
 
