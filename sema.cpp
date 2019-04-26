@@ -75,7 +75,8 @@ void Semaphore::down(int threadID)
     {
         while(lastPop != threadID);
         //callToScheduler();
-        mcb->s->TCBList.getDatumById(threadID)->setState(READY);
+        if(threadID > 0)
+          mcb->s->TCBList.getDatumById(threadID)->setState(READY);
     }
     //resMutex.unlock();
     pthread_mutex_unlock(&resMutex);

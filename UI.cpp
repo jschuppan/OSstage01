@@ -33,20 +33,18 @@ Details       : creates three starter windows
 void UI :: addStarterWindows()
 {
     //Header Window
-      windowList.addToFront(Window(getMaxY() /5, getMaxX()-4, 2, 2,"HeaderWin "), windowCreatedCount);
+      windowList.addToFront(Window(getMaxY() /5, (getMaxX()/2)-3, 2, 2,"HeaderWin "), windowCreatedCount);
       windowCreatedCount++;
 
-     //Control window
+     //Running window
      int y2 = windowList.getDatumById(0)->getY() + windowList.getDatumById(0)->getHeight();
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*1/3-2, y2, 2,"RunningWin "),windowCreatedCount);
+     windowList.addToEnd(Window(getMaxY() /5 +2, (getMaxX()/2) -3, y2, 2,"RunningWin "),windowCreatedCount);
      windowCreatedCount++;
 
-     int tempx =  windowList.getDatumById(1)->getX() +  windowList.getDatumById(1)->getWidth();
-     int tempy =  windowList.getDatumById(1)->getY();
+     int tempx =  windowList.getDatumById(0)->getX() +  windowList.getDatumById(0)->getWidth() + 2;
 
-     //Input window
-     windowList.addToEnd(Window(getMaxY() /5, getMaxX()*2/3-2, tempy, tempx,"ConsoleWin "), windowCreatedCount);
-     windowList.getDatumById(2)->write_window(1,1,"Press h for help.");
+     //Console window
+     windowList.addToEnd(Window(getMaxY() -4, (getMaxX()/2)-3, 2, tempx,"ConsoleWin "), windowCreatedCount);
      windowCreatedCount++;
 
 }
@@ -60,7 +58,7 @@ Details       : creates three starter windows
 void UI :: addNewWindow()
 {
      int height = getMaxY() /2;
-     int width = (getMaxX()-3) /3;
+     int width = ((getMaxX()/2)-3) /3;
      int y2;
      std::string tempString = "ThreadWin " + windowCreatedCount;
      //Only create 9 windows

@@ -210,7 +210,6 @@ void Scheduler::messageDump(Window* targetWin, int level)
   char mBuff[16384];
   std::string tempString;
   char* chr;
-  stop();
   SCHEDULER_SUSPENDED = true;
 
   // get threadID of current element

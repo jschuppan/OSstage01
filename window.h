@@ -30,7 +30,6 @@ public:
 	Window();
 	Window(int height, int width, int starty, int startx, std::string name);
 	void create_window(int height, int width, int starty, int startx);
-  void display_help();
   void write_window(const char* text);
   void write_window(int y, int x, const char* text);
   void moveWindow(int y, int x);

@@ -75,45 +75,6 @@ void Window :: write_window(int y, int x, const char* text)
   wrefresh(window_ptr); // draw the window
 }
 
-/*-----------------------------------------------------------------
-Function      : display_help();
-Parameters    :
-Returns       : void
-Details       : displays a help menu to the window
-------------------------------------------------------------------*/
-void Window :: display_help()
-{
-  wclear(window_ptr);
-  write_window(1, 1, "...Help...");
-  write_window(2, 1, "0= Kill 0");
-  write_window(3, 1, "1= Kill 1");
-  write_window(4, 1, "2= Kill 2");
-  write_window(1, 18, "3= Kill 3");
-  write_window(2, 18, "4= Kill 4");
-  write_window(3, 18, "5= Kill 5");
-  write_window(4, 18, "c= clear screen");
-  write_window(1, 35, "h= help screen");
-  write_window(2, 35, "q= Quit");
-  write_window(3, 35, "r=..Restart...");
-  write_window(4, 35, "a= Add Thread");
-  write_window(1, 50, "s=..Sched Dump1...");
-  write_window(2, 50, "d=..Sched Dump2...");
-  write_window(3, 50, "f=..Sema Dump1...");
-  write_window(4, 50, "g=..Semap Dump2...");
-  write_window(1, 75, "y=..Message Dump..");
-  write_window(2, 75, "k=. Write Out Of Bounds");
-  write_window(3, 75, "m= Write in Bounds");
-  write_window(4, 75, "l= Free Memory 2");
-  write_window(5, 75, "o= Free Memory 1");
-  write_window(5, 35, "p= Memory Dump");
-  write_window(5, 50, "b= Allocate Mem_1 = 300");
-  write_window(6, 1, "v= Allocate Mem_2 = 300");
-  write_window(6, 18, "x= Allocate_Mem_3 = 300");
-  write_window(6, 35, "z= Allocate Mem_1 = 400");
-
-
-
-}
 
 /*-----------------------------------------------------------------
 Function      : resizeWindow(int,height,int width);
@@ -136,7 +97,6 @@ Details       : refreshes and draws a box around the window
 ------------------------------------------------------------------*/
 void Window :: windowRefresh()
 {
-    //write_window(1,1,"HELLO");
     box(window_ptr,0,0);
     wrefresh(window_ptr);
 }
@@ -175,7 +135,6 @@ Details       : clears the screen, draws a box around the window and
 void Window :: clearScreen()
 {
   wclear(window_ptr);
-  write_window(1,1,"Press h for help.");
   box(window_ptr,0,0);
   wrefresh(window_ptr);
 
