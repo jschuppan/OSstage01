@@ -50,14 +50,12 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
     this->nextFileHandle = 0;
 
     // create iNode corresponding to UFS here
-        // iNode crINODE();
-    inodes = new iNode[ numberOfBlocks ];  // like this?
+    inodes = new iNode[ numberOfBlocks ];
 
     std::ifstream metaFile(metaFileName.c_str());
-    std::ifstream dataFile(fsName.c_str());
+    std::ifstream dataFile(this->fsName.c_str());
 
     if (metaFile.fail() || dataFile.fail()) {  // one or more files don't exist
-
         metaFile.close();
         dataFile.close();
         format();  // format file system with initChar
@@ -80,6 +78,7 @@ UFS::UFS(std::string fsName, int numberOfBlocks, int fsBlockSize, char initChar)
             }
         }
     }
+    
 }
 
 
@@ -167,7 +166,7 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
                     return -1;
                 }
             }
-            //success (unique int file_id?)
+
             openFiles tempNode;
             tempNode.T_ID = threadID;
             tempNode.filename = fileName;
@@ -176,12 +175,14 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             tempNode.ownerID = inodes[i].ownerTaskID;
             //protect linked list
             mcb->UFSLinkSema->down(threadID);
-            openFileList.addToFront(tempNode, ++nextFileID);
+            openFileList.addToFront(tempNode, tempNode.fileID);
             mcb->UFSLinkSema->up();
 
             writeToThreadWindow(threadID, "  Success Open\n");
 
-            return nextFileID;
+            ++nextFileID;
+
+            return tempNode.fileID;
         }
     }
     // file doesn't exist
@@ -217,6 +218,7 @@ int UFS::closeFile(int threadID, int fileID)
 			openFileList.removeNodeByElement(fileID);
             //free sema
             mcb->UFSLinkSema->up();
+            writeToThreadWindow(threadID, "  File closed\n");
 			return 1;
 		}
 	}
@@ -297,10 +299,14 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
             return 1;
         }
     }
-    // shouldn't reach this return because file should be found
-    writeToThreadWindow(threadID, "  readChar() bad error\n");
+    // file deleted before being closed
+    writeToThreadWindow(threadID, "  File deleted before closed\n");
+    
     //free sema
     mcb->UFSLinkSema->up();
+
+    closeFile(threadID, fileID);
+    
     return -99;
 }
 
@@ -314,15 +320,9 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     openFiles *ptr = openFileList.getDatumById(fileID);
 
 
-    // file is NOT open
-    if (!ptr) {
-          writeToThreadWindow(threadID, "  File Does Not Exist\n");
-        return -1;
-    }
-
-    // task didn't open file
-    if ( ptr->T_ID != threadID ) {
-        writeToThreadWindow(threadID, "  Do Not Have Correct Permissions\n");
+    // file is NOT open or task didn't open file
+    if (!ptr || ptr->T_ID != threadID) {
+        writeToThreadWindow(threadID, "  File Not Open\n");
         return -1;
     }
 
@@ -368,7 +368,14 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
             return 1;
         }
     }
-    // shouldn't reach this return because file should be found
+    // file deleted before being closed
+    writeToThreadWindow(threadID, "  File deleted before closed\n");
+    
+    //free sema
+    mcb->UFSLinkSema->up();
+
+    closeFile(threadID, fileID);
+
     return -99;
 }
 
@@ -398,28 +405,27 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
 	  {
   		for (int i = 0; i < numberOfBlocks; i++)
   		{
-          if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
-          {
-            writeToThreadWindow(threadID, "  File Already Exists\n");
-            return -1;
-          }
+            if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
+            {
+                writeToThreadWindow(threadID, "  File Already Exists\n");
+                return -1;
+            }
   		    if (inodes[i].ownerTaskID == -1)
-  			  {
+  			{
   		       	inodes[i].ownerTaskID = threadID;
-  			   	  inodes[i].permission = permission;
-              inodes[i].handle = ++nextFileHandle;
-  				    strcpy(inodes[i].fileName, fileName.c_str());
-              //for(int k=0; k<8; k++)
-  				     //	inodes[i].fileName[k] = fileName[k];
-  				    //ADD SEMAPHORE HERE
-  				    metaFile.seekp(sizeof(iNode) * i);
-  				    metaFile.write((char *) &(inodes[i]), sizeof(iNode));
-  				    available--;
-  			      used++;
-              writeToThreadWindow(threadID, "  File Created\n");
-              metaFile.close();
-              //release sema before return
-              mcb->metaFileSema->up();
+  			   	inodes[i].permission = permission;
+                inodes[i].handle = ++nextFileHandle;
+  			    strcpy(inodes[i].fileName, fileName.c_str());
+                
+  				//ADD SEMAPHORE HERE
+  				metaFile.seekp(sizeof(iNode) * i);
+  				metaFile.write((char *) &(inodes[i]), sizeof(iNode));
+  				available--;
+  			    used++;
+                writeToThreadWindow(threadID, "  File Created\n");
+                metaFile.close();
+                //release sema before return
+                mcb->metaFileSema->up();
 
   		        return inodes[i].handle;
   		    }
@@ -515,7 +521,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 // for all inodes corresponding to this file
                 // reset dataFile block and reset inode
                 int current = i;
-				        int nextIndex = 0;
+				int nextIndex = 0;
                 while (current != -1) {
 
                     // reset dataFile block
@@ -524,7 +530,7 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                         dataFile.put('$');
                     }
 
-					          nextIndex = inodes[ current ].nextIndex;
+					nextIndex = inodes[ current ].nextIndex;
 
                     // reset inode
                     memset(inodes[ current ].fileName, 0, sizeof( inodes[ current ].fileName ));
@@ -542,6 +548,9 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                     metaFile.seekp( current * inodeSize );
                     metaFile.write((char *) &(inodes[ current ]), inodeSize);
 
+                    available++;
+                    used--;
+
                     current = nextIndex;
                 }
 
@@ -551,8 +560,6 @@ int UFS::deleteFile(int threadID, std::string fileName) {
                 mcb->dataFileSema->up();
                 mcb->metaFileSema->up();
                 writeToThreadWindow(threadID, "  File deleted\n");
-                available++;
-                used--;
                 return 0;  // success
             }
 
