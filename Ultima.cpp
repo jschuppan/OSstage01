@@ -110,7 +110,7 @@ void wrapperDump(int level,std::string menu,int threadID)
 {
 
   Window* writeWin = mcb->userInf->getWindowByID(CONSOLE_WINDOW);
-  mcb->writeSema->down(-1);
+  //mcb->writeSema->down(-1);
   writeWin->clearScreen();
 
   if(menu == "Scheduler")
@@ -127,11 +127,11 @@ void wrapperDump(int level,std::string menu,int threadID)
       mcb->ufs->dump(writeWin);
     else if(level == 1)
       mcb->ufs->dir(writeWin);
-    else 
+    else
       mcb->ufs->dir(writeWin,threadID);
   }
 
-  mcb->writeSema->up();
+  //mcb->writeSema->up();
 }
 
 
@@ -156,70 +156,68 @@ void ULTIMA_menu()
       //Get user input
       ch = getch();
       switch (ch)
-  {
-  case 's':
-    {
-      //Enter Scheduler Sub menu
-      scheduler_subMenu();
-      menu = "ULTIMA";
-      writeTitle();
-      break;
-    }
-    case 'S':
-    {
-      //Enter Scheduler Sub menu
-      sema_subMenu();
-      menu = "ULTIMA";
-      writeTitle();
-      break;
-    }
-  case 'i':
-    {
-      //Enter IPC Sub menu
-      ipc_subMenu();
-      menu = "ULTIMA";
-      writeTitle();
-      break;
-    }
-    case 'f':
-    {
-      //Enter Scheduler Sub menu
-      FS_subMenu();
-      menu = "ULTIMA";
-      writeTitle();
-      break;
-    }
-  case 'm':
-    {
-      memMgr_subMenu();
-      menu = "ULTIMA";
-      writeTitle();
-      break;
-    }
-    //clear console screen
-        case  'c':
-    {
-      writeTitle();
-            break;
-    }
-    //Display help
-        case 'h':
-    {
-            display_help();
-            break;
-    }
-
-      
-  }
+		  {
+		  	case 's':
+		    {
+		      //Enter Scheduler Sub menu
+		      scheduler_subMenu();
+		      menu = "ULTIMA";
+		      writeTitle();
+		      break;
+		    }
+		    case 'S':
+		    {
+		      //Enter Scheduler Sub menu
+		      sema_subMenu();
+		      menu = "ULTIMA";
+		      writeTitle();
+		      break;
+		    }
+		  	case 'i':
+		    {
+		      //Enter IPC Sub menu
+		      ipc_subMenu();
+		      menu = "ULTIMA";
+		      writeTitle();
+		      break;
+		    }
+		    case 'f':
+		    {
+		      //Enter Scheduler Sub menu
+		      FS_subMenu();
+		      menu = "ULTIMA";
+		      writeTitle();
+		      break;
+		    }
+		  	case 'm':
+		    {
+		      memMgr_subMenu();
+		      menu = "ULTIMA";
+		      writeTitle();
+		      break;
+		    }
+		    //clear console screen
+		    case  'c':
+		    {
+		      writeTitle();
+		      break;
+		    }
+		    //Display help
+		    case 'h':
+		    {
+          display_help();
+          break;
+		    }
+		  }
     }
 }
 
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
 void scheduler_subMenu()
 {
@@ -234,76 +232,76 @@ void scheduler_subMenu()
 
       //Get user input
       ch = getch();
-      
+
       switch (ch)
       {
-            //Add new window
-  case 'a':
-    {
-            usleep(1000);;
-      createTask();
-      break;
-    }
-	case'd':
-	{
-      wrapperDump(1,menu,0);
-	    break;
-	}
-	case 'D':
-	{
-	   wrapperDump(2,menu,0);
-	   break;
-	}
+      	//Add new window
+		  	case 'a':
+		    {
+		      usleep(1000);;
+		      createTask();
+		      break;
+		    }
+				case'd':
+				{
+			      wrapperDump(1,menu,0);
+				    break;
+				}
+				case 'D':
+				{
+				   wrapperDump(2,menu,0);
+				   break;
+				}
         case 'r':
-	{
-	    mcb->s->resume();
-	    break;
-	}
+				{
+				    mcb->s->resume();
+				    break;
+				}
         case 's':
-	{
-	    mcb->s->stop();
-	    break;
-	}
-	//clear console screen
+				{
+				    mcb->s->stop();
+				    break;
+				}
+				//clear console screen
         case  'c':
-	{
-	  writeTitle();
-	  break;
-	}
-	//Display help
+				{
+				  writeTitle();
+				  break;
+				}
+				//Display help
         case 'h':
-	{
-    display_help();
-	  break;
-	}
-	//Kill thread
+				{
+			    display_help();
+				  break;
+				}
+				//Kill thread
         case '0':
         case '1':
         case '2':
         case '3':
         case '4':
         case '5':
-	{
+				{
 
-	  if(mcb->s->getTCBList().getDatumById((int)ch-'0') == NULL)
-	    {
-	      usleep(1000);
-	      mcb->userInf->getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
-	    }
+				  if(mcb->s->getTCBList().getDatumById((int)ch-'0') == NULL)
+				    {
+				      usleep(1000);
+				      mcb->userInf->getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
+				    }
 
-	  else
-	    mcb->s->getTCBList().getDatumById((int)ch-'0')->setState(3);
-	  break;
-	}
+				  else
+				    mcb->s->getTCBList().getDatumById((int)ch-'0')->setState(3);
+				  break;
+				}
       }
     }
 }
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
  void sema_subMenu()
  {
@@ -317,109 +315,145 @@ void scheduler_subMenu()
       schedule();
       //Get user input
       ch = getch();
-      
+
       switch (ch)
       {
-	case 'd':
-	{
-
-	    wrapperDump(3,menu,0);
-	    break;
-	}
-	  //Dump(level4)
+				case 'd':
+				{
+				    wrapperDump(3,menu,0);
+				    break;
+				}
+	  		//Dump(level4)
         case 'D':
-	{
-      wrapperDump(4,menu,0);
-      break;
-	}
+				{
+			      wrapperDump(4,menu,0);
+			      break;
+				}
         case 'r':
-	{
-	    mcb->s->resume();
-	    break;
-	}
+				{
+				    mcb->s->resume();
+				    break;
+				}
         case 's':
-	{
-	    mcb->s->stop();
-	    break;
-	}
-	//clear console screen
+				{
+				    mcb->s->stop();
+				    break;
+				}
+				//clear console screen
         case  'c':
-	{
-	  writeTitle();
-	  break;
-	}
-	//Display help
+				{
+				  writeTitle();
+				  break;
+				}
+				//Display help
         case 'h':
-	{
-	  display_help();
-	  break;
-	}
+				{
+				  display_help();
+				  break;
+				}
         case 'f':
-	{
-	  mcb->s->forceWrite(rand()%5);
-	  break;
-	}
+				{
+				  mcb->writeSema->down(0);
+					mcb->writeSema->down(1);
+					mcb->writeSema->down(2);
+				  break;
+				}
+				case 'F':
+				{
+					mcb->writeSema->up();
+					mcb->writeSema->up();
+ 				  break;
+				}
       }
     }
  }
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
  void ipc_subMenu()
  {
   menu = "IPC";
   writeTitle();
   char ch;
-
+	std::string message;
+	char buff[255];
+	char* msg;
   //loop until q is pressed
   while(ch != 'q')
   {
       schedule();
       //Get user input
       ch = getch();
-      
+
       switch (ch)
       {
-	case'd':
-	{
-	    wrapperDump(1,menu,0);
-	    break;
-	}
+				case'd':
+				{
+				    wrapperDump(1,menu,0);
+				    break;
+				}
          case 'r':
-	{
-	    mcb->s->resume();
-	    break;
-	}
-        case 's':
-	{
-	    mcb->s->stop();
-	    break;
-	}
-	//clear console screen
+				{
+				    mcb->s->resume();
+				    break;
+				}
+			   case 's':
+				{
+				    mcb->s->stop();
+				    break;
+				}
+				//clear console screen
         case  'c':
-	{
-	  writeTitle();
-	  break;
-	}
-	//Display help
+				{
+				  writeTitle();
+				  break;
+				}
+				//Display help
         case 'h':
-	{
-	  display_help();
-	  break;
-	}
+				{
+				  display_help();
+				  break;
+				}
+				case 'm':
+				{
+					int task1 = rand()%3;
+					int task2 = rand()%3;
+				  mcb->ipc->Message_Send(task1, task2, "Can you hear me now?");
+					sprintf(buff,  "  Message sent to task %d\n",task2);
+					mcb->s->getThreadInfo().getDatumById(task1)->getThreadWin()->write_window(buff);
+				  break;
+				}
+				case 'M':
+				{
+					int task = rand()%3;
+					mcb->ipc->Message_Receive(task, message);
+					msg = strdup(message.c_str());
+					sprintf(buff,  "  %s\n",msg);
+					mcb->s->getThreadInfo().getDatumById(task)->getThreadWin()->write_window(buff);
+				  break;
+				}
+				case 'R':
+				{
+					int task = rand()%3;
+					mcb->ipc->Message_DeleteAll(task);
+					mcb->s->getThreadInfo().getDatumById(task)->getThreadWin()->write_window("  All Messages deleted\n");
+				  break;
+				}
+
+
       }
     }
  }
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
  void memMgr_subMenu()
  {
@@ -433,71 +467,71 @@ void scheduler_subMenu()
       schedule();
       //Get user input
       ch = getch();
-      
+
       switch (ch)
       {
-	case'd':
-	{
-	    wrapperDump(0,menu,0);
-	    break;
-	}
+				case'd':
+				{
+				    wrapperDump(0,menu,0);
+				    break;
+				}
         case 'r':
-	{
-	    mcb->s->resume();
-	    break;
-	}
+				{
+				    mcb->s->resume();
+				    break;
+				}
         case 's':
-	{
-	    mcb->s->stop();
-	    break;
-	}
-	//clear console screen
+				{
+				    mcb->s->stop();
+				    break;
+				}
+				//clear console screen
         case  'c':
-	{
-	  writeTitle();
-	  break;
-	}
-	//Display help
+				{
+				  writeTitle();
+				  break;
+				}
+				//Display help
         case 'h':
-	{
-	  display_help();
-	  break;
-	}
-	
-        case 'w':
-	{	 
-	  char* c = "This space is not mine";
-	  // mem_mgr_write(int offset,char *text, int tid)
-	  mem_mgr_write(90,c,rand()%3);
-	}
-        case 'W':
-	{
-	  char* c = "This space is mine";
-	  // mem_mgr_write(int offset,char *text, int tid)
-	  mem_mgr_write(1,c,rand()%3);
+				{
+				  display_help();
+				  break;
+				}
 
-	  break;
-	}
+        case 'w':
+				{
+				  char* c = "This space is not mine";
+				  // mem_mgr_write(int offset,char *text, int tid)
+				  mem_mgr_write(90,c,rand()%3);
+				}
+        case 'W':
+				{
+				  char* c = "This space is mine";
+				  // mem_mgr_write(int offset,char *text, int tid)
+				  mem_mgr_write(1,c,rand()%3);
+
+				  break;
+				}
         case 'a':
-	{
-	  // void mem_mgr_alloc(int size, int tid)
-	  mem_mgr_alloc(300, rand()%3);
-	  break;
-	}
+				{
+				  // void mem_mgr_alloc(int size, int tid)
+				  mem_mgr_alloc(300, rand()%3);
+				  break;
+				}
         case 'f':
-	{
-	  mem_mgr_free(rand()%3);
-	  break;
-	}
+				{
+				  mem_mgr_free(rand()%3);
+				  break;
+				}
       }
     }
  }
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
  void FS_subMenu()
  {
@@ -511,7 +545,7 @@ void scheduler_subMenu()
       schedule();
       //Get user input
       ch = getch();
-      
+
       switch (ch)
       {
         case 's':
@@ -626,9 +660,9 @@ void scheduler_subMenu()
 
 /*-----------------------------------------------------------------
   Function      :
-  Parameters    : 
-  Returns       : 
-  Details       : 
+  Parameters    :
+  Returns       :
+  Details       :
   ------------------------------------------------------------------*/
 void display_help()
 {
@@ -673,8 +707,8 @@ void display_help()
     writeWin->write_window("   d=...Dump Level 1...\n");
     writeWin->write_window("   D=...Dump Level 2...\n");
     //This still needs implemented
-    writeWin->write_window("   f=...Force DeadLock...NEEDS IMPLEMENTED\n");
-    writeWin->write_window("   F=...Free DeadLock...NEEDS IMPLEMENTED\n");
+    writeWin->write_window("   f=...Force DeadLock...\n");
+    writeWin->write_window("   F=...Free DeadLock...\n");
   }
   else if(menu == "IPC")
   {

@@ -269,7 +269,7 @@ void* Scheduler::perform_simple_output(void* arguments)
   while(*pthreads.getDatumById(i) != pthread_self()) {
     i++;
   }
-  int threadNum = i;  
+  int threadNum = i;
 
   do {
     // run in endless loop until killed by garbage_collect()
@@ -285,7 +285,6 @@ void* Scheduler::perform_simple_output(void* arguments)
         sprintf(buff, "  Task-%d running #%d\n",threadNum,tempCounter);
         mcb->writeSema->down(threadNum);
         threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(buff);
-        // td->thread_win->write_window(buff);
         mcb->writeSema->up();
 
         sprintf(buff, "  Thread-%d currently running.\n",threadNum);
@@ -294,55 +293,13 @@ void* Scheduler::perform_simple_output(void* arguments)
         // td->console_win->write_window(buff);
         mcb->writeSema->up();
 
-        int num = rand() % processCount;
-        char chr[255];
-        sprintf(chr,"  Message received from Thread %d", threadNum);
-        std::string str(chr);
-        mcb->ipc->Message_Send(threadNum,num,str);
-
         // catch a suspend here in case we
         // didnt get it up top due to timing
         while (THREAD_SUSPENDED);
 
         //process yields itself after completing run
 
-          if(!mcb->ipc->threadMailboxes.getDatumById(threadNum)->isEmpty())
-          {
-            std:: string message;
-            char *chr;
-            //only works if message exists
-            if(mcb->ipc->Message_Receive(threadNum, message))
-            {
-              //message = mcb->ipc->getMessage()->getMessageText();
-              message+= "\n";
-              //message = "HELLO ALL";
-              chr = strdup(message.c_str());
-              mcb->writeSema->down(threadNum);
-              threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(chr);
-              mcb->writeSema->up();
-            }
-          }
-          mcb->ipc->Message_Print(threadNum);
-          mcb->ipc->Message_DeleteAll(threadNum);
           yield(threadNum);
-
-          //Uncomment when mem_Read and mem_Write  finished
-          /*
-          //Every 5 cycles write to memory
-          if(count % 5)
-          {
-            char *mem_ch = "Write to Memory";
-            threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(mem_ch);
-            mcb.mem_mgr->mem_write(threadData->mem_handle, mem_ch, threadNum);
-          }
-          //Every 6 cycles read from memory
-          if(count % 6)
-          {
-            char *mem_c = "Read From Memory";
-            threadInfo.getDatumById(threadNum)->getThreadWin()->write_window(mem_c);
-            mcb.mem_mgr->mem_write(threadData->mem_handle, mem_ch, threadNum);
-          }
-          */
           count++;
       }
       else {

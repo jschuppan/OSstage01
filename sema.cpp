@@ -56,32 +56,33 @@ void Semaphore::down(int threadID)
     // make resource unavailable
     sema_value--;
   }
-
   // case 2: resource is unavailable
   else if (sema_value <= 0)
   {
-    //resMutex.lock();
+    sema_value--;
     pthread_mutex_lock(&resMutex);
     // set out mutex lock to prevent resource from
     // being used by multiple threads
     // first push new process request on queue
     processQueue.enQueue(threadID);
     // we'll suspend the process in the scheduler
-    mcb->s->TCBList.getDatumById(threadID)->setState(BLOCKED);
+    if(threadID >= 0)
+        mcb->s->TCBList.getDatumById(threadID)->setState(BLOCKED);
 
     // we need to deal with requests until the queue
     // is empty
     if(!mcb->s->THREAD_SUSPENDED)
     {
         while(lastPop != threadID);
+
+        //+++++++++++++++++THIS NEVER GETS PRINTED ++++++++++++++++++++++++
+        mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window("  Exiting semaWrite Queue\n");
         //callToScheduler();
-        if(threadID > 0)
+        if(threadID >= 0)
           mcb->s->TCBList.getDatumById(threadID)->setState(READY);
     }
-    //resMutex.unlock();
     pthread_mutex_unlock(&resMutex);
   }
-
   // otherwise there is an issue
   else
   {
@@ -103,7 +104,7 @@ void Semaphore::up()
   pthread_mutex_lock(&resMutex);
   // next in queue gets released
   // get threadID from pop
-  if(!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
+  if(!processQueue.isEmpty())//!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
       lastPop = processQueue.deQueue();
 
   // check if queue is now empty. If so release and unlock
@@ -135,12 +136,10 @@ void Semaphore :: dump(Window* targetWin, int level)
   }
   else
   {
-      //sprintf(buff + strlen(buff), "Queue : ");
       //loops until the end of the queue
       sprintf(buff + strlen(buff), "\t");
       while ((nextElement = processQueue.getNextElement(nextElement)))
       {
-          //nextElement = processQueue.getNextElement(nextElement);
           sprintf(buff + strlen(buff), "%d-> ", *nextElement);
       }
   }
