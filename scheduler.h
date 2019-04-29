@@ -17,6 +17,7 @@ class MCB;
 #include <pthread.h>
 #include "window.h"
 #include "linkedlist.h"
+#include "ezQueue.h"
 
 
 class Scheduler {
@@ -27,15 +28,15 @@ class Scheduler {
     struct thread_data
     {
         int thread_no;
-        int mem_handle;
+        
         int mem_size;
         Window* thread_win;
         Window* head_win;
         Window* console_win;
       public:
+        ezQueue<int> mem_Handle;
         linkedList<int> fileHandle;
         Window* getThreadWin() {return this->thread_win;}
-        int getMemHandle() {return this->mem_handle;}
         Window* getHeadWin() {return this->head_win;}
         Window* getConsoleWin() {return this->console_win;}
         int getThreadNo() { return thread_no; }
@@ -95,6 +96,7 @@ class Scheduler {
     bool SCHEDULER_SUSPENDED;
     bool THREAD_SUSPENDED;
     void forceWrite(int threadID);
+    bool force_Deadlock;
     friend class Semaphore;
     /******************************** END PUBLIC MEMBERS ********************************/
 

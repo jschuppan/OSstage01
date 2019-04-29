@@ -393,11 +393,13 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
     if ( fileSize <=0 || fileSize >= 4*fsBlockSize)
     {
         writeToThreadWindow(threadID, "  Invalid File Size\n");
-		    return -1;
+        mcb->metaFileSema->up();
+		return -1;
     }
     else if(strlen(fileName.c_str()) > 7)
     {
       writeToThreadWindow(threadID, "  Invalid Filename Size\n");
+       mcb->metaFileSema->up();
       return -1;
     }
     //Requested Block is less that 128
@@ -408,6 +410,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
             if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
             {
                 writeToThreadWindow(threadID, "  File Already Exists\n");
+                mcb->metaFileSema->up();
                 return -1;
             }
   		    if (inodes[i].ownerTaskID == -1)
@@ -441,6 +444,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
       if(inodes[i].ownerTaskID == threadID && strcmp(inodes[i].fileName, fileName.c_str()) == 0)
       {
         writeToThreadWindow(threadID, "  File Already Exists\n");
+        mcb->metaFileSema->up();
         return -1;
       }
 		  if (inodes[i].ownerTaskID == -1 && count == 1)
@@ -478,7 +482,7 @@ int UFS::createFile(int threadID, std::string fileName, int fileSize, char permi
                 //release sema before return
                 mcb->metaFileSema->up();
 
-		            return inodes[i].handle;
+		        return inodes[i].handle;
 				}
 				count++;
 			}
@@ -984,8 +988,8 @@ Details       : A Wrapper function to write to the thread windows
 ------------------------------------------------------------------*/
 void UFS::writeToThreadWindow(int threadID, char* text)
 {
-    mcb->writeSema->down(threadID);
+    //mcb->writeSema->down(threadID);
     mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
 
 }

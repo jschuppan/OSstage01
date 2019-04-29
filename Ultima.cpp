@@ -353,16 +353,13 @@ void scheduler_subMenu()
 				}
         case 'f':
 				{
-				  mcb->writeSema->down(0);
-					mcb->writeSema->down(1);
-					mcb->writeSema->down(2);
+          mcb->s->force_Deadlock = true;
 				  break;
 				}
 				case 'F':
 				{
-					mcb->writeSema->up();
-					mcb->writeSema->up();
-					mcb->writeSema->up();
+					mcb->s->force_Deadlock = false;
+          mcb->writeSema->up();
  				  break;
 				}
       }
@@ -671,7 +668,7 @@ void display_help()
   Window* writeWin = mcb->userInf->getWindowByID(CONSOLE_WINDOW);
 
   //Protect write window
-  mcb->writeSema->down(-1);
+  //mcb->writeSema->down(-1);
   writeWin->clearScreen();
   if(menu == "ULTIMA")
   {
@@ -763,7 +760,7 @@ void display_help()
   }
 
 //Free Window write
-mcb->writeSema->up();
+//mcb->writeSema->up();
 }
  /*==================================================
 
@@ -791,18 +788,21 @@ void schedule()
 
 void mem_mgr_write(int offset,char *text, int tid)
 {
-  mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(tid)->getMemHandle(), offset, strlen(text), text, tid);
+  mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue(), offset, strlen(text), text, tid);
 }
 
 void mem_mgr_alloc(int size, int tid)
 {
   mcb->s->getThreadInfo().getDatumById(tid)->mem_size = size;
-  mcb->s->getThreadInfo().getDatumById(tid)-> mem_handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(tid)->mem_size, tid);
+  int handle = mcb->mem_mgr->mem_alloc(mcb->s->getThreadInfo().getDatumById(tid)->mem_size, tid);
+  if(handle >=0)
+      mcb->s->getThreadInfo().getDatumById(tid)-> mem_Handle.enQueue(handle);
 }
 
 void mem_mgr_free(int tid)
 {
-  mcb->mem_mgr->mem_free(mcb->s->getThreadInfo().getDatumById(tid)->getMemHandle(),tid);
+  int handle = mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue();
+  mcb->mem_mgr->mem_free(handle,tid);
 }
 
 void ufs_createFile(int tid, char permission, std::string filename, int size)
@@ -837,7 +837,7 @@ void createTask()
 void writeTitle()
 {
   Window* writeWin = mcb->userInf->getWindowByID(CONSOLE_WINDOW);
-  mcb->writeSema->down(-1);
+  //mcb->writeSema->down(-1);
   writeWin->clearScreen();
 
   if(menu == "ULTIMA")
@@ -853,5 +853,5 @@ void writeTitle()
   else if(menu == "UFS")
     writeWin->write_window("\n   WELCOME TO THE UFS SUB MENU\n   press h for help\n");
 
-  mcb->writeSema->up();
+  //mcb->writeSema->up();
 }

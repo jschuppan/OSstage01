@@ -11,7 +11,6 @@ Purpose       : implementation of sema.h
 // necessary includes
 #include <stdio.h>
 #include <iostream>
-#include <queue>
 #include <string.h>
 #include "sema.h"
 #include "ezQueue.h"
@@ -65,21 +64,13 @@ void Semaphore::down(int threadID)
     // first push new process request on queue
     processQueue.enQueue(threadID);
     // we'll suspend the process in the scheduler
-    if(threadID >= 0)
-        mcb->s->TCBList.getDatumById(threadID)->setState(BLOCKED);
+    mcb->s->TCBList.getDatumById(threadID)->setState(BLOCKED);
 
     // we need to deal with requests until the queue
     // is empty
-     if(!mcb->s->THREAD_SUSPENDED)
-       {
-        while( mcb->s->TCBList.getDatumById(threadID)->getState() == BLOCKED);
+        pthread_mutex_unlock(&resMutex);
+        while( mcb->s->TCBList.getDatumById(threadID)->getState() == BLOCKED || mcb->s->TCBList.getDatumById(threadID)->getState() == READY );
 
-        //+++++++++++++++++THIS NEVER GETS PRINTED ++++++++++++++++++++++++
-        mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window("  Exiting semaWrite Queue\n");
-        //callToScheduler();
-      
-	 }
-    pthread_mutex_unlock(&resMutex);
   }
   // otherwise there is an issue
   else
@@ -98,22 +89,18 @@ Details       : unlocks the mutex and allows the resource to be used
 ------------------------------------------------------------------*/
 void Semaphore::up()
 {
-  //resMutex.lock();
   pthread_mutex_lock(&resMutex);
   // next in queue gets released
   // get threadID from pop
-  if(!processQueue.isEmpty())//!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
+  if(!processQueue.isEmpty())
     {
       lastPop = processQueue.deQueue();
-      if(lastPop >= 0)
-        mcb->s->TCBList.getDatumById(lastPop)->setState(READY);
+      mcb->s->TCBList.getDatumById(lastPop)->setState(READY);
     }
   else
+   // check if queue is now empty. If so release and unlock
      sema_value++;
-
-  // check if queue is now empty. If so release and unlock
  
-  //resMutex.unlock();
   pthread_mutex_unlock(&resMutex);
 }
 
