@@ -59,7 +59,6 @@ void Semaphore::down(int threadID)
   // case 2: resource is unavailable
   else if (sema_value <= 0)
   {
-    sema_value--;
     pthread_mutex_lock(&resMutex);
     // set out mutex lock to prevent resource from
     // being used by multiple threads
@@ -71,16 +70,15 @@ void Semaphore::down(int threadID)
 
     // we need to deal with requests until the queue
     // is empty
-    if(!mcb->s->THREAD_SUSPENDED)
-    {
-        while(lastPop != threadID);
+     if(!mcb->s->THREAD_SUSPENDED)
+       {
+        while( mcb->s->TCBList.getDatumById(threadID)->getState() == BLOCKED);
 
         //+++++++++++++++++THIS NEVER GETS PRINTED ++++++++++++++++++++++++
         mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window("  Exiting semaWrite Queue\n");
         //callToScheduler();
-        if(threadID >= 0)
-          mcb->s->TCBList.getDatumById(threadID)->setState(READY);
-    }
+      
+	 }
     pthread_mutex_unlock(&resMutex);
   }
   // otherwise there is an issue
@@ -105,10 +103,16 @@ void Semaphore::up()
   // next in queue gets released
   // get threadID from pop
   if(!processQueue.isEmpty())//!mcb->s->THREAD_SUSPENDED && !processQueue.isEmpty())
+    {
       lastPop = processQueue.deQueue();
+      if(lastPop >= 0)
+        mcb->s->TCBList.getDatumById(lastPop)->setState(READY);
+    }
+  else
+     sema_value++;
 
   // check if queue is now empty. If so release and unlock
-  sema_value++;
+ 
   //resMutex.unlock();
   pthread_mutex_unlock(&resMutex);
 }

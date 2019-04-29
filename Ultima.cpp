@@ -362,6 +362,7 @@ void scheduler_subMenu()
 				{
 					mcb->writeSema->up();
 					mcb->writeSema->up();
+					mcb->writeSema->up();
  				  break;
 				}
       }
