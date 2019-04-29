@@ -88,10 +88,10 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   char buff[255];
   //Not enough Memory
   if (size > available) {
-    mcb->writeSema->down(tid);
+    //mcb->writeSema->down(tid);
     sprintf(buff, "\n  mem_alloc() : not enough memory\n  available size: %d \n  Requested Size %d\n",available,size);
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
     return -1;  //error: not enough memory
   }
 
@@ -115,10 +115,10 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
       }
       else
       {
-        mcb->writeSema->down(tid);
+        //mcb->writeSema->down(tid);
         sprintf(buff, "\n  Not Enough Consecutive Memory\n");
         mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-        mcb->writeSema->up();
+        //mcb->writeSema->up();
         return -1;
       }
     }
@@ -143,10 +143,10 @@ int Mem_Mgr::mem_alloc(unsigned int size, int tid) {
   tmpDatum.write_cursor = tmpDatum.read_cursor = sPtr->start;
 
   //Write to window on success
-  mcb->writeSema->down(tid);
+  //mcb->writeSema->down(tid);
   sprintf(buff, "\n  Memory Allocated \n");
   mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-  mcb->writeSema->up();
+  //mcb->writeSema->up();
 
 
 
@@ -171,19 +171,19 @@ int Mem_Mgr::mem_free(int handle, int tid) {
 
   //If mem_seg doesnt exist
   if (ms_ptr == NULL) {
-    mcb->writeSema->down(tid);
+    //mcb->writeSema->down(tid);
     sprintf(buff,"\n   mem_free() : Item segment doesn't exist\n");
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
     return -1;  //error: not found
   }
 
   //If tid Does not have permission
   if (tid != ms_ptr->owner_tid) {
-    mcb->writeSema->down(tid);
+    //mcb->writeSema->down(tid);
     sprintf(buff,"\n   mem_free() : access denied\n");
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
     return -1;  //error: access denied
   }
 
@@ -352,19 +352,19 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   //tid does not have permission
   if (tid != ms_ptr->owner_tid)
   {
-    mcb->writeSema->down(tid);
+    //mcb->writeSema->down(tid);
     sprintf(buff, "\n  Owner permission denied\n");
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();    return -1;  //error: access denied
+    //mcb->writeSema->up();    return -1;  //error: access denied
   }
 
   //if not enough space to write string
   if (ms_ptr->write_cursor+text_size+offset >ms_ptr->end)
   {
-    mcb->writeSema->down(tid);
+    //mcb->writeSema->down(tid);
     sprintf(buff,"\n  Segmentation Fault\n");
     mcb->s->getThreadInfo().getDatumById(tid)->getThreadWin()->write_window(buff);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
     return -1;  //error: segment is full
   }
 
@@ -621,8 +621,8 @@ int Mem_Mgr::burp() {
 
 void Mem_Mgr::writeToThreadWindow(int threadID, char* text)
 {
-    mcb->writeSema->down(threadID);
+    //mcb->writeSema->down(threadID);
     mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
-    mcb->writeSema->up();
+    //mcb->writeSema->up();
 
 }

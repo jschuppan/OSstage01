@@ -236,12 +236,12 @@ void scheduler_subMenu()
       switch (ch)
       {
       	//Add new window
-		  	case 'a':
-		    {
-		      usleep(1000);;
-		      createTask();
-		      break;
-		    }
+		  	// case 'a':
+		    // {
+		    //   usleep(1000);;
+		    //   createTask();
+		    //   break;
+		    // }
 				case'd':
 				{
 			      wrapperDump(1,menu,0);
@@ -278,19 +278,20 @@ void scheduler_subMenu()
         case '0':
         case '1':
         case '2':
-        case '3':
-        case '4':
-        case '5':
+        // case '3':
+        // case '4':
+        // case '5':
 				{
 
 				  if(mcb->s->getTCBList().getDatumById((int)ch-'0') == NULL)
 				    {
 				      usleep(1000);
-				      mcb->userInf->getWindowByID((int)ch-'0')->write_window(1,1,"ERROR DELETING THREAD");
+				      mcb->userInf->getWindowByID((int)ch-'0')->write_window("  ERROR DELETING THREAD");
 				    }
 
 				  else
 				    mcb->s->getTCBList().getDatumById((int)ch-'0')->setState(3);
+
 				  break;
 				}
       }
@@ -567,7 +568,7 @@ void scheduler_subMenu()
         case 'a':
 	{
 	  // void ufs_createFile(int tid,char permission, string filename, int size)
-	  char status = 0b1111;
+	  char status = 0b0101;
 	  ufs_createFile(rand()%3 ,status,fileName1,fileSize1);
 	  break;
 	}
@@ -653,6 +654,18 @@ void scheduler_subMenu()
 	  mcb->ufs->deleteFile(0,fileName5);
 	  break;
 	}
+        case 'p':
+	{
+	  //Test UFS Read in bounds
+	  mcb->ufs->changePermission(0, fileName1, 0b0100);
+	  break;
+	}
+        case 'C':
+	{
+	  //Test UFS Read in bounds
+	  mcb->ufs->closeFile(0, fileOpen1);;
+	  break;
+	}
       }
     }
  }
@@ -686,13 +699,13 @@ void display_help()
     writeWin->write_window("   q=...Quit...\n");
     writeWin->write_window("   s=...stop...\n");
     writeWin->write_window("   r=...Restart...\n");
-    writeWin->write_window("   a=...Add a thread...\n");
+    // writeWin->write_window("   a=...Add a thread...\n");
     writeWin->write_window("   0=...Kill task 0...\n");
     writeWin->write_window("   1=...Kill task 1...\n");
     writeWin->write_window("   2=...Kill task 2...\n");
-    writeWin->write_window("   3=...Kill task 3...\n");
-    writeWin->write_window("   4=...Kill task 4...\n");
-    writeWin->write_window("   5=...Kill task 5...\n");
+    // writeWin->write_window("   3=...Kill task 3...\n");
+    // writeWin->write_window("   4=...Kill task 4...\n");
+    // writeWin->write_window("   5=...Kill task 5...\n");
     writeWin->write_window("   d=...Dump level 1..\n");
     writeWin->write_window("   d=...Dump level 2...\n");
   }
@@ -756,6 +769,8 @@ void display_help()
     writeWin->write_window("   V=...Read in bound...\n");
     writeWin->write_window("   g=...Delete file...\n");
     writeWin->write_window("   g=...Delete Multiple files...\n");
+    writeWin->write_window("   p=...Change Permission...\n");
+    writeWin->write_window("   C=...Close File...\n");
 
   }
 

@@ -139,13 +139,13 @@ int UFS::openFile(int threadID, int fileHandle, std::string fileName, char mode)
             // owner wants to open
             if (inodes[i].ownerTaskID == threadID || fileHandle == inodes[i].handle) {
                 // asking for read without read permission
-                if ((mode & READ) && !(inodes[i].permission & OWNER_READ)) {
+                if ((mode & READ) && ((inodes[i].permission & OWNER_READ) == 0)) {
                     writeToThreadWindow(threadID, "  Invalid Read Permission\n");
                     return -1;
                 }
 
                 // asking for write without write permission
-                if ((mode & WRITE) && !(inodes[i].permission & OWNER_WRITE)) {
+                if ((mode & WRITE) && ((inodes[i].permission & OWNER_WRITE) == 0)) {
                     writeToThreadWindow(threadID, "  Invalid Write Permission\n");
                     return -1;
                 }
@@ -277,6 +277,7 @@ int UFS::readChar(int threadID, int fileID, char &c,int offset) {
             // out of boundaries
             if (skips > 0) {
                 writeToThreadWindow(threadID, "  readChar() out of bounds\n");
+                mcb->UFSLinkSema->up();
                 return -1;
             }
 
@@ -372,7 +373,7 @@ int UFS::writeChar(int threadID, int fileID, char c,int offset) {
     writeToThreadWindow(threadID, "  File deleted before closed\n");
     
     //free sema
-    mcb->UFSLinkSema->up();
+    //mcb->UFSLinkSema->up();
 
     closeFile(threadID, fileID);
 

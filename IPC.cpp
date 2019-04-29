@@ -216,7 +216,7 @@ Details       : this function allows us to delete all messages of a
 ------------------------------------------------------------------*/
 int IPC::Message_DeleteAll(int task_Id)
 {
-  //mcb->messageSema->down(task_Id);
+  mcb->messageSema->down(task_Id);
   ezQueue<IPC::Message_Type>* stdMessages = threadMailboxes.getDatumById(task_Id);
   ezQueue<IPC::Message_Type>* stdMessagesArchive = threadMailboxesArchive.getDatumById(task_Id);
   while(stdMessages->getSize() > 0) {
@@ -226,7 +226,7 @@ int IPC::Message_DeleteAll(int task_Id)
   while(stdMessagesArchive->getSize() > 0) {
     stdMessagesArchive->deQueue();
   }
-  //mcb->messageSema->up();
+  mcb->messageSema->up();
   return 1;
 }
 
@@ -241,7 +241,4 @@ void IPC::setMCB(MCB* mcb)
   this->mcb = mcb;
 }
 
-// IPC::Message_Type IPC::getMessage()
-// {
-//   return message;
-// }
+
