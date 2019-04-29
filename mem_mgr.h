@@ -62,6 +62,7 @@ class Mem_Mgr {
   int mem_smallest();
   int mem_coalesce();
   int burp();
+  void writeToThreadWindow(int, char*);
   /****************************  Private end   ********************************/
 
 };

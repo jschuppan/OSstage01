@@ -503,7 +503,8 @@ void scheduler_subMenu()
 				{
 				  char* c = "This space is not mine";
 				  // mem_mgr_write(int offset,char *text, int tid)
-				  mem_mgr_write(90,c,rand()%3);
+				  mem_mgr_write(300,c,rand()%3);
+          break;
 				}
         case 'W':
 				{
@@ -601,7 +602,7 @@ void scheduler_subMenu()
         case '2':
 	{
 	  //Test UFS  Dir dump
-	  wrapperDump(2,menu,0);
+	  wrapperDump(2, menu, (int)(ch - '0'));
 	  break;
 	}
         case 'w':

@@ -221,14 +221,14 @@ int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid)
   //mem_seg does not exist
   if (ms_ptr == NULL)
   {
-    std::cout << "\nmem_read() : Item segment doesn't exist\n";
+    writeToThreadWindow(tid, "  mem_read() : Item segment doesn't exist\n");
     return -1;  //error: not found
   }
 
   //tid does not have permission
   if (tid != ms_ptr->owner_tid)
   {
-    std::cout << "\nmem_read() : access denied\n";
+    writeToThreadWindow(tid, "  mem_read() : access denied\n");
     return -1;  //error: access denied
   }
 
@@ -259,13 +259,13 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
 
   //mem_seg does not exist
   if (ms_ptr == NULL) {
-    std::cout << "\nmem_read() : Item segment doesn't exist\n";
+    writeToThreadWindow(tid, "  mem_read() : Item segment doesn't exist\n");
     return -1;  //error: not found
   }
 
   //tid does not have permission
   if (tid != ms_ptr->owner_tid || offset > ms_ptr->end) {
-    std::cout << "\nmem_read() : access denied\n";
+    writeToThreadWindow(tid, "  mem_read() : access denied\n");
     return -1;  //error: access denied
   }
 
@@ -303,21 +303,21 @@ int Mem_Mgr::mem_write(int handle, unsigned char c, int tid) {
   //mem_seg does not exist
   if (ms_ptr == NULL)
   {
-    std::cout << "\nmem_write() : Item segment doesn't exist\n";
+    writeToThreadWindow(tid, "  mem_write() : Item segment doesn't exist\n");
     return -1;  //error: not found
   }
 
   //tid does not perssion
   if (tid != ms_ptr->owner_tid)
   {
-    std::cout << "\nmem_write() : access denied\n";
+    writeToThreadWindow(tid, "  mem_write() : access denied\n");
     return -1;  //error: access denied
   }
 
   //if writecursor is at end of memory
   if (ms_ptr->write_cursor > ms_ptr->end)
   {
-    std::cout << "\nmem_write() : segment is full\n";
+    writeToThreadWindow(tid, "  mem_write() : segment is full\n");
     return -1;  //error: segment is full
   }
 
@@ -344,7 +344,7 @@ int Mem_Mgr::mem_write(int handle, unsigned int offset, unsigned int text_size, 
   //mem_seg does not exist
   if (ms_ptr == NULL)
   {
-    std::cout << "\nmem_write() : Item segment doesn't exist\n";
+    writeToThreadWindow(tid, "  mem_write() : Item segment doesn't exist\n");
     return -1;  //error: not found
   }
 
@@ -515,7 +515,7 @@ void Mem_Mgr::mem_dump(Window* Win)
    //Suspend scheduler
    mcb->s->SCHEDULER_SUSPENDED = true;
 
-   tempString = "\n\n   Status \t Memory Handle \t Starting Location \t Ending Location \t Size \t task-ID\n";
+   tempString = "\n\n  Status | Memory Handle | Starting Location | Ending Location | Size | task-ID\n";
    chr = strdup(tempString.c_str());
    sprintf(mBuff, "%s",chr);
    Win->write_window(mBuff);
@@ -527,21 +527,21 @@ void Mem_Mgr::mem_dump(Window* Win)
    {
      if(myT->free)
      {
-       sprintf(mBuff, "   Free \t\t ");
+       sprintf(mBuff, "  Free");
      }
      else
-       sprintf(mBuff, "   Used \t\t ");
+       sprintf(mBuff, "  Used");
 
-     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->handle);
-     sprintf(mBuff + strlen(mBuff),"%d \t\t\t", myT->start);
-     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->end);
-     sprintf(mBuff + strlen(mBuff),"%d \t\t", myT->size);
-     sprintf(mBuff + strlen(mBuff),"%d \n", myT->owner_tid);
+     sprintf(mBuff + strlen(mBuff),"\t   %d\t\t", myT->handle);
+     sprintf(mBuff + strlen(mBuff),"   %d\t\t\t", myT->start);
+     sprintf(mBuff + strlen(mBuff),"%d\t\t", myT->end);
+     sprintf(mBuff + strlen(mBuff)," %d\t", myT->size);
+     sprintf(mBuff + strlen(mBuff),"%d\n", myT->owner_tid);
 
      Win->write_window(mBuff);
    }
 
-   sprintf(cBuff, "   %c",memory[count]);
+   sprintf(cBuff, "");
 
    //Output memory segment
    while(count < capacity)
@@ -555,7 +555,7 @@ void Mem_Mgr::mem_dump(Window* Win)
           continue;
           count++;
       }
-     sprintf(cBuff+strlen(cBuff), "   %c",memory[count]);
+     sprintf(cBuff+strlen(cBuff), "  %c",memory[count]);
      count++;
    }
    sprintf(cBuff+strlen(cBuff), "\n");
@@ -616,4 +616,13 @@ int Mem_Mgr::burp() {
 
   mem_coalesce();
   return 1;
+}
+
+
+void Mem_Mgr::writeToThreadWindow(int threadID, char* text)
+{
+    mcb->writeSema->down(threadID);
+    mcb->s->getThreadInfo().getDatumById(threadID)->getThreadWin()->write_window(text);
+    mcb->writeSema->up();
+
 }
