@@ -291,16 +291,12 @@ void* Scheduler::perform_simple_output(void* arguments)
         mcb->writeSema->down(threadNum);
         threadInfo.getDatumById(threadNum)->getConsoleWin()->write_window(buff);
         // td->console_win->write_window(buff);
-
         if(!force_Deadlock)
           mcb->writeSema->up();
-
         // catch a suspend here in case we
         // didnt get it up top due to timing
         while (THREAD_SUSPENDED);
-
         //process yields itself after completing run
-
           yield(threadNum);
           count++;
       }

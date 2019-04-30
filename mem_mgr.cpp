@@ -236,7 +236,6 @@ int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid)
   *c = memory[ ms_ptr->read_cursor ];
 
   ms_ptr->read_cursor ++;
-
   //if read_cursor goes past write_cursor, wrap around to start
   if (ms_ptr->read_cursor >= ms_ptr->write_cursor)
   {

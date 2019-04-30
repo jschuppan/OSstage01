@@ -71,6 +71,7 @@ void ufs_createFile(int tid,char permission, std::string filename, int size);
 void createTask();
 void display_help();
 void writeTitle();
+void mem_mgr_read(int offset,unsigned char *text, int tid);
 
 
 //main
@@ -110,7 +111,6 @@ void wrapperDump(int level,std::string menu,int threadID)
 {
 
   Window* writeWin = mcb->userInf->getWindowByID(CONSOLE_WINDOW);
-  //mcb->writeSema->down(-1);
   writeWin->clearScreen();
 
   if(menu == "Scheduler")
@@ -459,6 +459,7 @@ void scheduler_subMenu()
    menu = "MemMgr";
    writeTitle();
   char ch;
+	char buff[255];
 
   //loop until q is pressed
   while(ch != 'q')
@@ -509,7 +510,23 @@ void scheduler_subMenu()
 				  char* c = "This space is mine";
 				  // mem_mgr_write(int offset,char *text, int tid)
 				  mem_mgr_write(1,c,rand()%3);
-
+				  break;
+				}
+				case 'v':
+				{
+					unsigned char* c;
+					int id = rand()%3;
+				  // mem_mgr_write(int offset,char *text, int tid)
+				  mem_mgr_read(1,c,id);
+					sprintf(buff,"  %s\n",c);
+					mcb->s->getThreadInfo().getDatumById(id)->getThreadWin()->write_window(buff);
+				  break;
+				}
+				case 'V':
+				{
+					unsigned char* c;
+					// mem_mgr_write(int offset,char *text, int tid)
+				  mem_mgr_read(300,c,rand()%3);
 				  break;
 				}
         case 'a':
@@ -549,123 +566,123 @@ void scheduler_subMenu()
       switch (ch)
       {
         case 's':
-	{
-	    mcb->s->stop();
-	    break;
-	}
+				{
+				    mcb->s->stop();
+				    break;
+				}
 	//clear console screen
         case  'c':
-	{
-	  writeTitle();
-	  break;
-	}
+				{
+				  writeTitle();
+				  break;
+				}
 	//Display help
         case 'h':
-	{
-	  display_help();
-	  break;
-	}
+				{
+				  display_help();
+				  break;
+				}
         case 'a':
-	{
-	  // void ufs_createFile(int tid,char permission, string filename, int size)
-	  char status = 0b0101;
-	  ufs_createFile(rand()%3 ,status,fileName1,fileSize1);
-	  break;
-	}
+				{
+				  // void ufs_createFile(int tid,char permission, string filename, int size)
+				  char status = 0b0101;
+				  ufs_createFile(rand()%3 ,status,fileName1,fileSize1);
+				  break;
+				}
         case 'A':
-	{
-	  //Create multiple files to fill memory
-	  //void ufs_createFile(int tid,char permission, string filename, int size)
-	  char status = 0b1100;
-	  ufs_createFile(0 ,status,fileName2,fileSize2);
-	  ufs_createFile(1 ,status,fileName3,fileSize2);
-	  ufs_createFile(2 ,status,fileName4,fileSize2);
-	  ufs_createFile(0 ,status,fileName5,fileSize2);
-	  break;
-	}
+				{
+				  //Create multiple files to fill memory
+				  //void ufs_createFile(int tid,char permission, string filename, int size)
+				  char status = 0b1100;
+				  ufs_createFile(0 ,status,fileName2,fileSize2);
+				  ufs_createFile(1 ,status,fileName3,fileSize2);
+				  ufs_createFile(2 ,status,fileName4,fileSize2);
+				  ufs_createFile(0 ,status,fileName5,fileSize2);
+				  break;
+				}
         case 'd':
-	{
-	  //Test UFS Dump
-	  wrapperDump(0,menu,0);
-	  break;
-	}
-        case 'D':
-	{
-	  //Test UFS Dir dump
-	  wrapperDump(1,menu,0);
-	  break;
-	}
+				{
+				  //Test UFS Dump
+				  wrapperDump(0,menu,0);
+				  break;
+				}
+			  case 'D':
+				{
+				  //Test UFS Dir dump
+				  wrapperDump(1,menu,0);
+				  break;
+				}
         case '0':
         case '1':
         case '2':
-	{
-	  //Test UFS  Dir dump
-	  wrapperDump(2, menu, (int)(ch - '0'));
-	  break;
-	}
+				{
+				  //Test UFS  Dir dump
+				  wrapperDump(2, menu, (int)(ch - '0'));
+				  break;
+				}
         case 'w':
-	{
-	  //Test UFS Write out of bounds
-	  mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],700);
-	  break;
-	}
+				{
+				  //Test UFS Write out of bounds
+				  mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],700);
+				  break;
+				}
         case 'W':
-	{
-	  //Test UFS Write in bounds
-	  mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],rand() % fileSize1 );
-	  break;
-	}
+				{
+				  //Test UFS Write in bounds
+				  mcb->ufs->writeChar(0,fileOpen1, alphabet[rand()%26],rand() % fileSize1 );
+				  break;
+				}
         case 'o':
-	{
-	  //Test UFS OpenFile for Write
-	  fileOpen1 =mcb->ufs->openFile(0,tempFileHandle,fileName1 , WRITE);
-	  break;
-	}
+				{
+				  //Test UFS OpenFile for Write
+				  fileOpen1 =mcb->ufs->openFile(0,tempFileHandle,fileName1 , WRITE);
+				  break;
+				}
         case 'O':
-	{
-	  //Test UFS OpenFile for Read
-	  fileOpen1 =mcb->ufs->openFile(0, tempFileHandle, fileName1 , READ);
-	  break;
-	}
+				{
+				  //Test UFS OpenFile for Read
+				  fileOpen1 =mcb->ufs->openFile(0, tempFileHandle, fileName1 , READ);
+				  break;
+				}
         case 'v':
-	{
-	  //Test UFS Read out of bounds
-	  mcb->ufs->readChar(0,fileOpen1, c,700);
-	  break;
-	}
+				{
+				  //Test UFS Read out of bounds
+				  mcb->ufs->readChar(0,fileOpen1, c,700);
+				  break;
+				}
         case 'V':
-	{
-	  //Test UFS Read in bounds
-	  mcb->ufs->readChar(0,fileOpen1,c,rand() % fileSize1 );
-	  break;
-	}
+				{
+				  //Test UFS Read in bounds
+				  mcb->ufs->readChar(0,fileOpen1,c,rand() % fileSize1 );
+				  break;
+				}
         case 'g':
-	{
-	  //Test UFS Delete File
-	  mcb->ufs->deleteFile(rand()%3,fileName1);
-	  break;
-	}
+				{
+				  //Test UFS Delete File
+				  mcb->ufs->deleteFile(rand()%3,fileName1);
+				  break;
+				}
         case 'G':
-	{
-	  //Test UFS Multiple file create
-	  mcb->ufs->deleteFile(0,fileName2);
-	  mcb->ufs->deleteFile(1,fileName3);
-	  mcb->ufs->deleteFile(2,fileName4);
-	  mcb->ufs->deleteFile(0,fileName5);
-	  break;
-	}
+				{
+				  //Test UFS Multiple file create
+				  mcb->ufs->deleteFile(0,fileName2);
+				  mcb->ufs->deleteFile(1,fileName3);
+				  mcb->ufs->deleteFile(2,fileName4);
+				  mcb->ufs->deleteFile(0,fileName5);
+				  break;
+				}
         case 'p':
-	{
-	  //Test UFS Read in bounds
-	  mcb->ufs->changePermission(0, fileName1, 0b0100);
-	  break;
-	}
+				{
+				  //Test UFS Read in bounds
+				  mcb->ufs->changePermission(0, fileName1, 0b0100);
+				  break;
+				}
         case 'C':
-	{
-	  //Test UFS Read in bounds
-	  mcb->ufs->closeFile(0, fileOpen1);;
-	  break;
-	}
+				{
+				  //Test UFS Read in bounds
+				  mcb->ufs->closeFile(0, fileOpen1);;
+				  break;
+				}
       }
     }
  }
@@ -804,6 +821,10 @@ void schedule()
 void mem_mgr_write(int offset,char *text, int tid)
 {
   mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue(), offset, strlen(text), text, tid);
+}
+void mem_mgr_read(int offset,unsigned char *text, int tid)
+{
+  mcb->mem_mgr->mem_read(mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue(), offset, sizeof(text), text, tid);
 }
 
 void mem_mgr_alloc(int size, int tid)
