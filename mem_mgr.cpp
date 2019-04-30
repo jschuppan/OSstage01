@@ -215,6 +215,10 @@ Details       : Reads from a given memory space
 ------------------------------------------------------------------*/
 int Mem_Mgr::mem_read(int handle, unsigned char *c, int tid)
 {
+  //List is empty
+  if(segments.getSize() == 0)
+    return -1;
+
   //get mem_seg by handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
@@ -253,9 +257,14 @@ Details       : reads from a given memory space
 ------------------------------------------------------------------*/
 /*********************  needs attention  ***********************/
 int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, unsigned char *text, int tid) {
+
+  //List is empty
+  if(segments.getSize() == 0)
+    return -1;
   //get mem_seg by handle
   mem_seg *ms_ptr = segments.getDatumById(handle);
 
+  text = new unsigned char[text_size +1];
   //mem_seg does not exist
   if (ms_ptr == NULL) {
     writeToThreadWindow(tid, "  mem_read() : Item segment doesn't exist\n");
@@ -268,22 +277,28 @@ int Mem_Mgr::mem_read(int handle, unsigned int offset, unsigned int text_size, u
     return -1;  //error: access denied
   }
 
+  // writeToThreadWindow(tid, "  Trying to READ\n");
+
   //else read from memory
   // set read cursor
-  ms_ptr->read_cursor = ms_ptr->start;
+  ms_ptr->read_cursor = ms_ptr->start + offset;
 
   // return all characters of what is in the memory space
   int i = 0;
-  while (ms_ptr->read_cursor < ms_ptr->end)
+  while (i<text_size)
   {
     text[i] = memory[ms_ptr->read_cursor];
     ms_ptr->read_cursor++;
     i++;
   }
   // null terminate
-  text[ms_ptr->end] = '\0';
+  text[text_size] = '\0';
   // reset cursor
   ms_ptr->read_cursor = ms_ptr->start;
+
+  char buff[255];
+  sprintf(buff, "   %s\n", text);
+  writeToThreadWindow(tid,buff);
 
 
   return 1;  //success

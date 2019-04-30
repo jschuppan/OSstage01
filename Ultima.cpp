@@ -516,17 +516,17 @@ void scheduler_subMenu()
 				{
 					unsigned char* c;
 					int id = rand()%3;
-				  // mem_mgr_write(int offset,char *text, int tid)
+				  // mem_mgr_read(int offset,char *text, int tid)
 				  mem_mgr_read(1,c,id);
-					sprintf(buff,"  %s\n",c);
-					mcb->s->getThreadInfo().getDatumById(id)->getThreadWin()->write_window(buff);
+					// sprintf(buff,"  %s\n",c);
+					// mcb->s->getThreadInfo().getDatumById(id)->getThreadWin()->write_window(buff);
 				  break;
 				}
 				case 'V':
 				{
 					unsigned char* c;
-					// mem_mgr_write(int offset,char *text, int tid)
-				  mem_mgr_read(300,c,rand()%3);
+					// mem_mgr_read(int offset,char *text, int tid)
+				  mem_mgr_read(20,c,rand()%3);
 				  break;
 				}
         case 'a':
@@ -820,11 +820,22 @@ void schedule()
 
 void mem_mgr_write(int offset,char *text, int tid)
 {
-  mcb->mem_mgr->mem_write(mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue(), offset, strlen(text), text, tid);
+	int handle = mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue();
+//WRITE AND PUSH HANDLE BACK ON QUEUE
+  mcb->mem_mgr->mem_write(handle, offset, strlen(text), text, tid);
+	mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.enQueue(handle);
+
 }
 void mem_mgr_read(int offset,unsigned char *text, int tid)
 {
-  mcb->mem_mgr->mem_read(mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue(), offset, sizeof(text), text, tid);
+	int handle = mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.deQueue();
+	//READ AND PUSH HANDLE BACK ON QUEUE
+  mcb->mem_mgr->mem_read(handle, offset, 18, text, tid);
+	mcb->s->getThreadInfo().getDatumById(tid)->mem_Handle.enQueue(handle);
+	// char buff[255];
+	// sprintf(buff,"  %s",text);
+	// mcb->userInf->getWindowByID(CONSOLE_WINDOW)->write_window(buff);
+
 }
 
 void mem_mgr_alloc(int size, int tid)
